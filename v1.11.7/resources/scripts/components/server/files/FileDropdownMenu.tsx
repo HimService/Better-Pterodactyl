@@ -41,10 +41,11 @@ const StyledRow = styled.div<{ $danger?: boolean }>`
         props.$danger ? tw`hover:bg-red-100 hover:text-red-700` : tw`hover:bg-neutral-100 hover:text-neutral-700`};
 `;
 
-interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
+interface RowProps {
     icon: IconDefinition;
     title: string;
     $danger?: boolean;
+    onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 const Row = ({ icon, title, ...props }: RowProps) => (
