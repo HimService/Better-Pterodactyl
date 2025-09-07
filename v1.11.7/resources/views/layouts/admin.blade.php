@@ -239,7 +239,7 @@
                 --color-sidebar-active-text-dark: #7f5af0;
                 --color-header-bg-dark: #171923;
                 --color-card-bg-dark: #1a202c;
-                --color-card-border-dark: #2d3748;
+                --color-card-border-dark: #4a5568;
                 --color-shadow-dark: rgba(0, 0, 0, 0.2);
             }
 

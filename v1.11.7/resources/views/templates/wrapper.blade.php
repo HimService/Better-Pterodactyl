@@ -34,13 +34,86 @@
         <style>
             @import url('//fonts.googleapis.com/css?family=Rubik:300,400,500&display=swap');
             @import url('//fonts.googleapis.com/css?family=IBM+Plex+Mono|IBM+Plex+Sans:500&display=swap');
+            
+            /* --- THEME VARIABLES --- */
+            :root {
+                --color-background-light: #f8f9fa;
+                --color-text-light: #495057;
+                --color-heading-light: #212529;
+                --color-primary-light: #5e72e4;
+                --color-primary-hover-light: #4a5cc0;
+                --color-sidebar-bg-light: #ffffff;
+                --color-sidebar-text-light: #525f7f;
+                --color-sidebar-active-bg-light: #f6f9fc;
+                --color-sidebar-active-text-light: #5e72e4;
+                --color-header-bg-light: #f8f9fa;
+                --color-card-bg-light: #ffffff;
+                --color-card-border-light: #e9ecef;
+                --color-shadow-light: rgba(0, 0, 0, 0.05);
+
+                --color-background-dark: #171923;
+                --color-text-dark: #a0aec0;
+                --color-heading-dark: #e2e8f0;
+                --color-primary-dark: #7f5af0;
+                --color-primary-hover-dark: #6a48d0;
+                --color-sidebar-bg-dark: #1a202c;
+                --color-sidebar-text-dark: #a0aec0;
+                --color-sidebar-active-bg-dark: #2d3748;
+                --color-sidebar-active-text-dark: #7f5af0;
+                --color-header-bg-dark: #171923;
+                --color-card-bg-dark: #1a202c;
+                --color-card-border-dark: #4a5568;
+                --color-shadow-dark: rgba(0, 0, 0, 0.2);
+            }
+
+            /* --- THEME ASSIGNMENT --- */
+            body[data-theme="light"] {
+                --color-background: var(--color-background-light);
+                --color-text: var(--color-text-light);
+                --color-heading: var(--color-heading-light);
+                --color-primary: var(--color-primary-light);
+                --color-primary-hover: var(--color-primary-hover-light);
+                --color-sidebar-bg: var(--color-sidebar-bg-light);
+                --color-sidebar-text: var(--color-sidebar-text-light);
+                --color-sidebar-active-bg: var(--color-sidebar-active-bg-light);
+                --color-sidebar-active-text: var(--color-sidebar-active-text-light);
+                --color-header-bg: var(--color-header-bg-light);
+                --color-card-bg: var(--color-card-bg-light);
+                --color-card-border: var(--color-card-border-light);
+                --color-shadow: var(--color-shadow-light);
+                --color-navigation-bg: var(--color-header-bg-light);
+            }
+
+            body[data-theme="dark"] {
+                --color-background: var(--color-background-dark);
+                --color-text: var(--color-text-dark);
+                --color-heading: var(--color-heading-dark);
+                --color-primary: var(--color-primary-dark);
+                --color-primary-hover: var(--color-primary-hover-dark);
+                --color-sidebar-bg: var(--color-sidebar-bg-dark);
+                --color-sidebar-text: var(--color-sidebar-text-dark);
+                --color-sidebar-active-bg: var(--color-sidebar-active-bg-dark);
+                --color-sidebar-active-text: var(--color-sidebar-active-text-dark);
+                --color-header-bg: var(--color-header-bg-dark);
+                --color-card-bg: var(--color-card-bg-dark);
+                --color-card-border: var(--color-card-border-dark);
+                --color-shadow: var(--color-shadow-dark);
+                --color-navigation-bg: var(--color-header-bg-dark);
+            }
+            
+            body {
+                background-color: var(--color-background);
+                color: var(--color-text);
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            }
         </style>
 
         @yield('assets')
 
         @include('layouts.scripts')
     </head>
-    <body class="{{ $css['body'] ?? 'bg-neutral-50' }}">
+    <body data-theme="light">
         @section('content')
             @yield('above-container')
             @yield('container')
