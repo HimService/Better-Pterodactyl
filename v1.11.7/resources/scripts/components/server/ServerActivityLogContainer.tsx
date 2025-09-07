@@ -50,13 +50,13 @@ export default () => {
             ) : !data?.items.length ? (
                 <p className={'text-sm text-center text-gray-400'}>此伺服器沒有可用的活動日誌。</p>
             ) : (
-                <div className={'bg-neutral-100 dark:bg-neutral-800 rounded-b'}>
+                <>
                     {data?.items.map((activity) => (
                         <ActivityLogEntry key={activity.id} activity={activity}>
                             <span />
                         </ActivityLogEntry>
                     ))}
-                </div>
+                </>
             )}
             {data && (
                 <PaginationFooter
