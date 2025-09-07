@@ -53,77 +53,75 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
     const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : '無限制';
 
     return (
-        <GreyRowBox as={Link} to={`/server/${server.id}`} className={className} css={tw`flex-wrap`}>
-            <div css={tw`flex items-center w-full sm:w-auto sm:flex-1`}>
+        <GreyRowBox as={Link} to={`/server/${server.id}`} className={className}>
+            <div css={tw`flex items-center`}>
                 <div css={tw`mr-4`}>
                     <FontAwesomeIcon icon={faServer} />
                 </div>
-                <div>
+                <div css={tw`flex-1`}>
                     <p css={tw`text-lg break-words`}>{server.name}</p>
                     {!!server.description && (
                         <p css={tw`text-sm text-neutral-300 break-words line-clamp-2`}>{server.description}</p>
                     )}
                 </div>
             </div>
-            <div css={tw`w-full sm:w-auto sm:flex-none sm:mt-0 mt-4`}>
-                <div css={tw`flex justify-end items-center`}>
-                    {!stats || isSuspended ? (
-                        isSuspended ? (
-                            <div css={tw`flex-1 text-right`}>
-                                <span css={tw`bg-red-500 rounded px-2 py-1 text-red-100 text-xs`}>
-                                    {server.status === 'suspended' ? '已暫停' : '連線錯誤'}
-                                </span>
-                            </div>
-                        ) : server.isTransferring || server.status ? (
-                            <div css={tw`flex-1 text-right`}>
-                                <span css={tw`bg-neutral-500 rounded px-2 py-1 text-neutral-100 text-xs`}>
-                                    {server.isTransferring
-                                        ? '轉移中'
-                                        : server.status === 'installing'
-                                        ? '安裝中'
-                                        : server.status === 'restoring_backup'
-                                        ? '還原備份中'
-                                        : '不可用'}
-                                </span>
-                            </div>
-                        ) : (
-                            <Spinner size={'small'} />
-                        )
+            <div css={tw`flex-none self-center ml-4`}>
+                <StatusIndicator status={stats?.status} />
+            </div>
+            <div css={tw`ml-auto flex items-center`}>
+                {!stats || isSuspended ? (
+                    isSuspended ? (
+                        <div css={tw`text-right`}>
+                            <span css={tw`bg-red-500 rounded px-2 py-1 text-red-100 text-xs`}>
+                                {server.status === 'suspended' ? '已暫停' : '連線錯誤'}
+                            </span>
+                        </div>
+                    ) : server.isTransferring || server.status ? (
+                        <div css={tw`text-right`}>
+                            <span css={tw`bg-neutral-500 rounded px-2 py-1 text-neutral-100 text-xs`}>
+                                {server.isTransferring
+                                    ? '轉移中'
+                                    : server.status === 'installing'
+                                    ? '安裝中'
+                                    : server.status === 'restoring_backup'
+                                    ? '還原備份中'
+                                    : '不可用'}
+                            </span>
+                        </div>
                     ) : (
-                        <>
-                            <div css={tw`flex-1 text-center`}>
-                                <div css={tw`flex items-center justify-center`}>
-                                    <FontAwesomeIcon icon={faMicrochip} css={alarms.cpu ? tw`text-red-400` : tw`text-neutral-500`} />
-                                    <p css={[tw`text-sm ml-2`, alarms.cpu ? tw`text-white` : tw`text-neutral-400`]}>
-                                        {stats.cpuUsagePercent.toFixed(2)} %
-                                    </p>
-                                </div>
-                                <p css={tw`text-xs text-neutral-600 mt-1`}>/ {cpuLimit}</p>
+                        <Spinner size={'small'} />
+                    )
+                ) : (
+                    <>
+                        <div css={tw`text-center`}>
+                            <div css={tw`flex items-center justify-center`}>
+                                <FontAwesomeIcon icon={faMicrochip} css={alarms.cpu ? tw`text-red-400` : tw`text-neutral-500`} />
+                                <p css={[tw`text-sm ml-2`, alarms.cpu ? tw`text-white` : tw`text-neutral-400`]}>
+                                    {stats.cpuUsagePercent.toFixed(2)} %
+                                </p>
                             </div>
-                            <div css={tw`flex-1 text-center mx-4`}>
-                                <div css={tw`flex items-center justify-center`}>
-                                    <FontAwesomeIcon icon={faMemory} css={alarms.memory ? tw`text-red-400` : tw`text-neutral-500`} />
-                                    <p css={[tw`text-sm ml-2`, alarms.memory ? tw`text-white` : tw`text-neutral-400`]}>
-                                        {bytesToString(stats.memoryUsageInBytes)}
-                                    </p>
-                                </div>
-                                <p css={tw`text-xs text-neutral-600 mt-1`}>/ {memoryLimit}</p>
+                            <p css={tw`text-xs text-neutral-600 mt-1`}>/ {cpuLimit}</p>
+                        </div>
+                        <div css={tw`text-center mx-4`}>
+                            <div css={tw`flex items-center justify-center`}>
+                                <FontAwesomeIcon icon={faMemory} css={alarms.memory ? tw`text-red-400` : tw`text-neutral-500`} />
+                                <p css={[tw`text-sm ml-2`, alarms.memory ? tw`text-white` : tw`text-neutral-400`]}>
+                                    {bytesToString(stats.memoryUsageInBytes)}
+                                </p>
                             </div>
-                            <div css={tw`flex-1 text-center`}>
-                                <div css={tw`flex items-center justify-center`}>
-                                    <FontAwesomeIcon icon={faHdd} css={alarms.disk ? tw`text-red-400` : tw`text-neutral-500`} />
-                                    <p css={[tw`text-sm ml-2`, alarms.disk ? tw`text-white` : tw`text-neutral-400`]}>
-                                        {bytesToString(stats.diskUsageInBytes)}
-                                    </p>
-                                </div>
-                                <p css={tw`text-xs text-neutral-600 mt-1`}>/ {diskLimit}</p>
+                            <p css={tw`text-xs text-neutral-600 mt-1`}>/ {memoryLimit}</p>
+                        </div>
+                        <div css={tw`text-center`}>
+                            <div css={tw`flex items-center justify-center`}>
+                                <FontAwesomeIcon icon={faHdd} css={alarms.disk ? tw`text-red-400` : tw`text-neutral-500`} />
+                                <p css={[tw`text-sm ml-2`, alarms.disk ? tw`text-white` : tw`text-neutral-400`]}>
+                                    {bytesToString(stats.diskUsageInBytes)}
+                                </p>
                             </div>
-                        </>
-                    )}
-                    <div css={tw`ml-6`}>
-                        <StatusIndicator status={stats?.status} />
-                    </div>
-                </div>
+                            <p css={tw`text-xs text-neutral-600 mt-1`}>/ {diskLimit}</p>
+                        </div>
+                    </>
+                )}
             </div>
         </GreyRowBox>
     );
