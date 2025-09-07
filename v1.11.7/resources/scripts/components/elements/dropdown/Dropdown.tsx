@@ -33,7 +33,7 @@ const Dropdown = forwardRef<typeof Menu, Props>(({ as, children }, ref) => {
     }
 
     return (
-        <Menu as={as || 'div'} className={styles.menu} ref={ref}>
+        <Menu as={(as || 'div') as any} className={styles.menu} ref={ref}>
             {Button}
             <Transition
                 enter={'transition duration-100 ease-out'}

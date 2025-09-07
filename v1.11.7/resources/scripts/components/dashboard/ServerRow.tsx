@@ -86,7 +86,7 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
     const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : '無限制';
 
     return (
-        <GreyRowBox as={Link} to={`/server/${server.id}`} className={className} css={tw`flex justify-between items-center`}>
+        <GreyRowBox as={Link as any} to={`/server/${server.id}`} className={className} css={tw`flex justify-between items-center`}>
             {/* Left side */}
             <div css={tw`flex items-center`}>
                 <div css={tw`mr-4`}>

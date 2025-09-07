@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --color-modal-bg: white;
+    --color-modal-text: #2d3748;
+}
+
+[data-theme="dark"] {
+    --color-modal-bg: #2f363f;
+    --color-modal-text: #f2f2f2;
+}

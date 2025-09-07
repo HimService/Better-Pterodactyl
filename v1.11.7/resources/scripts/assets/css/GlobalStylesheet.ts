@@ -3,8 +3,17 @@ import { createGlobalStyle } from 'styled-components/macro';
 
 export default createGlobalStyle`
     body {
-        ${tw`font-sans bg-neutral-800 text-neutral-200`};
+        ${tw`font-sans bg-gray-200 text-gray-800`};
         letter-spacing: 0.015em;
+
+        --color-modal-bg: white;
+        --color-modal-text: #2d3748;
+    }
+
+    body[data-theme="dark"] {
+        ${tw`bg-neutral-900 text-neutral-200`};
+        --color-modal-bg: #2f363f;
+        --color-modal-text: #f2f2f2;
     }
 
     h1, h2, h3, h4, h5, h6 {

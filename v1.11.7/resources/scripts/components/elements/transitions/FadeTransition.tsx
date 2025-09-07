@@ -18,7 +18,7 @@ export default ({ children, duration, ...props }: Props) => {
         : [duration, duration];
 
     return (
-        <Transition
+        <Transition as={React.Fragment as any}
             {...props}
             enter={`ease-out ${enterDuration}`}
             enterFrom={'opacity-0'}

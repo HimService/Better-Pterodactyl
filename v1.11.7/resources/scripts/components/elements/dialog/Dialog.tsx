@@ -64,7 +64,7 @@ export default ({
                 <DialogContext.Provider value={{ setIcon, setFooter, setIconPosition }}>
                     <HDialog
                         static
-                        as={motion.div}
+                        as={motion.div as any}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -81,7 +81,7 @@ export default ({
                                 onMouseUp={onContainerClick.bind(this, false)}
                             >
                                 <HDialog.Panel
-                                    as={motion.div}
+                                    as={motion.div as any}
                                     initial={'closed'}
                                     animate={down ? 'bounce' : 'open'}
                                     exit={'closed'}
