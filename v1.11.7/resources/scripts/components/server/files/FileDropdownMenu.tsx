@@ -172,6 +172,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                         onClick={(e) => {
                             e.stopPropagation();
                             setModal('rename');
+                            onClickRef.current?.triggerMenu(0);
                         }}
                         icon={faPencilAlt}
                         title={'重新命名'}
@@ -180,6 +181,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                         onClick={(e) => {
                             e.stopPropagation();
                             setModal('move');
+                            onClickRef.current?.triggerMenu(0);
                         }}
                         icon={faLevelUpAlt}
                         title={'移動'}
@@ -188,6 +190,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                         onClick={(e) => {
                             e.stopPropagation();
                             setModal('chmod');
+                            onClickRef.current?.triggerMenu(0);
                         }}
                         icon={faFileCode}
                         title={'權限'}
@@ -199,6 +202,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 doCopy();
+                                onClickRef.current?.triggerMenu(0);
                             }}
                             icon={faCopy}
                             title={'複製'}
@@ -211,6 +215,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 doUnarchive();
+                                onClickRef.current?.triggerMenu(0);
                             }}
                             icon={faBoxOpen}
                             title={'解壓縮'}
@@ -222,6 +227,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 doArchive();
+                                onClickRef.current?.triggerMenu(0);
                             }}
                             icon={faFileArchive}
                             title={'壓縮'}
@@ -233,6 +239,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                         onClick={(e) => {
                             e.stopPropagation();
                             doDownload();
+                            onClickRef.current?.triggerMenu(0);
                         }}
                         icon={faFileDownload}
                         title={'下載'}
@@ -243,6 +250,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                         onClick={(e) => {
                             e.stopPropagation();
                             setShowConfirmation(true);
+                            onClickRef.current?.triggerMenu(0);
                         }}
                         icon={faTrashAlt}
                         title={'刪除'}
