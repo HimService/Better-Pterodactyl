@@ -128,7 +128,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
     };
 
     return (
-        <>
+        <div onClick={(e) => e.stopPropagation()}>
             <Dialog.Confirm
                 open={showConfirmation}
                 onClose={() => setShowConfirmation(false)}
@@ -190,7 +190,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                     <Row onClick={() => setShowConfirmation(true)} icon={faTrashAlt} title={'刪除'} $danger />
                 </Can>
             </DropdownMenu>
-        </>
+        </div>
     );
 };
 
