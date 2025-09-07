@@ -10,6 +10,6 @@
     @apply mt-1 text-sm break-words line-clamp-2 pr-4;
 
     & strong {
-        @apply text-gray-50 font-semibold break-all;
+        @apply font-mono bg-neutral-200 dark:bg-neutral-900 rounded py-0.5 px-1;
     }
 }

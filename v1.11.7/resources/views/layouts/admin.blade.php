@@ -538,6 +538,72 @@
             body[data-theme="dark"] .close:hover {
                 opacity: 1;
             }
+
+            /* --- MODAL COMPONENT FIXES --- */
+            body[data-theme="dark"] .select2-container--default .select2-selection--single {
+                background-color: var(--color-background) !important;
+                border: 1px solid var(--color-card-border) !important;
+            }
+            body[data-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+                color: var(--color-text) !important;
+            }
+            body[data-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__arrow b {
+                border-color: var(--color-text) transparent transparent transparent !important;
+            }
+            body[data-theme="dark"] .select2-dropdown {
+                background-color: var(--color-card-bg) !important;
+                border: 1px solid var(--color-card-border) !important;
+            }
+            body[data-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field {
+                background-color: var(--color-background) !important;
+                border: 1px solid var(--color-card-border) !important;
+                color: var(--color-text) !important;
+            }
+            body[data-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
+                background-color: var(--color-primary) !important;
+                color: #fff !important;
+            }
+             body[data-theme="dark"] .select2-results__option {
+                color: var(--color-text);
+            }
+            body[data-theme="dark"] .btn-default {
+                background-color: #2d3748 !important;
+                color: var(--color-heading) !important;
+                border: 1px solid var(--color-card-border) !important;
+            }
+            body[data-theme="dark"] .btn-default:hover {
+                background-color: #4a5568 !important;
+            }
+            body[data-theme="dark"] .text-danger {
+                color: #e53e3e !important;
+            }
+
+            /* --- ADMIN PAGE COMPONENT FIXES --- */
+            body[data-theme="dark"] .label-default {
+                background-color: #2d3748 !important;
+                color: #e2e8f0 !important;
+            }
+            body[data-theme="dark"] code {
+                background-color: #2d3748 !important;
+                color: #e2e8f0 !important;
+            }
+            body[data-theme="dark"] .small-box {
+                background: var(--color-sidebar-active-bg) !important;
+            }
+            body[data-theme="dark"] .small-box .inner h3,
+            body[data-theme="dark"] .small-box .inner p {
+                color: var(--color-heading) !important;
+            }
+            body[data-theme="dark"] .small-box .icon {
+                color: rgba(255, 255, 255, 0.15) !important;
+            }
+            body[data-theme="dark"] .small-box > .small-box-footer {
+                background: rgba(0, 0, 0, 0.2) !important;
+                color: var(--color-text) !important;
+            }
+            body[data-theme="dark"] .small-box > .small-box-footer:hover {
+                background: rgba(0, 0, 0, 0.3) !important;
+            }
         </style>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
