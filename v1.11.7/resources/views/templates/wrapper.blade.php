@@ -50,6 +50,13 @@
                 --color-card-bg-light: #ffffff;
                 --color-card-border-light: #e9ecef;
                 --color-shadow-light: rgba(0, 0, 0, 0.05);
+                --color-text-muted-light: #6c757d;
+                --color-danger-bg-light: #f8d7da;
+                --color-danger-text-light: #721c24;
+                --color-danger-light: #dc3545;
+                --color-neutral-bg-light: #e9ecef;
+                --color-neutral-text-light: #495057;
+                --color-icon-light: #6c757d;
 
                 --color-background-dark: #171923;
                 --color-text-dark: #a0aec0;
@@ -64,6 +71,13 @@
                 --color-card-bg-dark: #1a202c;
                 --color-card-border-dark: #4a5568;
                 --color-shadow-dark: rgba(0, 0, 0, 0.2);
+                --color-text-muted-dark: #718096;
+                --color-danger-bg-dark: #4a2a2a;
+                --color-danger-text-dark: #feb2b2;
+                --color-danger-dark: #f56565;
+                --color-neutral-bg-dark: #2d3748;
+                --color-neutral-text-dark: #e2e8f0;
+                --color-icon-dark: #a0aec0;
             }
 
             /* --- THEME ASSIGNMENT --- */
@@ -82,6 +96,13 @@
                 --color-card-border: var(--color-card-border-light);
                 --color-shadow: var(--color-shadow-light);
                 --color-navigation-bg: var(--color-header-bg-light);
+                --color-text-muted: var(--color-text-muted-light);
+                --color-danger-bg: var(--color-danger-bg-light);
+                --color-danger-text: var(--color-danger-text-light);
+                --color-danger: var(--color-danger-light);
+                --color-neutral-bg: var(--color-neutral-bg-light);
+                --color-neutral-text: var(--color-neutral-text-light);
+                --color-icon: var(--color-icon-light);
             }
 
             body[data-theme="dark"] {
@@ -99,6 +120,13 @@
                 --color-card-border: var(--color-card-border-dark);
                 --color-shadow: var(--color-shadow-dark);
                 --color-navigation-bg: var(--color-header-bg-dark);
+                --color-text-muted: var(--color-text-muted-dark);
+                --color-danger-bg: var(--color-danger-bg-dark);
+                --color-danger-text: var(--color-danger-text-dark);
+                --color-danger: var(--color-danger-dark);
+                --color-neutral-bg: var(--color-neutral-bg-dark);
+                --color-neutral-text: var(--color-neutral-text-dark);
+                --color-icon: var(--color-icon-dark);
             }
             
             body {

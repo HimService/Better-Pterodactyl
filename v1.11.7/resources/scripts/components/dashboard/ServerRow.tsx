@@ -5,11 +5,44 @@ import { Link } from 'react-router-dom';
 import { Server } from '@/api/server/getServer';
 import getServerResourceUsage, { ServerPowerState, ServerStats } from '@/api/server/getServerResourceUsage';
 import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
-import tw from 'twin.macro';
+import tw, { styled } from 'twin.macro';
 import GreyRowBox from '@/components/elements/GreyRowBox';
 import Spinner from '@/components/elements/Spinner';
 import StatusIndicator from '@/components/elements/StatusIndicator';
 import isEqual from 'react-fast-compare';
+
+const Description = styled.p`
+    ${tw`text-sm break-words line-clamp-2`}
+    color: var(--color-text-muted);
+`;
+
+const StatusSpan = styled.span`
+    ${tw`rounded px-2 py-1 text-xs`}
+`;
+
+const SuspendedSpan = styled(StatusSpan)`
+    background-color: var(--color-danger-bg, #ef4444);
+    color: var(--color-danger-text, #fef2f2);
+`;
+
+const NeutralSpan = styled(StatusSpan)`
+    background-color: var(--color-neutral-bg, #737373);
+    color: var(--color-neutral-text, #f5f5f5);
+`;
+
+const ResourceText = styled.p<{ $alarm: boolean }>`
+    ${tw`text-sm ml-2`}
+    color: ${(props) => (props.$alarm ? 'var(--color-text)' : 'var(--color-text-muted)')};
+`;
+
+const LimitText = styled.p`
+    ${tw`text-xs mt-1`}
+    color: var(--color-text-muted);
+`;
+
+const Icon = styled(FontAwesomeIcon)<{ $alarm: boolean }>`
+    color: ${(props) => (props.$alarm ? 'var(--color-danger)' : 'var(--color-icon)')};
+`;
 
 const isAlarmState = (current: number, limit: number): boolean => limit > 0 && current / (limit * 1024 * 1024) >= 0.9;
 
@@ -61,9 +94,7 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                 </div>
                 <div>
                     <p css={tw`text-lg break-words`}>{server.name}</p>
-                    {!!server.description && (
-                        <p css={tw`text-sm text-neutral-300 break-words line-clamp-2`}>{server.description}</p>
-                    )}
+                    {!!server.description && <Description>{server.description}</Description>}
                 </div>
             </div>
 
@@ -72,11 +103,11 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                 {!stats || isSuspended ? (
                     <div css={tw`flex items-center`}>
                         {isSuspended ? (
-                            <span css={tw`bg-red-500 rounded px-2 py-1 text-red-100 text-xs`}>
+                            <SuspendedSpan>
                                 {server.status === 'suspended' ? '已暫停' : '連線錯誤'}
-                            </span>
+                            </SuspendedSpan>
                         ) : server.isTransferring || server.status ? (
-                            <span css={tw`bg-neutral-500 rounded px-2 py-1 text-neutral-100 text-xs`}>
+                            <NeutralSpan>
                                 {server.isTransferring
                                     ? '轉移中'
                                     : server.status === 'installing'
@@ -84,7 +115,7 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                                     : server.status === 'restoring_backup'
                                     ? '還原備份中'
                                     : '不可用'}
-                            </span>
+                            </NeutralSpan>
                         ) : (
                             <Spinner size={'small'} />
                         )}
@@ -95,32 +126,28 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                 ) : (
                     <div css={tw`flex items-center`}>
                         <div css={tw`text-center`}>
-                            <div css={tw`flex items-center justify-center`}>
-                                <FontAwesomeIcon icon={faMicrochip} css={alarms.cpu ? tw`text-red-400` : tw`text-neutral-500`} />
-                                <p css={[tw`text-sm ml-2`, alarms.cpu ? tw`text-white` : tw`text-neutral-400`]}>
-                                    {stats.cpuUsagePercent.toFixed(2)} %
-                                </p>
+                                <div css={tw`flex items-center justify-center`}>
+                                    <Icon icon={faMicrochip} $alarm={alarms.cpu} />
+                                    <ResourceText $alarm={alarms.cpu}>{stats.cpuUsagePercent.toFixed(2)} %</ResourceText>
+                                </div>
+                                <LimitText>/ {cpuLimit}</LimitText>
                             </div>
-                            <p css={tw`text-xs text-neutral-600 mt-1`}>/ {cpuLimit}</p>
-                        </div>
-                        <div css={tw`text-center mx-4`}>
-                            <div css={tw`flex items-center justify-center`}>
-                                <FontAwesomeIcon icon={faMemory} css={alarms.memory ? tw`text-red-400` : tw`text-neutral-500`} />
-                                <p css={[tw`text-sm ml-2`, alarms.memory ? tw`text-white` : tw`text-neutral-400`]}>
-                                    {bytesToString(stats.memoryUsageInBytes)}
-                                </p>
+                            <div css={tw`text-center mx-4`}>
+                                <div css={tw`flex items-center justify-center`}>
+                                    <Icon icon={faMemory} $alarm={alarms.memory} />
+                                    <ResourceText $alarm={alarms.memory}>
+                                        {bytesToString(stats.memoryUsageInBytes)}
+                                    </ResourceText>
+                                </div>
+                                <LimitText>/ {memoryLimit}</LimitText>
                             </div>
-                            <p css={tw`text-xs text-neutral-600 mt-1`}>/ {memoryLimit}</p>
-                        </div>
-                        <div css={tw`text-center`}>
-                            <div css={tw`flex items-center justify-center`}>
-                                <FontAwesomeIcon icon={faHdd} css={alarms.disk ? tw`text-red-400` : tw`text-neutral-500`} />
-                                <p css={[tw`text-sm ml-2`, alarms.disk ? tw`text-white` : tw`text-neutral-400`]}>
-                                    {bytesToString(stats.diskUsageInBytes)}
-                                </p>
+                            <div css={tw`text-center`}>
+                                <div css={tw`flex items-center justify-center`}>
+                                    <Icon icon={faHdd} $alarm={alarms.disk} />
+                                    <ResourceText $alarm={alarms.disk}>{bytesToString(stats.diskUsageInBytes)}</ResourceText>
+                                </div>
+                                <LimitText>/ {diskLimit}</LimitText>
                             </div>
-                            <p css={tw`text-xs text-neutral-600 mt-1`}>/ {diskLimit}</p>
-                        </div>
                         <div css={tw`ml-4`}>
                             <StatusIndicator status={stats?.status} />
                         </div>
