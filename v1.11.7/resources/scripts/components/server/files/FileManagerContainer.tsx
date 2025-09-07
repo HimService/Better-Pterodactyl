@@ -21,6 +21,8 @@ import { useStoreActions } from '@/state/hooks';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import { FileActionCheckbox } from '@/components/server/files/SelectFileCheckbox';
 import { hashToPath } from '@/helpers';
+import style from './style.module.css';
+
 const sortFiles = (files: FileObject[]): FileObject[] => {
     const sortedFiles: FileObject[] = files
         .sort((a, b) => a.name.localeCompare(b.name))
@@ -72,7 +74,7 @@ export default () => {
                         }
                     />
                     <Can action={'file.create'}>
-                        <div css={tw`flex items-center space-x-2`}>
+                        <div className={style.manager_actions}>
                             <FileManagerStatus />
                             <NewDirectoryButton />
                             <UploadButton />

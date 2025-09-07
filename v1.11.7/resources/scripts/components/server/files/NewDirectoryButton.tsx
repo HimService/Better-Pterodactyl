@@ -102,9 +102,9 @@ export default ({ className }: WithClassname) => {
     return (
         <>
             <NewDirectoryDialog open={open} onClose={setOpen.bind(this, false)} />
-            <Button onClick={setOpen.bind(this, true)} className={className}>
+            <Button.Text onClick={setOpen.bind(this, true)} className={className}>
                 建立目錄
-            </Button>
+            </Button.Text>
         </>
     );
 };

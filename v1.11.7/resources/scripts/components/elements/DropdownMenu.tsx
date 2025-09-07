@@ -6,6 +6,7 @@ import Fade from '@/components/elements/Fade';
 interface Props {
     children: React.ReactNode;
     renderToggle: (onClick: (e: React.MouseEvent<any, MouseEvent>) => void) => React.ReactChild;
+    onVisibilityChange?: (visible: boolean) => void;
 }
 
 export const DropdownButtonRow = styled.button<{ danger?: boolean }>`
@@ -34,7 +35,7 @@ class DropdownMenu extends React.PureComponent<Props, State> {
         this.removeListeners();
     }
 
-    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
+    componentDidUpdate = (prevProps: Readonly<Props>, prevState: Readonly<State>) => {
         const menu = this.menu.current;
 
         if (this.state.visible && !prevState.visible && menu) {
@@ -45,6 +46,10 @@ class DropdownMenu extends React.PureComponent<Props, State> {
 
         if (!this.state.visible && prevState.visible) {
             this.removeListeners();
+        }
+
+        if (this.props.onVisibilityChange && this.state.visible !== prevState.visible) {
+            this.props.onVisibilityChange(this.state.visible);
         }
     }
 
@@ -91,7 +96,6 @@ class DropdownMenu extends React.PureComponent<Props, State> {
                         ref={this.menu}
                         onClick={(e) => {
                             e.stopPropagation();
-                            this.setState({ visible: false });
                         }}
                         style={{ width: '12rem' }}
                         css={tw`absolute bg-white p-2 rounded border border-neutral-700 shadow-lg text-neutral-500 z-50`}
