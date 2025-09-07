@@ -2,13 +2,13 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEthernet, faHdd, faMemory, faMicrochip, faServer } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
-import { Server } from '../../../api/server/getServer';
-import getServerResourceUsage, { ServerPowerState, ServerStats } from '../../../api/server/getServerResourceUsage';
-import { bytesToString, ip, mbToBytes } from '../../../lib/formatters';
+import { Server } from '@/api/server/getServer';
+import getServerResourceUsage, { ServerPowerState, ServerStats } from '@/api/server/getServerResourceUsage';
+import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import tw from 'twin.macro';
-import GreyRowBox from '../../elements/GreyRowBox';
-import Spinner from '../../elements/Spinner';
-import StatusIndicator from '../../elements/StatusIndicator';
+import GreyRowBox from '@/components/elements/GreyRowBox';
+import Spinner from '@/components/elements/Spinner';
+import StatusIndicator from '@/components/elements/StatusIndicator';
 import isEqual from 'react-fast-compare';
 
 const isAlarmState = (current: number, limit: number): boolean => limit > 0 && current / (limit * 1024 * 1024) >= 0.9;
@@ -22,8 +22,8 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
 
     const getStats = () =>
         getServerResourceUsage(server.uuid)
-            .then((data) => setStats(data))
-            .catch((error) => console.error(error));
+            .then((data: ServerStats) => setStats(data))
+            .catch((error: any) => console.error(error));
 
     useEffect(() => {
         setIsSuspended(stats?.isSuspended || server.status === 'suspended');
@@ -53,31 +53,29 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
     const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : '無限制';
 
     return (
-        <GreyRowBox as={Link} to={`/server/${server.id}`} className={className}>
+        <GreyRowBox as={Link} to={`/server/${server.id}`} className={className} css={tw`flex justify-between items-center`}>
+            {/* Left side */}
             <div css={tw`flex items-center`}>
                 <div css={tw`mr-4`}>
                     <FontAwesomeIcon icon={faServer} />
                 </div>
-                <div css={tw`flex-1`}>
+                <div>
                     <p css={tw`text-lg break-words`}>{server.name}</p>
                     {!!server.description && (
                         <p css={tw`text-sm text-neutral-300 break-words line-clamp-2`}>{server.description}</p>
                     )}
                 </div>
             </div>
-            <div css={tw`flex-none self-center ml-4`}>
-                <StatusIndicator status={stats?.status} />
-            </div>
-            <div css={tw`ml-auto flex items-center`}>
+
+            {/* Right side */}
+            <div css={tw`flex items-center`}>
                 {!stats || isSuspended ? (
-                    isSuspended ? (
-                        <div css={tw`text-right`}>
+                    <div css={tw`flex items-center`}>
+                        {isSuspended ? (
                             <span css={tw`bg-red-500 rounded px-2 py-1 text-red-100 text-xs`}>
                                 {server.status === 'suspended' ? '已暫停' : '連線錯誤'}
                             </span>
-                        </div>
-                    ) : server.isTransferring || server.status ? (
-                        <div css={tw`text-right`}>
+                        ) : server.isTransferring || server.status ? (
                             <span css={tw`bg-neutral-500 rounded px-2 py-1 text-neutral-100 text-xs`}>
                                 {server.isTransferring
                                     ? '轉移中'
@@ -87,12 +85,15 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                                     ? '還原備份中'
                                     : '不可用'}
                             </span>
+                        ) : (
+                            <Spinner size={'small'} />
+                        )}
+                        <div css={tw`ml-4`}>
+                            <StatusIndicator status={stats?.status} />
                         </div>
-                    ) : (
-                        <Spinner size={'small'} />
-                    )
+                    </div>
                 ) : (
-                    <>
+                    <div css={tw`flex items-center`}>
                         <div css={tw`text-center`}>
                             <div css={tw`flex items-center justify-center`}>
                                 <FontAwesomeIcon icon={faMicrochip} css={alarms.cpu ? tw`text-red-400` : tw`text-neutral-500`} />
@@ -120,7 +121,10 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                             </div>
                             <p css={tw`text-xs text-neutral-600 mt-1`}>/ {diskLimit}</p>
                         </div>
-                    </>
+                        <div css={tw`ml-4`}>
+                            <StatusIndicator status={stats?.status} />
+                        </div>
+                    </div>
                 )}
             </div>
         </GreyRowBox>
