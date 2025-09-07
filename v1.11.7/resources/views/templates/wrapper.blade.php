@@ -135,6 +135,18 @@
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                 transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
             }
+
+            .grey-row-box {
+                background-color: var(--color-card-bg);
+                border: 1px solid var(--color-card-border);
+                box-shadow: 0 4px 6px -1px var(--color-shadow), 0 2px 4px -1px var(--color-shadow);
+                color: var(--color-text);
+                transition: all 0.2s ease-in-out;
+            }
+
+            .grey-row-box:hover {
+                border-color: var(--color-primary);
+            }
         </style>
 
         @yield('assets')

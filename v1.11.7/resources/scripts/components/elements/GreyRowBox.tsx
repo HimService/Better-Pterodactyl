@@ -1,25 +1,13 @@
 import React from 'react';
 import styled from 'styled-components/macro';
 
-const Container = styled.div<{ $hoverable?: boolean }>`
-    background-color: var(--color-card-bg);
-    border: 1px solid var(--color-card-border);
+const Container = styled.div`
     border-radius: 8px;
-    box-shadow: 0 4px 6px -1px var(--color-shadow), 0 2px 4px -1px var(--color-shadow);
-    transition: all 0.2s ease-in-out;
     display: flex;
     align-items: center;
     padding: 1rem;
-    color: var(--color-text);
     margin-bottom: 0.5rem;
-
-    ${(props) =>
-        props.$hoverable !== false &&
-        `
-        &:hover {
-            border-color: var(--color-primary);
-        }
-    `};
+    border: 1px solid transparent;
 `;
 
 const Title = styled.p`
@@ -71,7 +59,7 @@ const GreyRowBox = <C extends React.ElementType = 'div'>({
     // 該元件會 благодаря to its own `as` prop 渲染出正確的底層元素。
     return (
         <CopyOnClick text={copyOnClick}>
-            <Container as={as as any} className={className} $hoverable={$hoverable} {...props}>
+            <Container as={as as any} className={`grey-row-box ${className || ''}`} {...props}>
                 {icon && <div className={'mr-4'}>{icon}</div>}
                 <div className={'flex-1'}>
                     {title && <Title>{title}</Title>}
