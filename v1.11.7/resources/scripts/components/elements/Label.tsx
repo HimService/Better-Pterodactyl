@@ -1,11 +1,12 @@
-import styled from 'styled-components/macro';
+import tw from 'twin.macro';
 
-const Label = styled.label`
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-heading);
-    margin-bottom: 0.5rem;
+const Label = tw.label`
+    block
+    text-sm
+    font-semibold
+    text-neutral-700
+    dark:text-neutral-200
+    mb-2
 `;
 
 export default Label;

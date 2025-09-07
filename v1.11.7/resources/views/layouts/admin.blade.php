@@ -604,6 +604,39 @@
             body[data-theme="dark"] .small-box > .small-box-footer:hover {
                 background: rgba(0, 0, 0, 0.3) !important;
             }
+
+            /* --- BUILD CONFIG PAGE FIXES --- */
+            body[data-theme="dark"] .input-group-addon {
+                background-color: var(--color-sidebar-active-bg) !important;
+                border-color: var(--color-card-border) !important;
+                color: var(--color-text) !important;
+            }
+            body[data-theme="dark"] .select2-container--default .select2-selection--multiple {
+                background-color: var(--color-background) !important;
+                border-color: var(--color-card-border) !important;
+            }
+            body[data-theme="dark"] .select2-container--default .select2-selection--multiple .select2-selection__choice {
+                background-color: var(--color-sidebar-active-bg) !important;
+                border-color: var(--color-card-border) !important;
+                color: var(--color-text) !important;
+            }
+            body[data-theme="dark"] .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+                color: var(--color-text) !important;
+            }
+            body[data-theme="dark"] .radio label {
+                color: var(--color-text) !important;
+            }
+            body[data-theme="dark"] .text-muted,
+            body[data-theme="dark"] .text-muted small {
+                color: var(--color-text) !important;
+                opacity: 0.7;
+            }
+            body[data-theme="dark"] .text-muted code {
+                background-color: var(--color-sidebar-active-bg) !important;
+                color: var(--color-heading) !important;
+                border-radius: 3px;
+                padding: 2px 4px;
+            }
         </style>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
