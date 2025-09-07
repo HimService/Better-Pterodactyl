@@ -89,8 +89,8 @@ const EditScheduleModal = ({ schedule }: Props) => {
             }
         >
             {({ isSubmitting }) => (
-                <Form>
-                    <h3 css={tw`text-2xl mb-6`}>{schedule ? '編輯排程' : '建立新排程'}</h3>
+                <Form css={tw`bg-white dark:bg-transparent`}>
+                    <h3 css={tw`text-2xl mb-6 text-neutral-800 dark:text-neutral-200`}>{schedule ? '編輯排程' : '建立新排程'}</h3>
                     <FlashMessageRender byKey={'schedule:edit'} css={tw`mb-6`} />
                     <Field
                         name={'name'}
@@ -104,10 +104,10 @@ const EditScheduleModal = ({ schedule }: Props) => {
                         <Field name={'month'} label={'月'} />
                         <Field name={'dayOfWeek'} label={'星期'} />
                     </div>
-                    <p css={tw`text-neutral-400 text-xs mt-2`}>
+                    <p css={tw`text-neutral-500 dark:text-neutral-400 text-xs mt-2`}>
                         排程系統支援使用 Cronjob 語法來定義任務應何時開始執行。使用上面的欄位來指定這些任務應何時開始執行。
                     </p>
-                    <div css={tw`mt-6 bg-neutral-700 border border-neutral-800 shadow-inner p-4 rounded`}>
+                    <div css={tw`mt-6 bg-neutral-100 dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-800 shadow-inner p-4 rounded`}>
                         <Switch
                             name={'show_cheatsheet'}
                             description={'顯示 cron 備忘單以取得一些範例。'}
@@ -121,14 +121,14 @@ const EditScheduleModal = ({ schedule }: Props) => {
                             </div>
                         )}
                     </div>
-                    <div css={tw`mt-6 bg-neutral-700 border border-neutral-800 shadow-inner p-4 rounded`}>
+                    <div css={tw`mt-6 bg-neutral-100 dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-800 shadow-inner p-4 rounded`}>
                         <FormikSwitch
                             name={'onlyWhenOnline'}
                             description={'僅在伺服器處於執行中狀態時才執行此排程。'}
                             label={'僅當伺服器在線時'}
                         />
                     </div>
-                    <div css={tw`mt-6 bg-neutral-700 border border-neutral-800 shadow-inner p-4 rounded`}>
+                    <div css={tw`mt-6 bg-neutral-100 dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-800 shadow-inner p-4 rounded`}>
                         <FormikSwitch
                             name={'enabled'}
                             description={'如果啟用，此排程將自動執行。'}

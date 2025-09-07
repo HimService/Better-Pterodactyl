@@ -514,6 +514,30 @@
             body[data-theme="light"] .box-body .table td {
                 color: #343a40;
             }
+
+            /* --- MODALS --- */
+            body[data-theme="dark"] .modal-content {
+                background-color: var(--color-card-bg) !important;
+                border: 1px solid var(--color-card-border) !important;
+                color: var(--color-text) !important;
+            }
+            body[data-theme="dark"] .modal-header,
+            body[data-theme="dark"] .modal-footer {
+                border-color: var(--color-card-border) !important;
+            }
+            body[data-theme="dark"] .modal-title {
+                color: var(--color-heading) !important;
+            }
+            body[data-theme="dark"] .modal-body .form-group label {
+                color: var(--color-text) !important;
+            }
+            body[data-theme="dark"] .close {
+                color: var(--color-text) !important;
+                opacity: 0.75;
+            }
+            body[data-theme="dark"] .close:hover {
+                opacity: 1;
+            }
         </style>
         <script>
             document.addEventListener('DOMContentLoaded', function () {

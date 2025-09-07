@@ -102,9 +102,9 @@ const EditSubuserModal = ({ subuser }: Props) => {
                 permissions: array().of(string()),
             })}
         >
-            <Form>
+            <Form css={tw`bg-[var(--color-card-bg)] p-6 rounded`}>
                 <div css={tw`flex justify-between`}>
-                    <h2 css={tw`text-2xl`} ref={ref}>
+                    <h2 css={tw`text-2xl text-[var(--color-heading)]`} ref={ref}>
                         {subuser
                             ? `${canEditUser ? '修改' : '檢視'} ${subuser.email} 的權限`
                             : '建立新的子使用者'}
@@ -118,7 +118,7 @@ const EditSubuserModal = ({ subuser }: Props) => {
                 <FlashMessageRender byKey={'user:edit'} css={tw`mt-4`} />
                 {!isRootAdmin && loggedInPermissions[0] !== '*' && (
                     <div css={tw`mt-4 pl-4 py-2 border-l-4 border-cyan-400`}>
-                        <p css={tw`text-sm text-neutral-300`}>
+                        <p css={tw`text-sm text-[var(--color-text)] opacity-75`}>
                             建立或修改其他使用者時，只能選擇您帳戶目前已分配的權限。
                         </p>
                     </div>
@@ -145,7 +145,7 @@ const EditSubuserModal = ({ subuser }: Props) => {
                                 permissions={Object.keys(permissions[key].keys).map((pkey) => `${key}.${pkey}`)}
                                 css={index > 0 ? tw`mt-4` : undefined}
                             >
-                                <p css={tw`text-sm text-neutral-400 mb-4`}>{permissions[key].description}</p>
+                                <p css={tw`text-sm text-[var(--color-text)] opacity-75 mb-4`}>{permissions[key].description}</p>
                                 {Object.keys(permissions[key].keys).map((pkey) => (
                                     <PermissionRow
                                         key={`permission_${key}.${pkey}`}

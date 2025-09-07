@@ -33,7 +33,7 @@ const Clickable: React.FC<{ file: FileObject }> = memo(({ file, children }) => {
         <GreyRowBox
             as={isLink ? NavLink : 'div'}
             {...(isLink ? { to: `${match.url}${file.isFile ? '/edit' : ''}#${encodePathSegments(join(directory, file.name))}` } : {})}
-            css={tw`flex items-center text-sm no-underline text-current`}
+            css={tw`flex flex-1 items-center text-sm no-underline text-current min-w-0`}
         >
             {children}
         </GreyRowBox>
