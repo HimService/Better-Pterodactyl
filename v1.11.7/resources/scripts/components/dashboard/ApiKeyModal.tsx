@@ -14,11 +14,13 @@ const ApiKeyModal = ({ apiKey }: Props) => {
 
     return (
         <>
-            <h3 css={tw`mb-6 text-2xl`}>您的 API 金鑰</h3>
-            <p css={tw`text-sm mb-6`}>
+            <h3 css={tw`mb-6 text-2xl dark:text-neutral-200`}>您的 API 金鑰</h3>
+            <p css={tw`text-sm mb-6 dark:text-neutral-300`}>
                 您創建的 API 金鑰如下所示。請將其存放在安全的位置，它不會再次顯示。
             </p>
-            <pre css={tw`text-sm bg-neutral-900 rounded py-2 px-4 font-mono`}>
+            <pre
+                css={tw`text-sm bg-neutral-200 dark:bg-neutral-900 rounded py-2 px-4 font-mono text-neutral-800 dark:text-neutral-200`}
+            >
                 <CopyOnClick text={apiKey}>
                     <code css={tw`font-mono`}>{apiKey}</code>
                 </CopyOnClick>
