@@ -129,7 +129,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
     };
 
     return (
-        <div onClick={(e) => e.stopPropagation()}>
+        <>
             <Dialog.Confirm
                 open={showConfirmation}
                 onClose={() => setShowConfirmation(false)}
@@ -168,30 +168,89 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                 )}
             >
                 <Can action={'file.update'}>
-                    <Row onClick={() => setModal('rename')} icon={faPencilAlt} title={'重新命名'} />
-                    <Row onClick={() => setModal('move')} icon={faLevelUpAlt} title={'移動'} />
-                    <Row onClick={() => setModal('chmod')} icon={faFileCode} title={'權限'} />
+                    <Row
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setModal('rename');
+                        }}
+                        icon={faPencilAlt}
+                        title={'重新命名'}
+                    />
+                    <Row
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setModal('move');
+                        }}
+                        icon={faLevelUpAlt}
+                        title={'移動'}
+                    />
+                    <Row
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setModal('chmod');
+                        }}
+                        icon={faFileCode}
+                        title={'權限'}
+                    />
                 </Can>
                 {file.isFile && (
                     <Can action={'file.create'}>
-                        <Row onClick={doCopy} icon={faCopy} title={'複製'} />
+                        <Row
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                doCopy();
+                            }}
+                            icon={faCopy}
+                            title={'複製'}
+                        />
                     </Can>
                 )}
                 {file.isArchiveType() ? (
                     <Can action={'file.create'}>
-                        <Row onClick={doUnarchive} icon={faBoxOpen} title={'解壓縮'} />
+                        <Row
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                doUnarchive();
+                            }}
+                            icon={faBoxOpen}
+                            title={'解壓縮'}
+                        />
                     </Can>
                 ) : (
                     <Can action={'file.archive'}>
-                        <Row onClick={doArchive} icon={faFileArchive} title={'壓縮'} />
+                        <Row
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                doArchive();
+                            }}
+                            icon={faFileArchive}
+                            title={'壓縮'}
+                        />
                     </Can>
                 )}
-                {file.isFile && <Row onClick={doDownload} icon={faFileDownload} title={'下載'} />}
+                {file.isFile && (
+                    <Row
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            doDownload();
+                        }}
+                        icon={faFileDownload}
+                        title={'下載'}
+                    />
+                )}
                 <Can action={'file.delete'}>
-                    <Row onClick={() => setShowConfirmation(true)} icon={faTrashAlt} title={'刪除'} $danger />
+                    <Row
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setShowConfirmation(true);
+                        }}
+                        icon={faTrashAlt}
+                        title={'刪除'}
+                        $danger
+                    />
                 </Can>
             </DropdownMenu>
-        </div>
+        </>
     );
 };
 
