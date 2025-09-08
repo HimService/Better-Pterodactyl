@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEthernet, faHdd, faMemory, faMicrochip } from '@fortawesome/free-solid-svg-icons';
+import { faEthernet, faHdd, faMemory, faMicrochip, faServer } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { Server } from '@/api/server/getServer';
 import getServerResourceUsage, { ServerStats } from '@/api/server/getServerResourceUsage';
@@ -12,14 +12,26 @@ import isEqual from 'react-fast-compare';
 import styled from 'styled-components/macro';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { SocketEvent } from '@/components/server/events';
+import GreyRowBox from '@/components/elements/GreyRowBox';
+import { ServerPowerState } from '@/api/server/getServerResourceUsage';
 
-const Container = styled(Link)`
-    ${tw`flex flex-col p-4 rounded-lg mb-4 transition-all duration-150 ease-in-out`}
-    background-color: #313d4b;
+const StatusIndicatorBox = styled(GreyRowBox)<{ $status: ServerPowerState | undefined }>`
+    ${tw`grid grid-cols-12 gap-4 relative`};
 
-    &:hover {
-        background-color: #3a4656;
-        ${tw`transform -translate-y-px shadow-md`}
+    & .status-bar {
+        ${tw`w-2 bg-red-500 absolute right-0 z-20 rounded-full m-1 opacity-50 transition-all duration-150`};
+        height: calc(100% - 0.5rem);
+
+        ${({ $status }) =>
+            !$status || $status === 'offline'
+                ? tw`bg-red-500`
+                : $status === 'running'
+                ? tw`bg-green-500`
+                : tw`bg-yellow-500`};
+    }
+
+    &:hover .status-bar {
+        ${tw`opacity-75`};
     }
 `;
 
@@ -39,12 +51,16 @@ const ResourceRow = styled.div`
     ${tw`flex items-center text-sm`}
 `;
 
-const ResourceIcon = styled.div`
-    ${tw`w-8 text-center text-neutral-400`}
-`;
+const Icon = memo(
+    styled(FontAwesomeIcon)<{ $alarm: boolean }>`
+        ${(props) => (props.$alarm ? tw`text-red-400` : tw`text-neutral-500`)};
+    `,
+    isEqual
+);
 
-const ResourceLabel = styled.span`
-    ${tw`w-16 text-neutral-300`}
+const IconDescription = styled.p<{ $alarm: boolean }>`
+    ${tw`text-sm ml-2`};
+    ${(props) => (props.$alarm ? tw`text-white` : tw`text-neutral-400`)};
 `;
 
 const ProgressBarContainer = styled.div`
@@ -60,6 +76,14 @@ const ProgressBar = styled.div`
 
 const ResourceUsage = styled.span`
     ${tw`w-24 text-right font-mono text-neutral-300`}
+`;
+
+const ResourceIcon = styled.div`
+    ${tw`w-8 text-center text-neutral-400`}
+`;
+
+const ResourceLabel = styled.span`
+    ${tw`w-16 text-neutral-300`}
 `;
 
 const BottomSection = styled.div`
@@ -89,14 +113,14 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
     useWebsocketEvent(SocketEvent.STATUS, (data: string) => {
         const parsedData = JSON.parse(data);
         if (parsedData.server === server.uuid) {
-            setStats((prev) => ({ ...prev, status: parsedData.status }));
+            setStats((prev) => ({ ...(prev || {}), status: parsedData.status } as ServerStats));
         }
     });
 
     useWebsocketEvent(SocketEvent.STATS, (data: string) => {
         const parsedData = JSON.parse(data);
         if (parsedData.server === server.uuid) {
-            setStats((prev) => ({ ...prev, ...parsedData.stats }));
+            setStats((prev) => ({ ...(prev || {}), ...parsedData.stats } as ServerStats));
         }
     });
 
@@ -104,6 +128,10 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
         if (isSuspended) return;
 
         getStats();
+
+        return () => {
+            interval.current && clearInterval(interval.current);
+        };
     }, [isSuspended]);
 
     const cpuPercent = server.limits.cpu > 0 ? ((stats?.cpuUsagePercent || 0) / server.limits.cpu) * 100 : stats?.cpuUsagePercent || 0;
@@ -113,7 +141,18 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
     const allocation = server.allocations.find((alloc) => alloc.isDefault);
 
     return (
-        <Container to={`/server/${server.id}`} className={className}>
+        <StatusIndicatorBox className={className} $status={stats?.status}>
+            <Link to={`/server/${server.id}`} css={tw`flex items-center col-span-12 sm:col-span-5 lg:col-span-6`}>
+                <div className={'icon mr-4'}>
+                    <FontAwesomeIcon icon={faServer} />
+                </div>
+                <div>
+                    <p css={tw`text-lg break-words`}>{server.name}</p>
+                    {!!server.description && (
+                        <p css={tw`text-sm text-neutral-300 break-words line-clamp-2`}>{server.description}</p>
+                    )}
+                </div>
+            </Link>
             <TopSection>
                 <StatusIndicator status={stats?.status || (isSuspended ? 'offline' : undefined)} />
                 <ServerName>{server.name}</ServerName>
@@ -180,8 +219,8 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                     {allocation ? `${ip(allocation.ip)}:${allocation.port}` : 'N/A'}
                 </ServerIp>
             </BottomSection>
-        </Container>
+        </StatusIndicatorBox>
     );
 };
 
-export default memo(ServerRow, isEqual);
+export default ServerRow;
