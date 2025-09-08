@@ -1,6 +1,7 @@
 import * as Models from '@definitions/user/models';
 import { FractalResponseData } from '@/api/http';
 import { transform } from '@definitions/helpers';
+import { SubuserPermission } from '@/state/server/subusers';
 
 export default class Transformers {
     static toSSHKey = (data: Record<any, any>): Models.SSHKey => {
@@ -21,7 +22,7 @@ export default class Transformers {
             twoFactorEnabled: attributes['2fa_enabled'],
             permissions: attributes.permissions || [],
             createdAt: new Date(attributes.created_at),
-            can(permission): boolean {
+            can(permission: SubuserPermission): boolean {
                 return this.permissions.includes(permission);
             },
         };

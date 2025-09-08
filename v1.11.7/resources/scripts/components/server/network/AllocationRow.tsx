@@ -7,7 +7,6 @@ import InputSpinner from '@/components/elements/InputSpinner';
 import { Textarea } from '@/components/elements/Input';
 import Can from '@/components/elements/Can';
 import { Button } from '@/components/elements/button/index';
-import GreyRowBox from '@/components/elements/GreyRowBox';
 import { Allocation } from '@/api/server/getServer';
 import styled from 'styled-components/macro';
 import { debounce } from 'debounce';
@@ -21,6 +20,38 @@ import getServerAllocations from '@/api/swr/getServerAllocations';
 import { ip } from '@/lib/formatters';
 import Code from '@/components/elements/Code';
 
+const Card = styled.div`
+    ${tw`w-full bg-neutral-100 shadow-md rounded-lg p-4 mt-4`}
+    [data-theme='dark'] & {
+        ${tw`bg-neutral-900`}
+    }
+`;
+
+const IconContainer = styled.div`
+    ${tw`flex-shrink-0 h-8 w-8 rounded-full bg-neutral-500 flex items-center justify-center`}
+`;
+
+const Title = styled.h3`
+    ${tw`text-lg font-medium text-neutral-800`}
+    [data-theme='dark'] & {
+        ${tw`text-neutral-200`}
+    }
+`;
+
+const Subtitle = styled.p`
+    ${tw`text-sm text-neutral-500`}
+    [data-theme='dark'] & {
+        ${tw`text-neutral-400`}
+    }
+`;
+
+const NotesTextarea = styled(Textarea)`
+    ${tw`bg-neutral-200 hover:border-neutral-400 border-transparent`}
+    [data-theme='dark'] & {
+        ${tw`bg-neutral-800 hover:border-neutral-600`}
+    }
+`;
+
 const Label = styled.label`
     ${tw`uppercase text-xs mt-1 text-neutral-400 block px-1 select-none transition-colors duration-150`}
 `;
@@ -32,11 +63,11 @@ interface Props {
 const AllocationRow = ({ allocation }: Props) => {
     const [loading, setLoading] = useState(false);
     const { clearFlashes, clearAndAddHttpError } = useFlashKey('server:network');
-    const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
+    const uuid = ServerContext.useStoreState((state: any) => state.server.data!.uuid);
     const { mutate } = getServerAllocations();
 
     const onNotesChanged = useCallback((id: number, notes: string) => {
-        mutate((data) => data?.map((a) => (a.id === id ? { ...a, notes } : a)), false);
+        mutate((data: any) => data?.map((a: Allocation) => (a.id === id ? { ...a, notes } : a)), false);
     }, []);
 
     const setAllocationNotes = debounce((notes: string) => {
@@ -51,7 +82,7 @@ const AllocationRow = ({ allocation }: Props) => {
 
     const setPrimaryAllocation = () => {
         clearFlashes();
-        mutate((data) => data?.map((a) => ({ ...a, isDefault: a.id === allocation.id })), false);
+        mutate((data: any) => data?.map((a: Allocation) => ({ ...a, isDefault: a.id === allocation.id })), false);
 
         setPrimaryServerAllocation(uuid, allocation.id).catch((error) => {
             clearAndAddHttpError(error);
@@ -60,45 +91,42 @@ const AllocationRow = ({ allocation }: Props) => {
     };
 
     return (
-        <GreyRowBox
-            $hoverable={false}
-            className={'flex-wrap md:flex-nowrap mt-2'}
-            title={`${ip(allocation.ip)}:${allocation.port}`}
-        >
-            <div className={'flex items-center w-full md:w-auto'}>
-                <div className={'pl-4 pr-6 text-neutral-400'}>
-                    <FontAwesomeIcon icon={faNetworkWired} />
+        <Card>
+            <div className="flex items-center mb-4">
+                <IconContainer>
+                    <FontAwesomeIcon icon={faNetworkWired} className="text-white" />
+                </IconContainer>
+                <div className="ml-4">
+                    <Title>
+                        {allocation.alias ? (
+                            <CopyOnClick text={allocation.alias}>
+                                <span className="truncate">{allocation.alias}</span>
+                            </CopyOnClick>
+                        ) : (
+                            <CopyOnClick text={ip(allocation.ip)}>
+                                <span>{ip(allocation.ip)}</span>
+                            </CopyOnClick>
+                        )}
+                    </Title>
+                    <Subtitle>
+                        {allocation.alias ? '主機名稱' : 'IP 位址'}
+                    </Subtitle>
                 </div>
-                <div className={'mr-4 flex-1 md:w-40'}>
-                    {allocation.alias ? (
-                        <CopyOnClick text={allocation.alias}>
-                            <Code dark className={'w-40 truncate'}>
-                                {allocation.alias}
-                            </Code>
-                        </CopyOnClick>
-                    ) : (
-                        <CopyOnClick text={ip(allocation.ip)}>
-                            <Code dark>{ip(allocation.ip)}</Code>
-                        </CopyOnClick>
-                    )}
-                    <Label>{allocation.alias ? '主機名稱' : 'IP 位址'}</Label>
-                </div>
-                <div className={'w-16 md:w-24 overflow-hidden'}>
+                <div className="ml-auto text-right">
                     <Code dark>{allocation.port}</Code>
-                    <Label>連接埠</Label>
+                    <Subtitle>連接埠</Subtitle>
                 </div>
             </div>
-            <div className={'mt-4 w-full md:mt-0 md:flex-1 md:w-auto'}>
+            <div className="mt-4">
                 <InputSpinner visible={loading}>
-                    <Textarea
-                        className={'bg-neutral-800 hover:border-neutral-600 border-transparent'}
+                    <NotesTextarea
                         placeholder={'備註'}
                         defaultValue={allocation.notes || undefined}
-                        onChange={(e) => setAllocationNotes(e.currentTarget.value)}
+                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setAllocationNotes(e.currentTarget.value)}
                     />
                 </InputSpinner>
             </div>
-            <div className={'flex justify-end space-x-4 mt-4 w-full md:mt-0 md:w-48'}>
+            <div className="flex justify-end space-x-4 mt-4">
                 {allocation.isDefault ? (
                     <Button size={Button.Sizes.Small} className={'!text-gray-50 !bg-blue-600'} disabled>
                         主要連線位置
@@ -116,7 +144,7 @@ const AllocationRow = ({ allocation }: Props) => {
                     </>
                 )}
             </div>
-        </GreyRowBox>
+        </Card>
     );
 };
 

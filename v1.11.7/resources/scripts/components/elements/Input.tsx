@@ -41,7 +41,8 @@ const inputStyle = css<Props>`
     resize: none;
     ${tw`appearance-none outline-none w-full min-w-0`};
     ${tw`p-3 border-2 rounded text-sm transition-all duration-150`};
-    ${tw`bg-neutral-600 border-neutral-500 hover:border-neutral-400 text-neutral-200 shadow-none focus:ring-0`};
+    ${tw`bg-neutral-200 border-neutral-300 hover:border-neutral-400 text-neutral-800 shadow-none focus:ring-0`};
+    ${tw`dark:bg-neutral-900 dark:border-neutral-700 dark:hover:border-neutral-600 dark:text-neutral-200`};
 
     & + .input-help {
         ${tw`mt-1 text-xs`};
@@ -81,7 +82,7 @@ const Input = styled.input<Props>`
     }
 `;
 const Textarea = styled.textarea<Props>`
-    ${inputStyle}
+    ${inputStyle};
 `;
 
 const InputExport = Input;

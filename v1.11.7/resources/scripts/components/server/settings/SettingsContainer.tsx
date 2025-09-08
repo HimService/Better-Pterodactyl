@@ -60,12 +60,12 @@ export default () => {
                     <TitledGreyBox title={'偵錯資訊'} css={tw`mb-6 md:mb-10`}>
                         <div css={tw`flex items-center justify-between text-sm`}>
                             <p>節點</p>
-                            <code css={tw`font-mono bg-neutral-900 rounded py-1 px-2`}>{node}</code>
+                            <code css={tw`font-mono bg-neutral-200 dark:bg-neutral-900 rounded py-1 px-2 text-neutral-800 dark:text-white`}>{node}</code>
                         </div>
                         <CopyOnClick text={uuid}>
                             <div css={tw`flex items-center justify-between mt-2 text-sm`}>
                                 <p>伺服器 ID</p>
-                                <code css={tw`font-mono bg-neutral-900 rounded py-1 px-2`}>{uuid}</code>
+                                <code css={tw`font-mono bg-neutral-200 dark:bg-neutral-900 rounded py-1 px-2 text-neutral-800 dark:text-white`}>{uuid}</code>
                             </div>
                         </CopyOnClick>
                     </TitledGreyBox>
