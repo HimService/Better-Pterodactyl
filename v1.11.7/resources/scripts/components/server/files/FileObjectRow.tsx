@@ -23,7 +23,7 @@ const IconContainer = styled.div`
 const Clickable: React.FC<{ file: FileObject }> = memo(({ file, children }) => {
     const [canRead] = usePermissions(['file.read']);
     const [canReadContents] = usePermissions(['file.read-content']);
-    const directory = ServerContext.useStoreState((state) => state.files.directory);
+    const directory = ServerContext.useStoreState((state: any) => state.files.directory);
 
     const match = useRouteMatch();
 
@@ -44,13 +44,15 @@ const FileObjectRow = ({ file }: { file: FileObject }) => (
     <div
         css={tw`flex items-center`}
         key={file.name}
-        onContextMenu={(e) => {
+        onContextMenu={(e: React.MouseEvent<HTMLDivElement>) => {
             e.preventDefault();
             window.dispatchEvent(new CustomEvent(`pterodactyl:files:ctx:${file.key}`, { detail: e.clientX }));
         }}
     >
         <Clickable file={file}>
-            <SelectFileCheckbox name={file.name} />
+            <div onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
+                <SelectFileCheckbox name={file.name} />
+            </div>
             <IconContainer>
                 {file.isFile ? (
                     <FontAwesomeIcon
@@ -72,7 +74,7 @@ const FileObjectRow = ({ file }: { file: FileObject }) => (
     </div>
 );
 
-export default memo(FileObjectRow, (prevProps, nextProps) => {
+export default memo(FileObjectRow, (prevProps: { file: FileObject }, nextProps: { file: FileObject }) => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const { isArchiveType, isEditable, ...prevFile } = prevProps.file;
     const { isArchiveType: nextIsArchiveType, isEditable: nextIsEditable, ...nextFile } = nextProps.file;
