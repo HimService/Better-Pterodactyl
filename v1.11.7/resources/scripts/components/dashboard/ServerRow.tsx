@@ -26,14 +26,21 @@ const Icon = memo(
 
 const IconDescription = styled.p<{ $alarm: boolean }>`
     ${tw`text-sm ml-2`};
-    ${(props: { $alarm: boolean }) => (props.$alarm ? tw`text-white` : tw`text-neutral-500 dark:text-neutral-400`)};
+    ${(props: { $alarm: boolean }) => (props.$alarm ? tw`text-white` : tw`text-neutral-500`)};
+    [data-theme="dark"] & {
+        ${(props: { $alarm: boolean }) => (props.$alarm ? tw`text-white` : tw`text-neutral-400`)};
+    }
 `;
 
 const StatusIndicatorBox = styled(GreyRowBox).attrs({ as: Link })<{
     $status: ServerPowerState | undefined;
     to: string;
 }>`
-    ${tw`flex flex-col relative border-l-4 transition-all duration-150 bg-neutral-100 dark:bg-neutral-700/25 rounded-lg shadow-md backdrop-blur-sm`};
+    ${tw`flex flex-col relative border-l-4 transition-all duration-150 bg-neutral-100 rounded-lg shadow-lg hover:shadow-xl backdrop-blur-sm`};
+
+    [data-theme="dark"] & {
+        ${tw`bg-neutral-800`}
+    }
 
     &:hover {
         ${tw`shadow-xl border-cyan-500/50`}
@@ -53,6 +60,55 @@ const StatusIndicatorBox = styled(GreyRowBox).attrs({ as: Link })<{
                 : $status === 'running'
                 ? tw`border-green-400`
                 : tw`border-yellow-400`};
+    }
+`;
+
+const ServerName = styled.p`
+    ${tw`text-xl font-bold break-words text-neutral-800`};
+    [data-theme="dark"] & {
+        ${tw`text-white`}
+    }
+`;
+
+const ServerIp = styled.p`
+    ${tw`text-sm text-neutral-500 break-words line-clamp-2 font-mono`};
+    [data-theme="dark"] & {
+        ${tw`text-neutral-400`}
+    }
+`;
+
+const ResourceTitle = styled.p`
+    ${tw`text-xs text-neutral-500 uppercase mb-1`};
+    [data-theme="dark"] & {
+        ${tw`text-neutral-300`}
+    }
+`;
+
+const ResourceValue = styled.p`
+    ${tw`text-sm font-mono text-neutral-800 mb-2`};
+    [data-theme="dark"] & {
+        ${tw`text-neutral-100`}
+    }
+`;
+
+const ProgressBar = styled.div`
+    ${tw`w-full bg-neutral-200 rounded-full h-1`};
+    [data-theme="dark"] & {
+        ${tw`bg-neutral-900/50`}
+    }
+`;
+
+const ServerIconContainer = styled.div`
+    ${tw`mr-4 w-14 h-14 rounded-full bg-neutral-200 flex items-center justify-center shadow-inner`};
+    [data-theme="dark"] & {
+        ${tw`bg-neutral-700`}
+    }
+`;
+
+const ServerIcon = styled(FontAwesomeIcon)`
+    ${tw`text-2xl text-neutral-800`};
+    [data-theme="dark"] & {
+        ${tw`text-neutral-300`}
     }
 `;
 
@@ -103,14 +159,14 @@ export default ({ server: initialServer, className }: { server: ExtendedServer; 
 
     return (
         <StatusIndicatorBox to={`/server/${server.id}`} className={className} $status={stats?.status}>
-            <div css={tw`flex items-center w-full p-4 border-b border-neutral-200 dark:border-neutral-800/50`}>
-                <div css={tw`flex-none w-1/4 flex items-center`}>
-                    <div className={'icon mr-4 w-12 h-12 rounded-full bg-neutral-200 dark:bg-neutral-900/50 flex items-center justify-center shadow-md'}>
-                        <FontAwesomeIcon icon={faServer} css={tw`text-xl text-neutral-800 dark:text-neutral-300`} />
-                    </div>
-                    <div>
-                        <p css={tw`text-lg font-semibold break-words text-neutral-800 dark:text-neutral-50`}>{server.name}</p>
-                        <p css={tw`text-sm text-neutral-600 dark:text-neutral-400 break-words line-clamp-2 font-mono`}>
+            <div css={tw`flex items-center w-full p-4`}>
+                <div css={tw`flex-none flex items-center`}>
+                    <ServerIconContainer>
+                        <ServerIcon icon={faServer} />
+                    </ServerIconContainer>
+                    <div css={tw`flex-grow`}>
+                        <ServerName>{server.name}</ServerName>
+                        <ServerIp>
                             {server.allocations
                                 .filter((alloc: Allocation) => alloc.isDefault)
                                 .map((allocation: Allocation) => (
@@ -118,7 +174,7 @@ export default ({ server: initialServer, className }: { server: ExtendedServer; 
                                         {allocation.alias || ip(allocation.ip)}:{allocation.port}
                                     </React.Fragment>
                                 ))}
-                        </p>
+                        </ServerIp>
                     </div>
                 </div>
                 <div css={tw`flex-grow`}/>
@@ -159,54 +215,49 @@ export default ({ server: initialServer, className }: { server: ExtendedServer; 
                     <div css={tw`grid grid-cols-3 gap-6`}>
                         {/* CPU */}
                         <div css={tw`text-center`}>
-                            <p css={tw`text-xs text-neutral-500 dark:text-neutral-300 uppercase`}>處理器</p>
                             {!stats ?
                                 <Spinner size={'small'} />
                                 :
                                 <>
-                                    <p css={tw`text-sm font-mono text-neutral-800 dark:text-neutral-100 mb-2`}>{stats.cpuUsagePercent.toFixed(2)}%</p>
-                                    <div css={tw`w-full bg-neutral-200 dark:bg-neutral-900/50 rounded-full h-1`}>
-                                        <div
-                                            css={tw`bg-cyan-500 h-1 rounded-full`}
-                                            style={{ width: `${stats.cpuUsagePercent}%` }}
-                                        />
-                                    </div>
+                                    <ResourceTitle>處理器</ResourceTitle>
+                                    <ResourceValue>{stats.cpuUsagePercent.toFixed(2)}%</ResourceValue>
+                                    <ProgressBar>
+                                        <div css={tw`bg-cyan-500 h-1 rounded-full`} style={{ width: `${stats.cpuUsagePercent}%` }} />
+                                    </ProgressBar>
                                 </>
                             }
                         </div>
                         {/* Memory */}
                         <div css={tw`text-center`}>
-                            <p css={tw`text-xs text-neutral-500 dark:text-neutral-300 uppercase`}>記憶體</p>
                             {!stats ?
                                 <Spinner size={'small'} />
                                 :
                                 <>
-                                    <p css={tw`text-sm font-mono text-neutral-800 dark:text-neutral-100 mb-2`}>{bytesToString(stats.memoryUsageInBytes)}</p>
-                                    <div css={tw`w-full bg-neutral-200 dark:bg-neutral-900/50 rounded-full h-1`}>
+                                    <ResourceTitle>記憶體</ResourceTitle>
+                                    <ResourceValue>{bytesToString(stats.memoryUsageInBytes)}</ResourceValue>
+                                    <ProgressBar>
                                         <div
                                             css={tw`bg-green-500 h-1 rounded-full`}
-                                            style={{
-                                                width: `${(stats.memoryUsageInBytes / (server.limits.memory * 1024 * 1024)) * 100}%`,
-                                            }}
+                                            style={{ width: `${(stats.memoryUsageInBytes / (server.limits.memory * 1024 * 1024)) * 100}%` }}
                                         />
-                                    </div>
+                                    </ProgressBar>
                                 </>
                             }
                         </div>
                         {/* Disk */}
                         <div css={tw`text-center`}>
-                            <p css={tw`text-xs text-neutral-500 dark:text-neutral-300 uppercase`}>磁碟空間</p>
                             {!stats ?
                                 <Spinner size={'small'} />
                                 :
                                 <>
-                                    <p css={tw`text-sm font-mono text-neutral-800 dark:text-neutral-100 mb-2`}>{bytesToString(stats.diskUsageInBytes)}</p>
-                                    <div css={tw`w-full bg-neutral-200 dark:bg-neutral-900/50 rounded-full h-1`}>
+                                    <ResourceTitle>磁碟空間</ResourceTitle>
+                                    <ResourceValue>{bytesToString(stats.diskUsageInBytes)}</ResourceValue>
+                                    <ProgressBar>
                                         <div
                                             css={tw`bg-yellow-500 h-1 rounded-full`}
                                             style={{ width: `${(stats.diskUsageInBytes / (server.limits.disk * 1024 * 1024)) * 100}%` }}
                                         />
-                                    </div>
+                                    </ProgressBar>
                                 </>
                             }
                         </div>
