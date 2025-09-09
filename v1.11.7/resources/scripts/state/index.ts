@@ -1,6 +1,7 @@
 import { createStore, createTypedHooks } from 'easy-peasy';
 import flashes, { FlashStore } from '@/state/flashes';
 import user, { UserStore } from '@/state/user';
+import servers, { ServerStore } from '@/state/servers';
 import permissions, { GloablPermissionsStore } from '@/state/permissions';
 import settings, { SettingsStore } from '@/state/settings';
 import progress, { ProgressStore } from '@/state/progress';
@@ -11,6 +12,7 @@ export interface ApplicationStore {
     user: UserStore;
     settings: SettingsStore;
     progress: ProgressStore;
+    servers: ServerStore;
 }
 
 const state: ApplicationStore = {
@@ -19,6 +21,7 @@ const state: ApplicationStore = {
     user,
     settings,
     progress,
+    servers,
 };
 
 export const store = createStore(state);
