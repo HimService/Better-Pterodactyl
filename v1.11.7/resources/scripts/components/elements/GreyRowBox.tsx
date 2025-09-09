@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { ElementType, ReactNode } from 'react';
 import styled from 'styled-components/macro';
+import CopyOnClick from '@/components/elements/CopyOnClick';
 
 const Container = styled.div`
     border-radius: 8px;
@@ -23,24 +24,19 @@ const Content = styled.div`
     color: var(--color-heading);
 `;
 
-import CopyOnClick from '@/components/elements/CopyOnClick';
-
-// 1. 定義元件自身的 props，並使其成為泛型。
-interface GreyRowBoxOwnProps<C extends React.ElementType> {
-    icon?: React.ReactNode;
+interface GreyRowBoxOwnProps<C extends ElementType = 'div'> {
+    as?: C;
     title?: string;
     className?: string;
-    $hoverable?: boolean;
+    icon?: ReactNode;
     copyOnClick?: string;
-    as?: C;
+    $hoverable?: boolean;
+    children?: ReactNode; // ✅ 解決 children: never
 }
 
-// 2. 透過結合自身 props 與底層元素的 props 來建立最終的 props 類型。
-// 這裡使用 React.PropsWithChildren 來加入 `children` prop，並使用 Omit 來防止 prop 衝突。
-type GreyRowBoxProps<C extends React.ElementType> = React.PropsWithChildren<GreyRowBoxOwnProps<C>> &
+type GreyRowBoxProps<C extends React.ElementType> = GreyRowBoxOwnProps<C> &
     Omit<React.ComponentPropsWithoutRef<C>, keyof GreyRowBoxOwnProps<C>>;
 
-// 3. 使用泛型 props 實作元件。
 const GreyRowBox = <C extends React.ElementType = 'div'>({
     icon,
     title,
@@ -51,19 +47,19 @@ const GreyRowBox = <C extends React.ElementType = 'div'>({
     as,
     ...props
 }: GreyRowBoxProps<C>) => {
-    // 要渲染的元件將是 `as` prop 中傳入的元件，預設為 div。
     const Component = as || 'div';
 
-    // `...props` 現在將正確地包含 `href` 等屬性（當 as="a" 時）。
-    // 我們將這些 props 傳遞給 styled 的 `Container` 元件，
-    // 該元件會 благодаря to its own `as` prop 渲染出正確的底層元素。
     return (
         <CopyOnClick text={copyOnClick}>
-            <Container as={as as any} className={`grey-row-box ${className || ''}`} {...props}>
-                {icon && <div className={'mr-4'}>{icon}</div>}
-                <div className={'flex-1'}>
+            <Container
+                as={Component as any} // ✅ 關鍵：強制轉型避免 TS2769
+                className={`grey-row-box ${className || ''}`}
+                {...props}
+            >
+                {icon && <div className="mr-4">{icon}</div>}
+                <div className="flex-1">
                     {title && <Title>{title}</Title>}
-                    <Content>{children}</Content>
+                    {children}
                 </div>
             </Container>
         </CopyOnClick>

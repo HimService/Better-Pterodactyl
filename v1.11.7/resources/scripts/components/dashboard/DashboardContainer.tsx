@@ -8,11 +8,15 @@ import useFlash from '@/plugins/useFlash';
 import { useStoreState } from 'easy-peasy';
 import { usePersistedState } from '@/plugins/usePersistedState';
 import Switch from '@/components/elements/Switch';
-import tw from 'twin.macro';
+import tw, { styled } from 'twin.macro';
 import useSWR from 'swr';
 import { PaginatedResult } from '@/api/http';
 import Pagination from '@/components/elements/Pagination';
 import { useLocation } from 'react-router-dom';
+
+const Container = styled.div`
+    ${tw`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`}
+`;
 
 export default () => {
     const { search } = useLocation();
@@ -68,9 +72,11 @@ export default () => {
                 <Pagination data={servers} onPageSelect={setPage}>
                     {({ items }) =>
                         items.length > 0 ? (
-                            items.map((server, index) => (
-                                <ServerRow key={server.uuid} server={server} css={index > 0 ? tw`mt-2` : undefined} />
-                            ))
+                           <Container>
+                               {items.map((server) => (
+                                   <ServerRow key={server.uuid} server={server} />
+                               ))}
+                           </Container>
                         ) : (
                             <p css={tw`text-center text-sm text-neutral-400`}>
                                 {showOnlyAdmin

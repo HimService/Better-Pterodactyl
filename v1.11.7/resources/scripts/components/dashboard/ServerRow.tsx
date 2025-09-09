@@ -3,53 +3,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEthernet, faHdd, faMemory, faMicrochip, faServer } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { Server } from '@/api/server/getServer';
-import getServerResourceUsage, { ServerStats } from '@/api/server/getServerResourceUsage';
+import getServerResourceUsage, { ServerPowerState, ServerStats } from '@/api/server/getServerResourceUsage';
 import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import tw from 'twin.macro';
-import Spinner from '@/components/elements/Spinner';
-import StatusIndicator from '@/components/elements/StatusIndicator';
-import isEqual from 'react-fast-compare';
-import styled from 'styled-components/macro';
-import useWebsocketEvent from '@/plugins/useWebsocketEvent';
-import { SocketEvent } from '@/components/server/events';
 import GreyRowBox from '@/components/elements/GreyRowBox';
-import { ServerPowerState } from '@/api/server/getServerResourceUsage';
+import Spinner from '@/components/elements/Spinner';
+import styled from 'styled-components/macro';
+import isEqual from 'react-fast-compare';
+import { ApplicationStore, useStoreState } from '@/state';
+import { Allocation } from '@/api/server/getServer';
 
-const StatusIndicatorBox = styled(GreyRowBox)<{ $status: ServerPowerState | undefined }>`
-    ${tw`grid grid-cols-12 gap-4 relative`};
-
-    & .status-bar {
-        ${tw`w-2 bg-red-500 absolute right-0 z-20 rounded-full m-1 opacity-50 transition-all duration-150`};
-        height: calc(100% - 0.5rem);
-
-        ${({ $status }) =>
-            !$status || $status === 'offline'
-                ? tw`bg-red-500`
-                : $status === 'running'
-                ? tw`bg-green-500`
-                : tw`bg-yellow-500`};
-    }
-
-    &:hover .status-bar {
-        ${tw`opacity-75`};
-    }
-`;
-
-const TopSection = styled.div`
-    ${tw`flex items-center mb-3`}
-`;
-
-const ServerName = styled.p`
-    ${tw`text-lg font-semibold text-neutral-200 truncate ml-2`}
-`;
-
-const ResourcesSection = styled.div`
-    ${tw`flex flex-col space-y-2 mb-3`}
-`;
-
-const ResourceRow = styled.div`
-    ${tw`flex items-center text-sm`}
-`;
+// Determines if the current value is in an alarm threshold so we can show it in red rather
+// than the more faded default style.
+const isAlarmState = (current: number, limit: number): boolean => limit > 0 && current / (limit * 1024 * 1024) >= 0.9;
 
 const Icon = memo(
     styled(FontAwesomeIcon)<{ $alarm: boolean }>`
@@ -63,40 +29,41 @@ const IconDescription = styled.p<{ $alarm: boolean }>`
     ${(props) => (props.$alarm ? tw`text-white` : tw`text-neutral-400`)};
 `;
 
-const ProgressBarContainer = styled.div`
-    ${tw`flex-1 h-1.5 mx-4 rounded-full`}
-    background-color: #26303c;
-`;
+const StatusIndicatorBox = styled(GreyRowBox).attrs({ as: Link })<{
+    $status: ServerPowerState | undefined;
+    to: string;
+}>`
+    ${tw`flex flex-col relative border-l-4 transition-all duration-150 bg-neutral-700/25 rounded-lg shadow-md backdrop-blur-sm`};
 
-const ProgressBar = styled.div`
-    ${tw`h-1.5 rounded-full`}
-    width: ${(props: { $percent: number }) => props.$percent}%;
-    background-color: #5b6a7e;
-`;
+    &:hover {
+        ${tw`shadow-xl border-cyan-500/50`}
+    }
 
-const ResourceUsage = styled.span`
-    ${tw`w-24 text-right font-mono text-neutral-300`}
-`;
+    ${({ $status }) =>
+        !$status || $status === 'offline'
+            ? tw`border-red-500`
+            : $status === 'running'
+            ? tw`border-green-500`
+            : tw`border-yellow-500`};
 
-const ResourceIcon = styled.div`
-    ${tw`w-8 text-center text-neutral-400`}
-`;
-
-const ResourceLabel = styled.span`
-    ${tw`w-16 text-neutral-300`}
-`;
-
-const BottomSection = styled.div`
-    ${tw`border-t border-gray-800 pt-2 mt-2`}
-`;
-
-const ServerIp = styled.p`
-    ${tw`text-sm text-neutral-400 font-mono flex items-center`}
+    &:hover {
+        ${({ $status }) =>
+            !$status || $status === 'offline'
+                ? tw`border-red-400`
+                : $status === 'running'
+                ? tw`border-green-400`
+                : tw`border-yellow-400`};
+    }
 `;
 
 type Timer = ReturnType<typeof setInterval>;
 
-const ServerRow = ({ server, className }: { server: Server; className?: string }) => {
+export default ({ server: initialServer, className }: { server: Server; className?: string }) => {
+    const server =
+        useStoreState((state: ApplicationStore) =>
+            state.servers.data.find((s: Server) => s.uuid === initialServer.uuid)
+        ) || initialServer;
+
     const interval = useRef<Timer>(null) as React.MutableRefObject<Timer>;
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
     const [stats, setStats] = useState<ServerStats | null>(null);
@@ -110,117 +77,108 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
         setIsSuspended(stats?.isSuspended || server.status === 'suspended');
     }, [stats?.isSuspended, server.status]);
 
-    useWebsocketEvent(SocketEvent.STATUS, (data: string) => {
-        const parsedData = JSON.parse(data);
-        if (parsedData.server === server.uuid) {
-            setStats((prev) => ({ ...(prev || {}), status: parsedData.status } as ServerStats));
-        }
-    });
-
-    useWebsocketEvent(SocketEvent.STATS, (data: string) => {
-        const parsedData = JSON.parse(data);
-        if (parsedData.server === server.uuid) {
-            setStats((prev) => ({ ...(prev || {}), ...parsedData.stats } as ServerStats));
-        }
-    });
-
     useEffect(() => {
+        // Don't waste a HTTP request if there is nothing important to show to the user because
+        // the server is suspended.
         if (isSuspended) return;
 
-        getStats();
+        getStats().then(() => {
+            interval.current = setInterval(() => getStats(), 5000);
+        });
 
         return () => {
             interval.current && clearInterval(interval.current);
         };
     }, [isSuspended]);
 
-    const cpuPercent = server.limits.cpu > 0 ? ((stats?.cpuUsagePercent || 0) / server.limits.cpu) * 100 : stats?.cpuUsagePercent || 0;
-    const memoryPercent = server.limits.memory > 0 ? ((stats?.memoryUsageInBytes || 0) / mbToBytes(server.limits.memory)) * 100 : 0;
-    const diskPercent = server.limits.disk > 0 ? ((stats?.diskUsageInBytes || 0) / mbToBytes(server.limits.disk)) * 100 : 0;
+    const alarms = { cpu: false, memory: false, disk: false };
+    if (stats) {
+        alarms.cpu = server.limits.cpu === 0 ? false : stats.cpuUsagePercent >= server.limits.cpu * 0.9;
+        alarms.memory = isAlarmState(stats.memoryUsageInBytes, server.limits.memory);
+        alarms.disk = server.limits.disk === 0 ? false : isAlarmState(stats.diskUsageInBytes, server.limits.disk);
+    }
 
-    const allocation = server.allocations.find((alloc) => alloc.isDefault);
+    const diskLimit = server.limits.disk !== 0 ? bytesToString(mbToBytes(server.limits.disk)) : '無限制';
+    const memoryLimit = server.limits.memory !== 0 ? bytesToString(mbToBytes(server.limits.memory)) : '無限制';
+    const cpuLimit = server.limits.cpu !== 0 ? server.limits.cpu + ' %' : '無限制';
 
     return (
-        <StatusIndicatorBox className={className} $status={stats?.status}>
-            <Link to={`/server/${server.id}`} css={tw`flex items-center col-span-12 sm:col-span-5 lg:col-span-6`}>
-                <div className={'icon mr-4'}>
-                    <FontAwesomeIcon icon={faServer} />
+        <StatusIndicatorBox to={`/server/${server.id}`} className={className} $status={server.status || stats?.status}>
+            <div css={tw`flex items-center w-full p-4 border-b border-neutral-800/50`}>
+                <div css={tw`flex-none w-1/4 flex items-center`}>
+                    <div className={'icon mr-4 w-12 h-12 rounded-full bg-neutral-900/50 flex items-center justify-center shadow-md'}>
+                        <FontAwesomeIcon icon={faServer} css={tw`text-xl text-neutral-300`} />
+                    </div>
+                    <div>
+                        <p css={tw`text-lg font-semibold break-words`}>{server.name}</p>
+                        <p css={tw`text-sm text-neutral-400 break-words line-clamp-2 font-mono`}>
+                            {server.allocations
+                                .filter((alloc: Allocation) => alloc.isDefault)
+                                .map((allocation: Allocation) => (
+                                    <React.Fragment key={allocation.ip + allocation.port.toString()}>
+                                        {allocation.alias || ip(allocation.ip)}:{allocation.port}
+                                    </React.Fragment>
+                                ))}
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <p css={tw`text-lg break-words`}>{server.name}</p>
-                    {!!server.description && (
-                        <p css={tw`text-sm text-neutral-300 break-words line-clamp-2`}>{server.description}</p>
-                    )}
+                <div css={tw`flex-grow`}/>
+                <div css={tw`w-1/4 flex items-center justify-end`}>
+                    {!stats || isSuspended ? (
+                        isSuspended ? (
+                            <div css={tw`text-center`}>
+                                <span css={tw`bg-red-600 rounded-full px-3 py-1 text-red-100 text-xs font-semibold uppercase tracking-wider`}>
+                                    {server.status === 'suspended' ? '已暫停' : '連線錯誤'}
+                                </span>
+                            </div>
+                        ) : server.isTransferring || server.status ? (
+                            <div css={tw`text-center`}>
+                                <span css={tw`bg-neutral-600 rounded-full px-3 py-1 text-neutral-100 text-xs font-semibold uppercase tracking-wider`}>
+                                    {server.isTransferring
+                                        ? '轉移中'
+                                        : server.status === 'installing'
+                                        ? '安裝中'
+                                        : server.status === 'restoring_backup'
+                                        ? '還原備份中'
+                                        : '不可用'}
+                                </span>
+                            </div>
+                        ) : (
+                            <Spinner size={'small'} />
+                        )
+                    ) : null}
                 </div>
-            </Link>
-            <TopSection>
-                <StatusIndicator status={stats?.status || (isSuspended ? 'offline' : undefined)} />
-                <ServerName>{server.name}</ServerName>
-            </TopSection>
-
-            {!stats || isSuspended ? (
-                <div css={tw`flex items-center justify-center h-24`}>
-                    {isSuspended ? (
-                        <p css={tw`text-sm text-neutral-500`}>伺服器已暫停</p>
-                    ) : server.isTransferring || server.status ? (
-                        <div css={tw`flex-1 text-center`}>
-                            <span css={tw`bg-neutral-500 rounded px-2 py-1 text-neutral-100 text-xs`}>
-                                {server.isTransferring
-                                    ? '轉移中'
-                                    : server.status === 'installing'
-                                    ? '安裝中'
-                                    : server.status === 'restoring_backup'
-                                    ? '還原備份中'
-                                    : '不可用'}
-                            </span>
+            </div>
+            {stats && !isSuspended && (
+                <div css={tw`w-full px-4 py-3`}>
+                    <div css={tw`grid grid-cols-3 gap-6`}>
+                        {/* CPU */}
+                        <div css={tw`text-center`}>
+                            <p css={tw`text-xs text-neutral-300 uppercase`}>處理器</p>
+                            <p css={tw`text-sm font-mono text-neutral-100 mb-2`}>{stats.cpuUsagePercent.toFixed(2)}%</p>
+                            <div css={tw`w-full bg-neutral-900/50 rounded-full h-1`}>
+                                <div css={tw`bg-cyan-500 h-1 rounded-full`} style={{ width: `${stats.cpuUsagePercent}%` }} />
+                            </div>
                         </div>
-                    ) : (
-                        <Spinner size={'small'} />
-                    )}
+                        {/* Memory */}
+                        <div css={tw`text-center`}>
+                            <p css={tw`text-xs text-neutral-300 uppercase`}>記憶體</p>
+                            <p css={tw`text-sm font-mono text-neutral-100 mb-2`}>{bytesToString(stats.memoryUsageInBytes)}</p>
+                            <div css={tw`w-full bg-neutral-900/50 rounded-full h-1`}>
+                                <div css={tw`bg-green-500 h-1 rounded-full`} style={{ width: `${(stats.memoryUsageInBytes / (server.limits.memory * 1024 * 1024)) * 100}%` }} />
+                            </div>
+                        </div>
+                        {/* Disk */}
+                        <div css={tw`text-center`}>
+                            <p css={tw`text-xs text-neutral-300 uppercase`}>磁碟空間</p>
+                            <p css={tw`text-sm font-mono text-neutral-100 mb-2`}>{bytesToString(stats.diskUsageInBytes)}</p>
+                            <div css={tw`w-full bg-neutral-900/50 rounded-full h-1`}>
+                                <div css={tw`bg-yellow-500 h-1 rounded-full`} style={{ width: `${(stats.diskUsageInBytes / (server.limits.disk * 1024 * 1024)) * 100}%` }} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            ) : (
-                <ResourcesSection>
-                    <ResourceRow>
-                        <ResourceIcon>
-                            <FontAwesomeIcon icon={faMicrochip} />
-                        </ResourceIcon>
-                        <ResourceLabel>CPU</ResourceLabel>
-                        <ProgressBarContainer>
-                            <ProgressBar $percent={cpuPercent} />
-                        </ProgressBarContainer>
-                        <ResourceUsage>{stats.cpuUsagePercent.toFixed(2)}%</ResourceUsage>
-                    </ResourceRow>
-                    <ResourceRow>
-                        <ResourceIcon>
-                            <FontAwesomeIcon icon={faMemory} />
-                        </ResourceIcon>
-                        <ResourceLabel>記憶體</ResourceLabel>
-                        <ProgressBarContainer>
-                            <ProgressBar $percent={memoryPercent} />
-                        </ProgressBarContainer>
-                        <ResourceUsage>{bytesToString(stats.memoryUsageInBytes)}</ResourceUsage>
-                    </ResourceRow>
-                    <ResourceRow>
-                        <ResourceIcon>
-                            <FontAwesomeIcon icon={faHdd} />
-                        </ResourceIcon>
-                        <ResourceLabel>硬碟</ResourceLabel>
-                        <ProgressBarContainer>
-                            <ProgressBar $percent={diskPercent} />
-                        </ProgressBarContainer>
-                        <ResourceUsage>{bytesToString(stats.diskUsageInBytes)}</ResourceUsage>
-                    </ResourceRow>
-                </ResourcesSection>
             )}
-
-            <BottomSection>
-                <ServerIp>
-                    <FontAwesomeIcon icon={faEthernet} css={tw`mr-2`} />
-                    {allocation ? `${ip(allocation.ip)}:${allocation.port}` : 'N/A'}
-                </ServerIp>
-            </BottomSection>
         </StatusIndicatorBox>
     );
 };
-
-export default ServerRow;
