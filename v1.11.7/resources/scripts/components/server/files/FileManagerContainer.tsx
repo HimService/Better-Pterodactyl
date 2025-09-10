@@ -62,19 +62,21 @@ export default () => {
     return (
         <ServerContentBlock title={'檔案管理器'} showFlashKey={'files'}>
             <ErrorBoundary>
-                <div className={'flex flex-wrap-reverse md:flex-nowrap mb-4'}>
-                    <FileManagerBreadcrumbs
-                        renderLeft={
-                            <FileActionCheckbox
-                                type={'checkbox'}
-                                css={tw`mx-4`}
-                                checked={selectedFilesLength === (files?.length === 0 ? -1 : files?.length)}
-                                onChange={onSelectAllClick}
-                            />
-                        }
-                    />
+                <div css={tw`flex flex-wrap-reverse md:flex-nowrap justify-between items-center mb-4`}>
+                    <div css={tw`flex-grow mr-4`}>
+                        <FileManagerBreadcrumbs
+                            renderLeft={
+                                <FileActionCheckbox
+                                    type={'checkbox'}
+                                    css={tw`mx-4`}
+                                    checked={selectedFilesLength === (files?.length === 0 ? -1 : files?.length)}
+                                    onChange={onSelectAllClick}
+                                />
+                            }
+                        />
+                    </div>
                     <Can action={'file.create'}>
-                        <div className={style.manager_actions}>
+                        <div css={tw`flex-shrink-0 flex items-center space-x-2`}>
                             <FileManagerStatus />
                             <NewDirectoryButton />
                             <UploadButton />
@@ -93,7 +95,7 @@ export default () => {
                         <p css={tw`text-sm text-neutral-400 text-center`}>此目錄似乎是空的。</p>
                     ) : (
                         <CSSTransition classNames={'fade'} timeout={150} appear in>
-                            <div>
+                            <div css={tw`space-y-2`}>
                                 {files.length > 250 && (
                                     <div css={tw`rounded bg-yellow-400 mb-px p-3`}>
                                         <p css={tw`text-yellow-900 text-sm text-center`}>

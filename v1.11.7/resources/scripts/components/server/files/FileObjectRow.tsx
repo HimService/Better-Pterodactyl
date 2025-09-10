@@ -13,11 +13,23 @@ import SelectFileCheckbox from '@/components/server/files/SelectFileCheckbox';
 import { usePermissions } from '@/plugins/usePermissions';
 import { join } from 'path';
 import { bytesToString } from '@/lib/formatters';
-import GreyRowBox from '@/components/elements/GreyRowBox';
+const Row = styled.div`
+    ${tw`flex items-center bg-neutral-100 rounded-lg p-3 shadow-sm transition-all duration-150 mb-2`};
+
+    [data-theme="dark"] & {
+        ${tw`bg-neutral-800`};
+    }
+
+    &:hover {
+        ${tw`shadow-md transform -translate-y-px`};
+        & .file-icon {
+            ${tw`text-cyan-500`};
+        }
+    }
+`;
 
 const IconContainer = styled.div`
-    ${tw`flex-none ml-6 mr-4 text-lg w-8 text-center`}
-    color: var(--color-icon);
+    ${tw`flex-none ml-3 mr-4 text-xl w-8 text-center text-neutral-500 transition-colors duration-150`}
 `;
 
 const Clickable: React.FC<{ file: FileObject }> = memo(({ file, children }) => {
@@ -30,19 +42,19 @@ const Clickable: React.FC<{ file: FileObject }> = memo(({ file, children }) => {
     const isLink = (file.isFile && file.isEditable() && canReadContents) || (!file.isFile && canRead);
 
     return (
-        <GreyRowBox
+        <Row
             as={(isLink ? NavLink : 'div') as any}
             {...(isLink ? { to: `${match.url}${file.isFile ? '/edit' : ''}#${encodePathSegments(join(directory, file.name))}` } : {})}
             css={tw`flex flex-1 items-center text-sm no-underline text-current min-w-0`}
         >
             {children}
-        </GreyRowBox>
+        </Row>
     );
 }, isEqual);
 
 const FileObjectRow = ({ file }: { file: FileObject }) => (
     <div
-        css={tw`flex items-center`}
+        css={tw`flex items-center relative`}
         key={file.name}
         onContextMenu={(e: React.MouseEvent<HTMLDivElement>) => {
             e.preventDefault();
@@ -50,10 +62,10 @@ const FileObjectRow = ({ file }: { file: FileObject }) => (
         }}
     >
         <Clickable file={file}>
-            <div onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
+            <div css={tw`flex-none w-10 flex items-center justify-center`} onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
                 <SelectFileCheckbox name={file.name} />
             </div>
-            <IconContainer>
+            <IconContainer className={'file-icon'}>
                 {file.isFile ? (
                     <FontAwesomeIcon
                         icon={file.isSymlink ? faFileImport : file.isArchiveType() ? faFileArchive : faFileAlt}
@@ -63,14 +75,16 @@ const FileObjectRow = ({ file }: { file: FileObject }) => (
                 )}
             </IconContainer>
             <div css={tw`flex-1 truncate`}>{file.name}</div>
-            {file.isFile && <div css={tw`w-1/6 text-right mr-4 hidden sm:block`}>{bytesToString(file.size)}</div>}
-            <div css={tw`w-1/5 text-right mr-4 hidden md:block`} title={file.modifiedAt.toString()}>
+            {file.isFile && <div css={tw`w-1/6 text-right mr-6 hidden sm:block`}>{bytesToString(file.size)}</div>}
+            <div css={tw`w-1/5 text-right mr-6 hidden md:block`} title={file.modifiedAt.toString()}>
                 {Math.abs(differenceInHours(file.modifiedAt, new Date())) > 48
                     ? format(file.modifiedAt, 'MMM do, yyyy h:mma')
                     : formatDistanceToNow(file.modifiedAt, { addSuffix: true })}
             </div>
         </Clickable>
-        <FileDropdownMenu file={file} />
+        <div css={tw`absolute right-0 mr-2`}>
+            <FileDropdownMenu file={file} />
+        </div>
     </div>
 );
 
