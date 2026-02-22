@@ -112,4 +112,6 @@ return [
     'save' => '儲存',
     'add' => '新增',
     'copyright' => '&copy; 2015 - :year Pterodactyl Software',
+    'assigned_to' => '指派給',
+    'ports' => '連接埠',
 ];

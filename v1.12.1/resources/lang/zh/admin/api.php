@@ -40,5 +40,6 @@ return [
         'node_allocations' => '節點分配 (Node Allocations)',
         'server_databases' => '伺服器資料庫 (Server Databases)',
         'server_variables' => '伺服器變數 (Server Variables)',
+        'database_hosts' => '資料庫主機',
     ],
 ];
