@@ -1,0 +1,132 @@
+.button {
+    @apply px-5 py-2.5 inline-flex items-center justify-center;
+    @apply rounded-full text-sm font-medium transition-all duration-300;
+    @apply focus:outline-none focus:ring-4 focus:ring-brand-500/30;
+    @apply shadow-sm scale-100;
+
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+
+    &:active:not(:disabled) {
+        transform: scale(0.95);
+    }
+
+    /* Sizing Controls */
+    &.small {
+        @apply px-3 py-1.5 h-auto text-xs;
+    }
+
+    &.large {
+        @apply px-6 py-3 text-base;
+    }
+
+    &.secondary {
+        @apply shadow-none;
+        background: transparent !important;
+        border-color: transparent !important;
+
+        &:disabled {
+            background: transparent !important;
+        }
+    }
+
+    &:disabled {
+        @apply cursor-not-allowed opacity-60;
+    }
+
+    &.square {
+        @apply p-0 w-12 h-12 aspect-square;
+
+        &.small {
+            @apply w-8 h-8;
+        }
+    }
+}
+
+.primary {
+    background-color: rgb(var(--color-brand-600));
+    color: white;
+
+    &:hover:not(:disabled) {
+        background-color: rgb(var(--color-brand-700));
+        box-shadow: 0 4px 14px 0 rgb(var(--color-brand-500) / 0.39);
+    }
+
+    &:active:not(:disabled) {
+        background-color: rgb(var(--color-brand-800));
+    }
+
+    &:disabled {
+        background-color: rgb(var(--color-brand-600) / 0.7);
+    }
+
+    &.secondary {
+        background: transparent !important;
+        border: 1px solid rgb(var(--border-color));
+        color: rgb(var(--text-primary));
+
+        &:hover:not(:disabled) {
+            background-color: rgb(var(--color-brand-600)) !important;
+            border-color: rgb(var(--color-brand-600)) !important;
+            color: white;
+            box-shadow: 0 4px 14px 0 rgb(var(--color-brand-500) / 0.39);
+        }
+    }
+}
+
+.text {
+    background-color: rgb(var(--bg-card-hover));
+    color: rgb(var(--text-secondary));
+    border: 1px solid rgb(var(--border-color));
+
+    &:hover:not(:disabled) {
+        background-color: rgb(var(--border-color));
+        color: rgb(var(--text-primary));
+    }
+
+    &:active:not(:disabled) {
+        background-color: rgb(var(--border-color));
+    }
+
+    &.secondary {
+        background: transparent !important;
+        color: rgb(var(--text-secondary));
+
+        &:hover:not(:disabled) {
+            background-color: rgb(var(--bg-card-hover)) !important;
+            color: rgb(var(--text-primary));
+        }
+    }
+
+    &:disabled {
+        background-color: rgb(var(--bg-card-hover) / 0.7);
+    }
+}
+
+.danger {
+    @apply bg-red-600 text-white;
+
+    &:hover:not(:disabled) {
+        @apply bg-red-700;
+        box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39);
+    }
+
+    &:active:not(:disabled) {
+        @apply bg-red-800;
+    }
+
+    &.secondary {
+        background: transparent !important;
+        color: theme('colors.red.600');
+        border: 1px solid theme('colors.red.600');
+
+        &:hover:not(:disabled) {
+            @apply bg-red-600 text-white !important;
+            box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39);
+        }
+    }
+
+    &:disabled {
+        @apply bg-red-600/70 text-white/90;
+    }
+}

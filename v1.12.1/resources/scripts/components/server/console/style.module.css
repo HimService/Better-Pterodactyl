@@ -1,0 +1,58 @@
+.stat_block {
+    @apply flex items-center rounded-2xl relative;
+    @apply col-span-3 md:col-span-2 lg:col-span-6;
+    @apply px-3 py-2 md:p-3 lg:p-4;
+
+    &>.status_bar {
+        @apply w-1 h-full absolute left-0 top-0 rounded-l-2xl sm:hidden;
+    }
+
+    &>.icon {
+        @apply hidden flex-shrink-0 items-center justify-center rounded-xl w-12 h-12;
+        @apply transition-all duration-500 hover:scale-105;
+        @apply sm:flex sm:mr-4;
+        box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.3);
+
+        &>svg {
+            @apply w-5 h-5 m-auto drop-shadow-md;
+        }
+    }
+}
+
+.terminal {
+    @apply flex flex-col w-full h-full;
+
+    &>.container {
+        @apply p-2 sm:p-4 bg-transparent min-h-[16rem] flex-1 font-mono text-sm;
+        border: none;
+
+        & #terminal {
+            @apply h-full;
+
+            &::-webkit-scrollbar-track {
+                @apply w-2;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                @apply bg-neutral-800 dark:bg-gray-900;
+            }
+        }
+    }
+
+    & .command_icon {
+        @apply flex items-center top-0 left-0 absolute z-10 select-none h-full px-4 transition-colors duration-100;
+    }
+
+    & .command_input {
+        @apply relative px-4 pl-11 pr-4 py-3 w-full font-mono text-sm;
+        @apply focus:ring-0 outline-none focus-visible:outline-none;
+        @apply transition-colors duration-200;
+        background-color: rgba(255, 255, 255, 0.03);
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+}
+
+.chart_container {
+    @apply rounded-2xl relative;
+}

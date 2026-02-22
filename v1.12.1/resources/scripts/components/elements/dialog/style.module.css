@@ -1,0 +1,39 @@
+.container {
+    @apply flex min-h-full items-center justify-center p-4 text-center;
+}
+
+.panel {
+    background-color: rgb(var(--bg-card));
+    border: 1px solid rgb(var(--border-color));
+    border-radius: var(--radius-card);
+    @apply relative max-w-xl w-full mx-auto shadow-xl text-left;
+}
+
+.title {
+    @apply font-header text-xl font-semibold mb-2 pr-4;
+    color: rgb(var(--text-primary));
+}
+
+.close_icon {
+    @apply w-5 h-5 group-hover:rotate-90 transition-transform duration-300;
+}
+
+.dialog_icon {
+    @apply flex items-center justify-center w-10 h-10 rounded-full mr-4;
+
+    &.danger {
+        @apply bg-red-500 text-red-50;
+    }
+
+    &.warning {
+        @apply bg-yellow-600 text-yellow-50;
+    }
+
+    &.success {
+        @apply bg-green-600 text-green-50;
+    }
+
+    &.info {
+        @apply bg-primary-500 text-primary-50;
+    }
+}
