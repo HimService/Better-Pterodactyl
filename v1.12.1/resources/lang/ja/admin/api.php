@@ -1,0 +1,45 @@
+<?php
+
+return [
+    'index' => [
+        'title' => 'アプリケーション API',
+        'description' => 'API経由でこのパネルを管理するための資格情報を制御します。',
+        'list' => '認証情報リスト',
+        'create_new' => '新しい認証情報の作成',
+        'key' => 'キー',
+        'memo' => 'メモ',
+        'last_used' => '最終使用',
+        'created' => '作成日',
+        'created_by' => '作成者',
+        'revoke_key_title' => 'APIキーの取り消し',
+        'revoke_key_text' => 'このAPIキーを取り消すと、現在これを使用しているすべてのアプリケーションが動作を停止します。',
+        'revoked_text' => 'APIキーが取り消されました。',
+        'whoops' => 'おっと！',
+        'revoke_error' => 'このキーの取り消し中にエラーが発生しました。',
+    ],
+    'new' => [
+        'header' => 'APIキーの作成',
+        'header_help' => '新しいアプリケーションAPIキーを作成します。',
+        'node_help' => '新しい認証情報を設定した後は、戻って編集することはできません。後で変更が必要になった場合は、新しい認証情報のセットを作成する必要があります。',
+        'create_credentials' => '認証情報の作成',
+    ],
+    'permissions' => [
+        'read' => '読み取り',
+        'read_write' => '読み取りと書き込み',
+        'none' => 'なし',
+        'select_permissions' => '権限の選択',
+    ],
+    'resources' => [
+        'locations' => '場所',
+        'nodes' => 'ノード',
+        'servers' => 'サーバー',
+        'users' => 'ユーザー',
+        'allocations' => '割り当て',
+        'nests' => 'Nest',
+        'eggs' => 'Egg',
+        'node_allocations' => 'ノード割り当て',
+        'server_databases' => 'サーバーデータベース',
+        'server_variables' => 'サーバー変数',
+        'database_hosts' => 'データベースホスト',
+    ],
+];
