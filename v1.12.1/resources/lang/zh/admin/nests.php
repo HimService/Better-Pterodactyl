@@ -16,6 +16,7 @@ return [
             'egg_created' => '已成功產下新的蛋。您需要重新啟動任何正在執行的守護行程以套用此新蛋。',
         ],
         'egg' => 'Egg',
+        'eggs' => '蛋 (Eggs)',
         'configuration' => '配置',
         'variables' => '變數',
         'install_script' => '安裝腳本',

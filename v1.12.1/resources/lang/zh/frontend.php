@@ -25,7 +25,7 @@ return [
             'continue' => '繼續',
             'stop_warning' => '強制停止伺服器可能導致資料損毀。',
             'start' => '啟動',
-            'restart' => '重新啟動',
+            'restart' => '重啟',
             'kill' => '強制停止',
             'stop' => '關閉',
             'transfer_failed' => '轉移失敗。',
