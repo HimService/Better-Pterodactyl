@@ -80,7 +80,7 @@
                         <div>
                             <div class="radio radio-success radio-inline">
                                 <input type="radio" id="pSSLTrue" value="https" name="scheme" {{ (old('scheme', $node->scheme) === 'https') ? 'checked' : '' }}>
-                                <label for="pSSLTrue"> @lang('admin/node.new.ssl_help')</label>
+                                <label for="pSSLTrue"> @lang('admin/node.new.ssl_help_ssl')</label>
                             </div>
                             <div class="radio radio-danger radio-inline">
                                 <input type="radio" id="pSSLFalse" value="http" name="scheme" {{ (old('scheme', $node->scheme) !== 'https') ? 'checked' : '' }}>
