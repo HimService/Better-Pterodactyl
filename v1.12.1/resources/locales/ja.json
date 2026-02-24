@@ -1,0 +1,812 @@
+{
+    "global": {
+        "delete": "削除",
+        "saving": "保存中",
+        "loading": "読み込み中...",
+        "create": "作成",
+        "cancel": "キャンセル",
+        "disable": "無効化",
+        "done": "完了",
+        "enable": "有効化",
+        "error": "エラー",
+        "save": "保存",
+        "close": "閉じる",
+        "whoops": "おっと！",
+        "modify": "変更",
+        "view": "表示",
+        "showing": "表示中",
+        "to": "から",
+        "of": "/",
+        "results": "件の結果",
+        "update": "更新",
+        "upload": "アップロード",
+        "create_file": "ファイル作成",
+        "rename": "名前変更",
+        "move": "移動",
+        "okay": "OK",
+        "success": "成功",
+        "metadata": "メタデータ",
+        "error_boundary": "このビューのレンダリング中にエラーが発生しました。ページを更新してください。",
+        "access_denied": "アクセス拒否",
+        "no_permission": "このページにアクセスする権限がありません。"
+    },
+    "auth": {
+        "welcome_back": "おかえりなさい",
+        "better_pterodactyl": "Better Pterodactyl",
+        "tagline": "より優れた管理インターフェース",
+        "description": "新しいサーバー管理インターフェースを体験してください。",
+        "intuitive": "直感的",
+        "convenient": "便利",
+        "efficient": "効率的",
+        "logout_confirmation": "セッションは安全にクリアされます。またのご利用をお待ちしております。",
+        "logout_title": "セッション終了",
+        "logout_stay": "ログインを維持",
+        "login": {
+            "title": "ログインして続行",
+            "username": "ユーザー名またはメールアドレス",
+            "please_enter_credentials": "コントロールパネルにアクセスするには、アカウントにログインしてください。",
+            "username_required": "ユーザー名またはメールアドレスを入力してください。",
+            "password_required": "パスワードを入力してください。",
+            "login_button": "ログイン",
+            "forgot_password": "パスワードを忘れた場合",
+            "password": "パスワード",
+            "pterodactyl_software": "Pterodactyl ソフトウェア"
+        },
+        "forgot_password": {
+            "title": "パスワードリセットのリクエスト",
+            "email": "メールアドレス",
+            "email_description": "パスワードリセットの手順を受け取るために、アカウントのメールアドレスを入力してください。",
+            "email_invalid": "続行するには有効なメールアドレスを入力してください。",
+            "email_required": "続行するには有効なメールアドレスを入力してください。",
+            "send_email": "メールを送信",
+            "return_login": "ログインに戻る"
+        },
+        "checkpoint": {
+            "title": "デバイス認証",
+            "auth_code": "認証コード",
+            "recovery_code": "リカバリコード",
+            "auth_description": "デバイスで生成された2要素認証コードを入力してください。",
+            "recovery_description": "2要素認証を設定したときに生成されたリカバリコードを入力して続行してください。",
+            "continue": "続行",
+            "lost_device": "デバイスを紛失しました",
+            "have_device": "デバイスを持っています",
+            "return_login": "ログインに戻る"
+        },
+        "reset_password": {
+            "title": "パスワードのリセット",
+            "email": "メールアドレス",
+            "new_password": "新しいパスワード",
+            "confirm_password": "新しいパスワード（確認）",
+            "password_description": "パスワードは8文字以上である必要があります。",
+            "password_required": "新しいパスワードを入力してください。",
+            "password_min_length": "新しいパスワードは8文字以上である必要があります。",
+            "password_confirm_required": "新しいパスワードが一致しません。",
+            "password_mismatch": "新しいパスワードが一致しません。",
+            "reset_button": "パスワードをリセット",
+            "return_login": "ログインに戻る"
+        }
+    },
+    "server": {
+        "files": {
+            "header": "ファイルマネージャー",
+            "new_file": "新規ファイル",
+            "empty_directory": "このディレクトリは空のようです。",
+            "too_large": "このディレクトリはブラウザで表示するには大きすぎます。最初の250ファイルのみ表示しています。",
+            "file": "ファイル",
+            "directory": "ディレクトリ",
+            "delete_confirm_prefix": "削除すると、",
+            "delete_confirm_suffix": "の内容を復元することはできません。",
+            "rename": "名前変更",
+            "move": "移動",
+            "permissions": "権限",
+            "copy": "コピー",
+            "unarchive": "アーカイブ解除",
+            "archive": "アーカイブ",
+            "download": "ダウンロード",
+            "archiving": "ファイルをアーカイブ中...",
+            "deleting": "ファイルを削除中...",
+            "delete_title": "ファイルを削除",
+            "delete_mass_confirm_prefix": "本当に",
+            "files_count": "個のファイル",
+            "delete_mass_confirm_suffix": "を削除しますか？この操作は取り消せず、ファイルを復元することはできません。",
+            "and_more": "と他",
+            "new_directory": "新規ディレクトリ",
+            "directory_name": "ディレクトリ名",
+            "create_as_prefix": "このディレクトリは次のように作成されます: ",
+            "rename_file": "ファイル名を変更",
+            "new_location": "新しい場所",
+            "upload_drop": "ファイルをドロップしてアップロード",
+            "chmod": {
+                "update": "更新",
+                "label": "ファイルモード"
+            },
+            "file_mode": "ファイル権限",
+            "file_name": "ファイル名",
+            "move_description": "このファイルまたはフォルダの新しい名前とディレクトリを入力してください（現在のディレクトリからの相対パス）。",
+            "drag_and_drop": "ここにファイルをドラッグしてアップロードします。",
+            "others": "個の他のファイル",
+            "edit_file": "ファイルを編集",
+            "save_content": "内容を保存",
+            "create_file": "ファイルを作成",
+            "pteroignore_editing": "編集中:",
+            "pteroignore_description": "ファイル。ここにリストされたファイルやフォルダはバックアップから除外されます。ワイルドカードがサポートされています。",
+            "pteroignore_negate": "ルールの前に感嘆符を付けることで、前のルールを無効にできます。",
+            "file_name_description": "このファイルを保存する名前を入力してください。",
+            "folder_upload_error": "フォルダのアップロードはサポートされていません。",
+            "create_directory": "ディレクトリを作成",
+            "create_directory_help": "このディレクトリは次に作成されます:",
+            "home": "home",
+            "container": "container"
+        },
+        "schedules": {
+            "header": "スケジュール",
+            "no_schedules": "このサーバーに設定されているスケジュールはありません。",
+            "create_schedule": "スケジュールを作成",
+            "edit": "編集",
+            "edit_title": "スケジュールを編集",
+            "create_title": "新規スケジュールを作成",
+            "name_label": "スケジュール名",
+            "name_description": "このスケジュールのわかりやすい名前。",
+            "cron_minute": "分",
+            "cron_hour": "時",
+            "cron_dom": "日",
+            "cron_month": "月",
+            "cron_dow": "曜日",
+            "cron_description": "スケジュールシステムは、タスクを実行するタイミングを定義するためにCron構文をサポートしています。上のフィールドでタスクの開始時間を指定してください。",
+            "cheatsheet_label": "チートシートを表示",
+            "cheatsheet_description": "参照用にCronチートシートを表示します。",
+            "cheatsheet": {
+                "examples": "例",
+                "every_5_minutes": "5分ごと",
+                "every_hour": "1時間ごと",
+                "hour_range": "時間の範囲",
+                "once_a_day": "1日に1回",
+                "every_monday": "毎週月曜日",
+                "special_characters": "特殊文字",
+                "any_value": "すべての値",
+                "value_list_separator": "値リストの区切り文字",
+                "range_values": "範囲値",
+                "step_values": "ステップ値"
+            },
+            "only_online_label": "サーバーがオンラインのときのみ",
+            "only_online_description": "サーバーが実行状態のときのみ、このスケジュールを実行します。",
+            "enabled_label": "スケジュール有効",
+            "enabled_description": "有効にすると、このスケジュールは自動的に実行されます。",
+            "save_changes": "変更を保存",
+            "edit_task": "タスクを編集",
+            "new_task": "新規タスク",
+            "task_action_required": "有効なアクションを指定してください。",
+            "task_payload_required": "ペイロードを入力してください。",
+            "task_offset_number": "タイムオフセットは0から900の間の有効な数値である必要があります。",
+            "task_offset_required": "タイムオフセット値を入力してください。",
+            "task_offset_min": "タイムオフセットは0以上である必要があります。",
+            "task_offset_max": "タイムオフセットは900秒以下である必要があります。",
+            "task_payload": "ペイロード",
+            "command_payload_description": "このタスクの実行時にサーバーに送信するコマンド。",
+            "backup_ignored_files": "無視するファイル",
+            "backup_payload_description": "オプション: このバックアップから除外するファイル/フォルダを入力してください。空の場合は.pteroignoreの内容が使用されます（存在する場合）。カンマ区切り、最大200文字。",
+            "task_time_offset": "タイムオフセット（秒）",
+            "task_time_offset_description": "前のタスクが終了してからこのタスクを実行するまでの待機秒数。これがシーケンスの最初のタスクの場合、スケジュールがトリガーされてからの待機秒数になります。",
+            "action_command": "コマンドを送信",
+            "action_power": "電源操作を送信",
+            "action_backup": "バックアップを作成",
+            "create_task": "タスクを作成",
+            "backup_limit_zero": "サーバーのバックアップ制限が0に設定されている場合、バックアップタスクを作成することはできません。",
+            "last_run_at": "最終実行:",
+            "never": "未実行",
+            "active": "アクティブ",
+            "inactive": "非アクティブ",
+            "processing": "処理中",
+            "confirm_task_delete": "タスク削除の確認",
+            "confirm_task_delete_description": "このタスクを削除してもよろしいですか？この操作は取り消せません。",
+            "delete_task": "タスクを削除",
+            "task_send_command": "コマンドを送信",
+            "task_send_power": "電源操作を送信",
+            "task_create_backup": "バックアップを作成",
+            "task_unknown": "不明なアクション",
+            "ignoring_files": "無視するファイルとフォルダ:",
+            "continues_on_failure": "失敗しても続行",
+            "seconds_later": "秒後"
+        },
+        "startup": {
+            "header": "起動設定",
+            "startup_command": "起動コマンド",
+            "docker_image": "Dockerイメージ",
+            "docker_image_description": "これは高度な機能であり、このサーバーインスタンスを実行するときに使用するDockerイメージを選択できます。",
+            "custom_image": "このサーバーのDockerイメージは管理者によって手動で設定されており、このインターフェースから変更することはできません。",
+            "variables": "環境変数",
+            "read_only": "読み取り専用"
+        },
+        "conflict": {
+            "installing_title": "インストール中",
+            "installing_msg": "サーバーの準備がまもなく完了します。数分後に再度確認してください。",
+            "suspended_title": "サーバー停止中",
+            "suspended_msg": "このサーバーは現在停止されており、アクセスできません。",
+            "maintenance_title": "ノードメンテナンス中",
+            "maintenance_msg": "このサーバーがあるノードは現在メンテナンス中です。",
+            "transferring_title": "転送中",
+            "restoring_title": "バックアップから復元中",
+            "transferring_msg": "サーバーを新しいノードに転送しています。後でもう一度お試しください。",
+            "restoring_msg": "サーバーは現在バックアップから復元されています。数分後に再度確認してください。",
+            "daemon_connection_trouble": "サーバーへの接続中に問題が発生しました。お待ちください...",
+            "daemon_connection_failed": "複数回の試行後、Websocketインスタンスへの接続に失敗しました。ページを更新してください。",
+            "daemon_credentials_error": "Websocketに提供された資格情報の検証中にエラーが発生しました。ページを更新してください。"
+        },
+        "backups": {
+            "no_backups_on_page": "このページに表示するバックアップはありません。",
+            "no_backups": "このサーバーのバックアップは現在ありません。",
+            "limit_is_0": "バックアップ制限が0に設定されているため、このサーバーのバックアップを作成することはできません。",
+            "row": {
+                "created": "作成日時"
+            },
+            "create_new": "サーバーバックアップを作成",
+            "name_label": "バックアップ名",
+            "name_description": "オプション: このバックアップの名前を入力してください。",
+            "ignored_label": "無視するファイルとフォルダ",
+            "ignored_description": "バックアップ作成時に無視するファイルやフォルダを入力してください。空の場合は、サーバーのルートにある.pteroignoreファイルの内容が使用されます（存在する場合）。アスタリスクによるワイルドカード一致がサポートされており、パスの前に感嘆符を付けることでルールを無効にできます。",
+            "locked_label": "ロック済み",
+            "locked_description": "ロックを解除するまで、このバックアップの削除を防止します。",
+            "start_button": "バックアップ開始",
+            "create_button": "バックアップ作成"
+        },
+        "console": {
+            "transfer_failed": "転送に失敗しました。",
+            "server_status": "サーバーの状態が {{status}} になりました...",
+            "type_command": "コマンドを入力...",
+            "command_input_aria": "コンソールコマンド入力。",
+            "stop_process": "プロセスを強制終了",
+            "continue": "続行",
+            "stop_warning": "サーバーを強制終了すると、データが破損する可能性があります。",
+            "start": "起動",
+            "restart": "再起動",
+            "kill": "強制終了",
+            "stop": "停止",
+            "title": "コンソール",
+            "node_under_maintenance": "このサーバーがあるノードは現在メンテナンス中のため、操作を実行できません。",
+            "running_installation": "このサーバーは現在インストールプロセスを実行中のため、ほとんどの操作を利用できません。",
+            "transferring": "このサーバーは現在別のノードに転送中のため、操作を実行できません。",
+            "address": "アドレス",
+            "uptime": "稼働時間",
+            "offline": "オフライン",
+            "cpu_load": "CPU使用率",
+            "memory": "メモリ",
+            "disk": "ディスク",
+            "network_inbound": "ネットワーク (受信)",
+            "network_outbound": "ネットワーク (送信)",
+            "cpu": "CPU",
+            "network": "ネットワーク",
+            "network_in": "受信 (In)",
+            "network_out": "送信 (Out)",
+            "inbound": "受信",
+            "outbound": "送信"
+        },
+        "databases": {
+            "validation": {
+                "name": {
+                    "required": "データベース名を入力してください。",
+                    "min": "データベース名は3文字以上である必要があります。",
+                    "max": "データベース名は48文字以内である必要があります。",
+                    "regex": "データベース名には、英数字、アンダースコア、ダッシュ、ピリオドのみ使用できます。",
+                    "match": "データベース名を入力してください。"
+                },
+                "connections": {
+                    "regex": "有効なホストアドレスを入力してください。"
+                }
+            },
+            "create_new": "新規データベース作成",
+            "name_label": "データベース名",
+            "name_description": "データベースインスタンスの説明的な名前。",
+            "connections_label": "接続元",
+            "connections_description": "接続を許可するオリジン。空の場合は、すべてのソースからの接続を許可します。",
+            "create_button": "データベース作成",
+            "new_database": "新規データベース",
+            "confirm_deletion": {
+                "title": "データベース削除の確認",
+                "description_1": "データベースの削除は永続的な操作であり、取り消すことはできません。これにより、",
+                "description_2": " データベースが永久に削除され、関連するすべてのデータが削除されます。"
+            },
+            "delete": {
+                "confirm_name": "データベース名を確認",
+                "confirm_description": "削除を確認するためにデータベース名を入力してください。",
+                "submit": "データベースを削除"
+            },
+            "connection_details": "データベース接続の詳細",
+            "endpoint": "エンドポイント",
+            "connections_from": "接続元",
+            "username": "ユーザー名",
+            "password": "パスワード",
+            "jdbc_connection": "JDBC接続文字列",
+            "resource_limit_allocated": "このサーバーにはこれ以上データベースを作成できません。",
+            "no_databases": "現在データベースはありません。",
+            "no_databases_found": "データベースが見つかりません。",
+            "rotate_password_button": "パスワードをリセット"
+        },
+        "features": {
+            "gsl_token": {
+                "title": "無効なGSLトークン！",
+                "description_invalid": "ゲームサーバーログインコード（GSLトークン）が無効であるか、期限切れのようです。",
+                "description_action": "新しいトークンを生成して下に入力するか、空にして完全に削除することができます。",
+                "label": "GSLトークン",
+                "help_text": "トークンを生成するには https://steamcommunity.com/dev/managegameservers にアクセスしてください。",
+                "update_button": "GSLトークンを更新"
+            },
+            "hytale_oauth": {
+                "title": "認証が必要",
+                "description": "サーバーファイルをダウンロードまたは更新するには、Hytaleアカウントで認証する必要があります。ログインして続行してください。",
+                "login_button": "ログイン"
+            },
+            "java_version": {
+                "title": "サポートされていないJavaバージョン",
+                "description_unsupported": "このサーバーは現在サポートされていないJavaバージョンを実行しており、起動できません。",
+                "description_select": "サーバーの起動を続行するには、下のリストからサポートされているバージョンを選択してください。",
+                "update_button": "Dockerイメージを更新"
+            },
+            "pid_limit": {
+                "title_admin": "メモリまたはプロセス制限に達しました...",
+                "description_limit": "このサーバーは最大プロセスまたはメモリ制限に達しました。",
+                "description_fix": "wingsの設定（config.yml）の \"container_pid_limit\" を増やすと、解決する場合があります。",
+                "description_note": "注意: 設定の変更を反映するには、Wingsを再起動する必要があります。",
+                "title_user": "リソース制限に達した可能性があります...",
+                "description_contact": "このサーバーは割り当てられた以上のリソースを使用しようとしています。下のエラーメッセージを管理者に伝えてください。"
+            },
+            "disk_space": {
+                "title": "ディスク容量不足...",
+                "description_admin": "このサーバーは利用可能なディスク容量を使い果たしたため、インストールまたは更新プロセスを完了できません。",
+                "description_fix": "ホストサーバーで \"df -h\" を入力して、VMに十分なストレージがあることを確認してください。ファイルを削除するか、使用済みのディスク容量を解放して解決してください。",
+                "description_user": "このサーバーは利用可能なディスク容量を使い果たしたため、インストールまたは更新プロセスを完了できません。管理者にストレージ不足について連絡してください。"
+            },
+            "eula": {
+                "title": "Minecraft® EULA に同意",
+                "description_prefix": "下の「同意する」をクリックすると、",
+                "description_link": "Minecraft® EULA 利用規約",
+                "accept_button": "同意する"
+            }
+        },
+        "network": {
+            "hostname": "ホスト名",
+            "ip": "IPアドレス",
+            "port": "ポート",
+            "notes": "メモ",
+            "primary": "メイン",
+            "make_primary": "メインに設定",
+            "delete_title": "割り当てを削除",
+            "delete_description": "この割り当てはサーバーからすぐに削除されます。",
+            "header": "ネットワーク",
+            "create_allocation": "割り当てを追加"
+        },
+        "settings": {
+            "reinstall_started": "サーバーの再インストールプロセスが開始されました。",
+            "reinstall_title": "サーバーを再インストール",
+            "reinstall_confirm_title": "サーバー再インストールの確認",
+            "reinstall_confirm_button": "はい、サーバーを再インストールします",
+            "reinstall_confirm": "このプロセス中にサーバーは停止され、一部のファイルが削除または変更される可能性があります。続行してもよろしいですか？",
+            "reinstall_description": "サーバーを再インストールすると停止し、最初にセットアップしたインストールスクリプトが再実行されます。",
+            "reinstall_warning": "このプロセス中に一部のファイルが削除または変更される可能性があるため、続行する前にすべてのデータをバックアップすることを強くお勧めします。",
+            "reinstall_button": "サーバーを再インストール",
+            "rename_title": "サーバーの詳細を変更",
+            "server_name": "サーバー名",
+            "server_description": "サーバーの説明",
+            "header": "設定",
+            "sftp_details": "SFTPの詳細",
+            "sftp_address": "サーバーアドレス",
+            "sftp_username": "ユーザー名",
+            "sftp_password": "SFTPパスワードは、このパネルへのログインに使用するパスワードと同じです。",
+            "launch_sftp": "SFTPを起動",
+            "debug_info": "デバッグ情報",
+            "node": "ノード",
+            "server_id": "サーバーID"
+        },
+        "users": {
+            "add_user": "ユーザーを追加",
+            "edit": {
+                "email_max": "メールアドレスは191文字以内である必要があります。",
+                "email_invalid": "有効なメールアドレスを入力してください。",
+                "permissions_for": "ユーザーの権限:",
+                "create_subuser": "新規サブユーザー作成",
+                "invite_user": "ユーザーを招待",
+                "only_assigned_permissions": "他のユーザーを作成または変更する場合、現在のアカウントに割り当てられている権限のみを選択できます。",
+                "user_email": "ユーザーのメールアドレス",
+                "user_email_description": "このサーバーのサブユーザーとして招待したいユーザーのメールアドレスを入力してください。"
+            },
+            "remove_title": "このサブユーザーを削除しますか？",
+            "remove_button": "はい、サブユーザーを削除します",
+            "remove_description": "このサブユーザーを削除してもよろしいですか？このユーザーはこのサーバーへのすべてのアクセス権をすぐに失います。",
+            "remove_aria_label": "サブユーザーを削除",
+            "row": {
+                "2fa_enabled": "2FA有効",
+                "permissions": "権限",
+                "edit_subuser": "サブユーザーを編集"
+            },
+            "header": "ユーザー管理",
+            "no_users": "このサーバーにはサブユーザーがいないようです。"
+        }
+    },
+    "navigation": {
+        "light_mode": "ライトモード",
+        "dark_mode": "ダークモード",
+        "system_theme": "システムテーマ",
+        "dashboard": "ダッシュボード",
+        "admin": "管理エリア",
+        "account_settings": "アカウント設定",
+        "sign_out": "ログアウト",
+        "servers": "サーバー",
+        "account": "マイアカウント",
+        "admin_panel": "管理パネル",
+        "console": "コンソール",
+        "files": "ファイル管理",
+        "databases": "データベース",
+        "schedules": "スケジュール",
+        "users": "ユーザー管理",
+        "backups": "バックアップ",
+        "network": "ネットワーク",
+        "startup": "起動設定",
+        "settings": "設定",
+        "activity_log": "活動ログ",
+        "api_credentials": "APIキー",
+        "ssh_keys": "SSHキー",
+        "activity": "活動ログ"
+    },
+    "dashboard": {
+        "account_api": {
+            "header": "アカウントAPI",
+            "create_key": "APIキーを作成",
+            "api_keys": "APIキー",
+            "delete_key": "APIキーを削除",
+            "delete_key_button": "キーを削除",
+            "delete_key_prefix": "この ",
+            "delete_key_suffix": " キーを使用するすべてのリクエストは無効になります。",
+            "no_keys": "このアカウントで利用可能なAPIキーはありません。",
+            "last_used": "最終使用:",
+            "never": "未使用",
+            "description": "説明",
+            "description_help": "このAPIキーの説明的なメモ。",
+            "allowed_ips": "許可されたIP",
+            "allowed_ips_help": "すべてのIPアドレスにこのAPIキーの使用を許可する場合は空にし、それ以外の場合は1行に1つずつ許可されたIPアドレスを入力してください。",
+            "api_key_modal": {
+                "title": "あなたのAPIキー",
+                "description": "リクエストしたAPIキーは以下の通りです。安全な場所に保管してください。二度と表示されません。"
+            }
+        },
+        "account_overview": {
+            "header": "アカウント概要",
+            "2fa_required": "2段階認証が必要",
+            "2fa_required_description": "続行するには、アカウントで2段階認証を有効にする必要があります。",
+            "update_password": "パスワード変更",
+            "update_email": "メールアドレス変更",
+            "two_step": "2段階認証",
+            "2fa_enabled": "現在、アカウントで2段階認証が有効になっています。",
+            "2fa_disabled": "現在、アカウントで2段階認証が有効になっていません。下のボタンをクリックしてセットアップを開始してください。",
+            "disable_2fa": "2段階認証を無効化",
+            "disable_2fa_description": "2段階認証を無効にすると、アカウントのセキュリティが低下します。",
+            "enable_2fa": "2段階認証を有効化",
+            "enable_2fa_description": "不正アクセスからアカウントを保護します。ログインや特定の操作ごとに認証コードの入力が求められます。",
+            "password": "パスワード",
+            "must_enter_password": "続行するにはアカウントのパスワードを入力してください。",
+            "2fa_enabled_title": "2段階認証が有効になりました",
+            "recovery_codes_help": "下のリカバリコードを安全に保管してください。電話へのアクセスを失った場合、これらのバックアップコードを使用してログインできます。",
+            "recovery_codes_warning": "これらのリカバリコードは二度と表示されません。",
+            "qr_code_help": "選択した2段階認証アプリを使用して上のQRコードをスキャンしてください。その後、生成された6桁のコードを下のフィールドに入力してください。",
+            "account_password": "アカウントパスワード",
+            "waiting_for_qr": "QRコードの読み込みを待っています...",
+            "must_enter_code_and_password": "続行するには、6桁の認証コードとパスワードを入力してください。",
+            "must_provide_password": "現在のアカウントパスワードを入力してください。",
+            "email_updated": "メインのメールアドレスが更新されました。",
+            "email": "メールアドレス",
+            "confirm_password": "パスワード（確認）",
+            "update_email_button": "メールアドレスを更新",
+            "must_provide_current_password": "現在のパスワードを入力してください。",
+            "password_confirmation_mismatch": "パスワードの確認が、入力した新しいパスワードと一致しません。",
+            "current_password": "現在のパスワード",
+            "new_password": "新しいパスワード",
+            "new_password_help": "新しいパスワードは8文字以上にし、他のサイトと使い回さないことをお勧めします。",
+            "confirm_new_password": "新しいパスワード（確認）",
+            "update_password_button": "パスワードを更新"
+        },
+        "header": "ダッシュボード",
+        "showing_others_servers": "他の人のサーバーを表示中",
+        "showing_your_servers": "自分のサーバーを表示中",
+        "no_other_servers": "表示する他のサーバーはありません。",
+        "no_servers": "あなたのアカウントに関連付けられたサーバーはありません。",
+        "server_row": {
+            "suspended": "停止中",
+            "transferring": "転送中",
+            "offline": "オフライン",
+            "running": "実行中",
+            "starting": "起動中",
+            "cpu": "CPU",
+            "memory": "メモリ",
+            "disk": "ディスク"
+        },
+        "account_activity": {
+            "header": "アカウント活動ログ",
+            "clear_filters": "フィルタをクリア"
+        },
+        "search": {
+            "header": "検索",
+            "search_validation": "検索を開始するには、少なくとも3文字入力してください。",
+            "search_term": "検索キーワード",
+            "search_description": "検索を開始するには、サーバー名、UUID、または割り当てられたポートを入力してください。"
+        },
+        "account_ssh": {
+            "header": "SSHキー",
+            "add_ssh_key": "SSHキーを追加",
+            "ssh_keys": "SSHキー",
+            "no_keys": "このアカウントで利用可能なSSHキーはありません。",
+            "added_on": "追加日:",
+            "ssh_key_name": "SSHキー名",
+            "public_key": "公開鍵",
+            "public_key_help": "公開SSHキーを入力してください。",
+            "delete_key": "SSHキーを削除",
+            "delete_key_button": "キーを削除",
+            "delete_key_prefix": "この ",
+            "delete_key_suffix": " SSHキーを削除すると、パネル内での使用が無効になります。"
+        }
+    },
+    "activity": {
+        "header": "活動ログ",
+        "no_logs": "このサーバーの活動ログは現在ありません。",
+        "using_api_key": "APIキーを使用中",
+        "using_sftp": "SFTPを使用中",
+        "event": {
+            "auth": {
+                "fail": "ログイン失敗",
+                "success": "ログイン成功",
+                "password-reset": "パスワードリセット",
+                "reset-password": "パスワードリセットをリクエスト",
+                "checkpoint": "2要素検証",
+                "recovery-token": "2要素リカバリトークン",
+                "token": "2要素検証",
+                "ip-blocked": "IPブロック済み",
+                "sftp": {
+                    "fail": "SFTPログイン失敗"
+                }
+            },
+            "user": {
+                "account": {
+                    "email-changed": "メールアドレスを変更しました",
+                    "password-changed": "パスワードを変更しました"
+                },
+                "api-key": {
+                    "create": "APIキーを作成しました",
+                    "delete": "APIキーを削除しました"
+                },
+                "ssh-key": {
+                    "create": "SSHキーを追加しました",
+                    "delete": "SSHキーを削除しました"
+                },
+                "two-factor": {
+                    "create": "2要素認証を有効にしました",
+                    "delete": "2要素認証を無効にしました"
+                }
+            },
+            "server": {
+                "reinstall": "サーバーを再インストールしました",
+                "console": {
+                    "command": "コマンドを実行しました"
+                },
+                "power": {
+                    "start": "サーバーを起動しました",
+                    "stop": "サーバーを停止しました",
+                    "restart": "サーバーを再起動しました",
+                    "kill": "サーバーを強制終了しました"
+                },
+                "backup": {
+                    "download": "バックアップをダウンロードしました",
+                    "delete": "バックアップを削除しました",
+                    "restore": "バックアップを復元しました",
+                    "restore-complete": "バックアップの復元が完了しました",
+                    "restore-failed": "バックアップの復元に失敗しました",
+                    "start": "バックアップを開始しました",
+                    "complete": "バックアップが完了しました",
+                    "fail": "バックアップが失敗しました",
+                    "lock": "バックアップをロックしました",
+                    "unlock": "バックアップのロックを解除しました"
+                },
+                "database": {
+                    "create": "データベースを作成しました",
+                    "rotate-password": "データベースのパスワードを更新しました",
+                    "delete": "データベースを削除しました"
+                },
+                "file": {
+                    "compress_one": "単一ファイルを圧縮しました",
+                    "compress_other": "複数のファイルを圧縮しました",
+                    "read": "ファイルを表示しました",
+                    "copy": "ファイルをコピーしました",
+                    "create-directory": "ディレクトリを作成しました",
+                    "decompress": "ファイルを解凍しました",
+                    "delete_one": "単一ファイルを削除しました",
+                    "delete_other": "複数のファイルを削除しました",
+                    "download": "ファイルをダウンロードしました",
+                    "pull": "リモートファイルをダウンロードしました",
+                    "rename_one": "単一ファイルの名前を変更しました",
+                    "rename_other": "複数のファイルの名前を変更しました",
+                    "write": "ファイルを保存しました",
+                    "upload": "ファイルをアップロードしました",
+                    "uploaded": "ファイルのアップロードが完了しました"
+                },
+                "sftp": {
+                    "denied": "SFTPアクセスが拒否されました",
+                    "create_one": "SFTPで単一ファイルを作成しました",
+                    "create_other": "SFTPで複数のファイルを作成しました",
+                    "write_one": "SFTPで単一ファイルを変更しました",
+                    "write_other": "SFTPで複数のファイルを変更しました",
+                    "delete_one": "SFTPで単一ファイルを削除しました",
+                    "delete_other": "SFTPで複数のファイルを削除しました",
+                    "create-directory_one": "SFTPで単一ディレクトリを作成しました",
+                    "create-directory_other": "SFTPで複数のディレクトリを作成しました",
+                    "rename_one": "SFTPで単一ファイルの名前を変更しました",
+                    "rename_other": "SFTPで複数のファイルの名前を変更しました"
+                },
+                "allocation": {
+                    "create": "割り当てを追加しました",
+                    "notes": "割り当てメモを更新しました",
+                    "primary": "メイン割り当てを設定しました",
+                    "delete": "割り当てを削除しました"
+                },
+                "schedule": {
+                    "create": "スケジュールを作成しました",
+                    "update": "スケジュールを更新しました",
+                    "execute": "スケジュールを手動で実行しました",
+                    "delete": "スケジュールを削除しました"
+                },
+                "task": {
+                    "create": "タスクを作成しました",
+                    "update": "タスクを更新しました",
+                    "delete": "タスクを削除しました"
+                },
+                "settings": {
+                    "rename": "サーバー名を変更しました",
+                    "description": "サーバーの説明を変更しました"
+                },
+                "startup": {
+                    "edit": "起動変数を変更しました",
+                    "image": "Dockerイメージを変更しました"
+                },
+                "subuser": {
+                    "create": "サブユーザーを追加しました",
+                    "update": "サブユーザーの権限を更新しました",
+                    "delete": "サブユーザーを削除しました"
+                }
+            }
+        },
+        "auth": {
+            "fail": "アカウントへのログインに失敗しました",
+            "success": "アカウントに正常にログインしました",
+            "password-reset": "アカウントのパスワードをリセットしました",
+            "reset-password": "パスワードのリセットをリクエストしました",
+            "checkpoint": "2要素検証をリクエストしました",
+            "recovery-token": "2要素リカバリコードを使用しました",
+            "token": "2要素検証チャレンジを完了しました",
+            "ip-blocked": "リストにないIPアドレスからの {{identifier}} のリクエストをブロックしました",
+            "sftp": {
+                "fail": "SFTPログインに失敗しました"
+            }
+        },
+        "user": {
+            "account": {
+                "email-changed": "メールアドレスを {{old}} から {{new}} に変更しました",
+                "password-changed": "アカウントのパスワードを変更しました"
+            },
+            "api-key": {
+                "create": "新しいAPIキー {{identifier}} を作成しました",
+                "delete": "APIキー {{identifier}} を削除しました"
+            },
+            "ssh-key": {
+                "create": "アカウントにSSHキー {{fingerprint}} を追加しました",
+                "delete": "アカウントからSSHキー {{fingerprint}} を削除しました"
+            },
+            "two-factor": {
+                "create": "2要素認証を有効にしました",
+                "delete": "2要素認証を無効にしました"
+            }
+        },
+        "server": {
+            "reinstall": "サーバーを再インストールしました",
+            "console": {
+                "command": "サーバーで \"{{command}}\" を実行しました"
+            },
+            "power": {
+                "start": "サーバーを起動しました",
+                "stop": "サーバーを停止しました",
+                "restart": "サーバーを再起動しました",
+                "kill": "サーバープロセスを強制終了しました"
+            },
+            "backup": {
+                "download": "{{name}} バックアップをダウンロードしました",
+                "delete": "{{name}} バックアップを削除しました",
+                "restore": "{{name}} バックアップを復元しました（削除されたファイル: {{truncate}}）",
+                "restore-complete": "{{name}} バックアップの復元が完了しました",
+                "restore-failed": "{{name}} バックアップの復元に失敗しました",
+                "start": "新しいバックアップ {{name}} を開始しました",
+                "complete": "{{name}} バックアップを完了としてマークしました",
+                "fail": "{{name}} バックアップを失敗としてマークしました",
+                "lock": "{{name}} バックアップをロックしました",
+                "unlock": "{{name}} バックアップのロックを解除しました"
+            },
+            "database": {
+                "create": "新しいデータベース {{name}} を作成しました",
+                "rotate-password": "データベース {{name}} のパスワードを更新しました",
+                "delete": "データベース {{name}} を削除しました"
+            },
+            "file": {
+                "compress_one": "{{directory}}{{file}} を圧縮しました",
+                "compress_other": "{{directory}} 内の {{count}} 個のファイルを圧縮しました",
+                "read": "{{file}} の内容を表示しました",
+                "copy": "{{file}} のコピーを作成しました",
+                "create-directory": "ディレクトリ {{directory}}{{name}} を作成しました",
+                "decompress": "{{directory}} 内の {{files}} を解凍しました",
+                "delete_one": "{{directory}}{{files.0}} を削除しました",
+                "delete_other": "{{directory}} 内の {{count}} 個のファイルを削除しました",
+                "download": "{{file}} をダウンロードしました",
+                "pull": "{{url}} から {{directory}} にリモートファイルをダウンロードしました",
+                "rename_one": "{{directory}}{{files.0.from}} を {{directory}}{{files.0.to}} に名前変更しました",
+                "rename_other": "{{directory}} 内の {{count}} 個のファイルの名前を変更しました",
+                "write": "{{file}} に新しい内容を書き込みました",
+                "upload": "ファイルのアップロードを開始しました",
+                "uploaded": "{{directory}}{{file}} をアップロードしました"
+            },
+            "sftp": {
+                "denied": "権限不足のため、SFTPアクセスをブロックしました",
+                "create_one": "{{files.0}} を作成しました",
+                "create_other": "{{count}} 個の新規ファイルを作成しました",
+                "write_one": "{{files.0}} の内容を変更しました",
+                "write_other": "{{count}} 個のファイルの内容を変更しました",
+                "delete_one": "{{files.0}} を削除しました",
+                "delete_other": "{{count}} 個のファイルを削除しました",
+                "create-directory_one": "{{files.0}} ディレクトリを作成しました",
+                "create-directory_other": "{{count}} 個のディレクトリを作成しました",
+                "rename_one": "{{directory}}{{files.0.from}} を {{directory}}{{files.0.to}} に名前変更しました",
+                "rename_other": "{{count}} 個のファイルを名前変更または移動しました"
+            },
+            "allocation": {
+                "create": "{{allocation}} をサーバーに追加しました",
+                "notes": "{{allocation}} のメモを \"{{old}}\" から \"{{new}}\" に更新しました",
+                "primary": "{{allocation}} をメインのサーバー割り当てに設定しました",
+                "delete": "{{allocation}} の割り当てを削除しました"
+            },
+            "schedule": {
+                "create": "{{name}} スケジュールを作成しました",
+                "update": "{{name}} スケジュールを更新しました",
+                "execute": "{{name}} スケジュールを手動で実行しました",
+                "delete": "{{name}} スケジュールを削除しました"
+            },
+            "task": {
+                "create": "{{name}} スケジュールに新しい \"{{action}}\" タスクを作成しました",
+                "update": "{{name}} スケジュールの \"{{action}}\" タスクを更新しました",
+                "delete": "{{name}} スケジュールのタスクを削除しました"
+            },
+            "settings": {
+                "rename": "サーバー名を {{old}} から {{new}} に変更しました",
+                "description": "サーバーの説明を {{old}} から {{new}} に変更しました"
+            },
+            "startup": {
+                "edit": "{{variable}} 変数を \"{{old}}\" から \"{{new}}\" に変更しました",
+                "image": "サーバーのDockerイメージを {{old}} から {{new}} に更新しました"
+            },
+            "subuser": {
+                "create": "{{email}} をサブユーザーとして追加しました",
+                "update": "{{email}} のサブユーザー権限を更新しました",
+                "delete": "{{email}} をサブユーザーから削除しました"
+            }
+        },
+        "schedules": {
+            "header": "スケジュール管理",
+            "create": "スケジュール作成",
+            "new_task": "タスク追加",
+            "run_now": "今すぐ実行",
+            "delete_confirm": "すべてのタスクが削除され、実行中のプロセスは終了されます。",
+            "cron": {
+                "minute": "分",
+                "hour": "時",
+                "day_month": "日（月）",
+                "month": "月",
+                "day_week": "日（週）"
+            },
+            "delete_task_confirm": "このタスクを削除してもよろしいですか？この操作は取り消せません。"
+        }
+    },
+    "common": {
+        "cancel": "キャンセル",
+        "close": "閉じる"
+    }
+}
