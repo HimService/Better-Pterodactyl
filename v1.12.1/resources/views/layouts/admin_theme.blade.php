@@ -10,6 +10,7 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: #0f172a !important; /* Tailwind Slate-900 */
     color: #e2e8f0 !important; /* Tailwind Slate-200 */
+    font-size: 18.25px !important; /* Aggressively increased for maximum accessibility */
 }
 
 /* CSS Variables for Blade templates to follow the dark theme if they use them */
@@ -24,6 +25,10 @@ body {
 body, .wrapper, .content-wrapper, .right-side {
     background-color: #0f172a !important;
     color: #e2e8f0 !important;
+}
+
+.content-wrapper {
+    margin-top: 56px !important; /* Sync with header height */
 }
 
 .main-header {
@@ -57,30 +62,43 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     background-color: #1e293b !important; /* Tailwind Slate-800 to match cards */
     border-bottom: 1px solid #334155 !important;
     background-image: none !important;
+    height: 56px !important; /* Slightly thinner for better balance */
+    line-height: 56px !important;
+    z-index: 1030 !important; /* Ensure it stays above everything but below modals */
+}
+
+.main-header .logo {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px !important;
 }
 
 /* Handle collapsed sidebar logo */
 @media (min-width: 768px) {
     body.sidebar-collapse .main-header .logo {
-        width: 230px !important;
+        width: 50px !important;
     }
     body.sidebar-collapse .main-header .navbar {
-        margin-left: 230px !important;
+        margin-left: 50px !important;
     }
     body.sidebar-collapse .main-header .logo > .logo-lg {
-        display: block !important;
+        display: none !important;
     }
     body.sidebar-collapse .main-header .logo > .logo-mini {
-        display: none !important;
+        display: block !important;
     }
 }
 
 .skin-blue .main-header .navbar .sidebar-toggle {
     color: #cbd5e1 !important; /* Tailwind Slate-300 */
-    padding: 16px 15px;
+    padding: 0 20px !important;
+    height: 56px !important;
+    display: flex !important;
+    align-items: center;
     float: left !important; /* Keep it on the left next to the logo */
     font-size: 1.25rem;
-    line-height: 20px;
+    line-height: 56px !important;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -96,6 +114,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .skin-blue .main-sidebar {
     background-color: #020617; /* Tailwind Slate-950 */
     box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    padding-top: 56px !important; /* Sync with header height */
 }
 
 .skin-blue .wrapper, .skin-blue .main-sidebar, .skin-blue .left-side {
@@ -106,8 +125,9 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     background-color: #020617;
     color: #64748b;
     font-weight: 600;
-    font-size: 11px;
-    letter-spacing: 0.5px;
+    font-size: 14.5px;
+    letter-spacing: 0.85px;
+    padding: 18px 25px 10px 15px !important;
 }
 
 /* Sidebar Modifications */
@@ -115,6 +135,8 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     color: #94a3b8 !important;
     border-left: 3px solid transparent;
     transition: all 0.3s ease;
+    font-size: 16.5px; /* Scaled sidebar links */
+    padding: 15px 15px 15px 20px !important; /* Larger hit area */
 }
 
 .skin-blue .sidebar-menu > li:hover > a,
@@ -624,9 +646,11 @@ button.close:hover {
 
 /* Content Header / Breadcrumb */
 .content-header > h1 {
-    font-weight: 700 !important;
-    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    font-size: 2rem !important;
     color: #f1f5f9 !important;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px !important;
 }
 
 .content-header > h1 > small {

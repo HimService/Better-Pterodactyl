@@ -67,10 +67,11 @@
             url: '{{ route('admin.nodes.view.configuration.token', $node->id) }}',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
         }).done(function (data) {
+            swal({
                 title: '@lang('admin/node.view.configuration_tab.token_created')',
                 text: '<p>@lang('admin/node.view.configuration_tab.auto_configure_command')<br /><small><pre>cd /etc/pterodactyl && sudo wings configure --panel-url {{ config('app.url') }} --token ' + data.token + ' --node ' + data.node + '{{ config('app.debug') ? ' --allow-insecure' : '' }}</pre></small></p>',
                 html: true
-            })
+            });
         }).fail(function () {
             swal({
                 title: '@lang('strings.error')',
