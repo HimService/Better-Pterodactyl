@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { Websocket } from '@/plugins/Websocket';
 import { ServerContext } from '@/state/server';
 import getWebsocketToken from '@/api/server/getWebsocketToken';
@@ -10,7 +12,9 @@ import tw from 'twin.macro';
 const reconnectErrors = ['jwt: exp claim is invalid', 'jwt: created too far in past (denylist)'];
 
 export default () => {
+    const { t } = useTranslation();
     let updatingToken = false;
+
     const [error, setError] = useState<'connecting' | string>('');
     const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
@@ -35,8 +39,9 @@ export default () => {
         socket.on('auth success', () => setConnectionState(true));
         socket.on('SOCKET_CLOSE', () => setConnectionState(false));
         socket.on('SOCKET_CONNECT_ERROR', () => {
-            setError('Failed to connect to websocket instance after multiple attempts: try refreshing the page.');
+            setError(t('server.conflict.daemon_connection_failed'));
         });
+
         socket.on('SOCKET_ERROR', () => {
             setError('connecting');
             setConnectionState(false);
@@ -56,10 +61,9 @@ export default () => {
             if (reconnectErrors.find((v) => error.toLowerCase().indexOf(v) >= 0)) {
                 updateToken(uuid, socket);
             } else {
-                setError(
-                    'There was an error validating the credentials provided for the websocket. Please refresh the page.'
-                );
+                setError(t('server.conflict.daemon_credentials_error'));
             }
+
         });
 
         socket.on('transfer status', (status: string) => {
@@ -115,8 +119,9 @@ export default () => {
                         <>
                             <Spinner size={'small'} />
                             <p css={tw`ml-2 text-sm text-red-100`}>
-                                We&apos;re having some trouble connecting to your server, please wait...
+                                {t('server.conflict.daemon_connection_trouble')}
                             </p>
+
                         </>
                     ) : (
                         <p css={tw`ml-2 text-sm text-white`}>{error}</p>

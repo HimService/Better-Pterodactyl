@@ -7,9 +7,17 @@
 }
 
 .description {
-    @apply mt-1 text-sm break-words line-clamp-2 pr-4;
+    @apply mt-1 text-sm break-words line-clamp-2 pr-4 text-neutral-600;
 
     & strong {
-        @apply text-neutral-900 dark:text-gray-50 font-semibold break-all;
+        @apply font-semibold break-all text-neutral-900;
+    }
+}
+
+:global(.dark) .description {
+    @apply text-gray-200;
+
+    & strong {
+        @apply text-gray-50;
     }
 }

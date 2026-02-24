@@ -28,7 +28,7 @@ export default () => {
     const match = useRouteMatch<{ id: string }>();
     const location = useLocation();
 
-    const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
+    const rootAdmin = useStoreState((state) => state.user.data?.rootAdmin || false);
     const [error, setError] = useState('');
 
     const id = ServerContext.useStoreState((state) => state.server.data?.id);

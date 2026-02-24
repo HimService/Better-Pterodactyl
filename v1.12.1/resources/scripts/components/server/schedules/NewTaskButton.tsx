@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Schedule } from '@/api/server/schedules/getServerSchedules';
 import TaskDetailsModal from '@/components/server/schedules/TaskDetailsModal';
 import { Button } from '@/components/elements/button/index';
@@ -8,13 +9,14 @@ interface Props {
 }
 
 export default ({ schedule }: Props) => {
+    const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
 
     return (
         <>
             <TaskDetailsModal schedule={schedule} visible={visible} onModalDismissed={() => setVisible(false)} />
             <Button onClick={() => setVisible(true)} className={'flex-1'}>
-                New Task
+                {t('server.schedules.new_task')}
             </Button>
         </>
     );

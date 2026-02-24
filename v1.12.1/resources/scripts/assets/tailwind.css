@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,32 +7,33 @@
 
 @layer base {
     :root {
-        /* Brand Colors (Indigo-ish) */
-        --color-brand-50: 238 242 255;
-        --color-brand-100: 224 231 255;
-        --color-brand-200: 199 210 254;
-        --color-brand-300: 165 180 252;
-        --color-brand-400: 129 140 248;
-        --color-brand-500: 99 102 241;
-        --color-brand-600: 79 70 229;
-        --color-brand-700: 67 56 202;
-        --color-brand-800: 55 48 163;
-        --color-brand-900: 49 46 129;
+        /* Brand Colors (Modern Indigo) */
+        --color-brand-50: 245 243 255;
+        --color-brand-100: 237 233 254;
+        --color-brand-200: 221 214 254;
+        --color-brand-300: 196 181 253;
+        --color-brand-400: 167 139 250;
+        --color-brand-500: 139 92 246;
+        /* Base Indigo */
+        --color-brand-600: 124 58 237;
+        --color-brand-700: 109 40 217;
+        --color-brand-800: 91 33 182;
+        --color-brand-900: 76 29 149;
 
-        /* Light Theme Values (Apple / SaaS Style) */
-        --bg-app: 229 231 235;
-        /* gray-200 (distinctly gray for white cards to pop) */
+        /* Light Theme Values (Soft SaaS Style) */
+        --bg-app: 249 250 251;
+        /* gray-50 */
         --bg-card: 255 255 255;
         /* white */
-        --bg-card-hover: 209 213 219;
-        /* gray-300 */
-        --border-color: 209 213 219;
-        /* gray-300 */
+        --bg-card-hover: 243 244 246;
+        /* gray-100 */
+        --border-color: 229 231 235;
+        /* gray-200 */
 
         --text-primary: 17 24 39;
         /* gray-900 */
         --text-secondary: 75 85 99;
-        /* gray-500 */
+        /* gray-600 */
         --text-muted: 156 163 175;
         /* gray-400 */
 
@@ -39,21 +41,21 @@
         --input-border: 209 213 219;
         /* gray-300 */
 
-        --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-        --radius-card: 1rem;
-        /* 16px */
+        --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+        --radius-card: 1.5rem;
+        /* 24px */
     }
 
     .dark {
-        /* Dark Theme Values */
-        --bg-app: 17 24 39;
+        /* Dark Theme Values (Obsidian / Deep Night) */
+        --bg-app: 3 7 18;
+        /* gray-950 */
+        --bg-card: 17 24 39;
         /* gray-900 */
-        --bg-card: 31 41 55;
+        --bg-card-hover: 31 41 55;
         /* gray-800 */
-        --bg-card-hover: 55 65 81;
-        /* gray-700 */
-        --border-color: 55 65 81;
-        /* gray-700 */
+        --border-color: 31 41 55;
+        /* gray-800/soft border */
 
         --text-primary: 249 250 251;
         /* gray-50 */
@@ -64,10 +66,10 @@
 
         --input-bg: 17 24 39;
         /* gray-900 */
-        --input-border: 75 85 99;
-        /* gray-600 */
+        --input-border: 55 65 81;
+        /* gray-700 */
 
-        --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+        --shadow-card: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
     }
 
     body {
@@ -76,5 +78,20 @@
         color: rgb(var(--text-primary));
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        @apply transition-colors duration-300;
+    }
+
+    code {
+        font-family: 'Fira Code', monospace;
+        @apply bg-opacity-10 rounded px-1.5 py-0.5 text-sm;
+        background-color: rgb(var(--color-brand-500) / 0.1);
+        color: rgb(var(--color-brand-400));
+    }
+}
+
+@layer components {
+    .glass {
+        @apply backdrop-blur-xl border border-white/10;
+        background: rgba(var(--bg-card), 0.7);
     }
 }

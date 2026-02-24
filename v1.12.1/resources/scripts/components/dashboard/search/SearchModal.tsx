@@ -96,7 +96,9 @@ export default ({ ...props }: Props) => {
                         >
                             <SearchWatcher />
                             <InputSpinner visible={isSubmitting}>
-                                <Field as={InputWithRef} name={'term'} />
+                                <div css={tw`pr-8 sm:pr-0`}>
+                                    <Field as={InputWithRef} name={'term'} />
+                                </div>
                             </InputSpinner>
                         </FormikFieldWrapper>
                     </Form>

@@ -19,6 +19,14 @@ const DisableTOTPDialog = () => {
     const updateUserData = useStoreActions((actions) => actions.user.updateUserData);
 
     useEffect(() => {
+        setProps((state) => ({
+            ...state,
+            title: t('dashboard.account_overview.disable_2fa'),
+            description: t('dashboard.account_overview.disable_2fa_description'),
+        }));
+    }, []);
+
+    useEffect(() => {
         setProps((state) => ({ ...state, preventExternalClose: submitting }));
     }, [submitting]);
 
@@ -68,7 +76,4 @@ const DisableTOTPDialog = () => {
     );
 };
 
-export default asDialog({
-    title: 'Disable Two-Step Verification',
-    description: 'Disabling two-step verification will make your account less secure.',
-})(DisableTOTPDialog);
+export default asDialog({})(DisableTOTPDialog);

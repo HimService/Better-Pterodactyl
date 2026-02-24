@@ -34,7 +34,7 @@ export default () => {
     }, [error]);
 
     return (
-        <ServerContentBlock title={t('server.activity.header', 'Activity Log')}>
+        <ServerContentBlock title={t('activity.header', 'Activity Log')}>
             <FlashMessageRender byKey={'server:activity'} />
             {(filters.filters?.event || filters.filters?.ip) && (
                 <div className={'flex justify-end mb-2'}>
@@ -50,7 +50,7 @@ export default () => {
             {!data && isValidating ? (
                 <Spinner centered />
             ) : !data?.items.length ? (
-                <p className={'text-sm text-center text-gray-400'}>{t('server.activity.no_logs', 'No activity logs available for this server.')}</p>
+                <p className={'text-sm text-center text-gray-400'}>{t('activity.no_logs', 'No activity logs available for this server.')}</p>
             ) : (
                 <div className={'bg-neutral-50 dark:bg-neutral-900/50 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm'}>
                     {data?.items.map((activity) => (

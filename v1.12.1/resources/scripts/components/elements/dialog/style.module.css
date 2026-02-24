@@ -1,39 +1,48 @@
 .container {
-    @apply flex min-h-full items-center justify-center p-4 text-center;
+    @apply flex min-h-full items-center justify-center p-6 text-center backdrop-blur-sm;
 }
 
 .panel {
-    background-color: rgb(var(--bg-card));
-    border: 1px solid rgb(var(--border-color));
+    background-color: rgba(var(--bg-card), 0.85);
+    border: 1px solid rgba(var(--border-color), 0.5);
     border-radius: var(--radius-card);
-    @apply relative max-w-xl w-full mx-auto shadow-xl text-left;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    width: 95%;
+    @apply relative max-w-xl mx-auto shadow-2xl text-left overflow-hidden transition-all duration-300 ease-out;
 }
 
 .title {
-    @apply font-header text-xl font-semibold mb-2 pr-4;
+    @apply font-header text-2xl font-bold mb-3 pr-8;
     color: rgb(var(--text-primary));
+    letter-spacing: -0.025em;
 }
 
 .close_icon {
-    @apply w-5 h-5 group-hover:rotate-90 transition-transform duration-300;
+    @apply w-6 h-6 group-hover:rotate-90 transition-transform duration-500 ease-in-out text-neutral-500 hover:text-white;
 }
 
 .dialog_icon {
-    @apply flex items-center justify-center w-10 h-10 rounded-full mr-4;
+    @apply flex items-center justify-center w-12 h-12 rounded-2xl mr-5 shadow-lg shadow-black/20;
 
     &.danger {
-        @apply bg-red-500 text-red-50;
+        @apply bg-red-500/10 text-red-500 border border-red-500/20;
     }
 
     &.warning {
-        @apply bg-yellow-600 text-yellow-50;
+        @apply bg-yellow-500/10 text-yellow-500 border border-yellow-500/20;
     }
 
     &.success {
-        @apply bg-green-600 text-green-50;
+        @apply bg-emerald-500/10 text-emerald-500 border border-emerald-500/20;
     }
 
     &.info {
-        @apply bg-primary-500 text-primary-50;
+        @apply bg-indigo-500/10 text-indigo-500 border border-indigo-500/20;
     }
+}
+
+/* Add a subtle gradient background to titles */
+.panel h2 {
+    @apply relative;
 }

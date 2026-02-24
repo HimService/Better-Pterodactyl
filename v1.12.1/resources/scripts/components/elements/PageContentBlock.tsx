@@ -27,10 +27,19 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({ title, showFlashKey
                 <ContentContainer css={tw`mb-4`}>
                     <p css={tw`text-center text-neutral-500 text-xs`}>
                         <a
+                            href={'https://github.com/HimService/Better-Pterodactyl'}
+                            target={'_blank'}
+                            rel={'noopener nofollow noreferrer'}
+                            css={tw`font-bold tracking-widest mr-2 no-underline text-neutral-500 hover:text-neutral-300 transition-colors`}
+                        >
+                            Better Pterodactyl
+                        </a>
+                        <span css={tw`opacity-50`}>|</span>
+                        <a
                             rel={'noopener nofollow noreferrer'}
                             href={'https://pterodactyl.io'}
                             target={'_blank'}
-                            css={tw`no-underline text-neutral-500 hover:text-neutral-300`}
+                            css={tw`no-underline text-neutral-500 hover:text-neutral-300 ml-2`}
                         >
                             Pterodactyl&reg;
                         </a>

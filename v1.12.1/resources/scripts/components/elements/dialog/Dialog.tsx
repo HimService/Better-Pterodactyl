@@ -74,7 +74,7 @@ export default ({
                     >
                         <div
                             className={'fixed inset-0 z-40'}
-                            style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+                            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
                         />
                         <div className={'fixed inset-0 overflow-y-auto z-50'}>
                             <div

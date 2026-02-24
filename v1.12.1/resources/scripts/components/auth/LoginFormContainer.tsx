@@ -45,7 +45,16 @@ export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => 
             </Form>
 
             <p className="text-center text-xs mt-12 transition-colors text-neutral-400 dark:text-neutral-500 font-medium">
-                &copy; 2015 - {new Date().getFullYear()}&nbsp;
+                <a
+                    href={'https://github.com/HimService/Better-Pterodactyl'}
+                    target={'_blank'}
+                    rel={'noopener nofollow noreferrer'}
+                    className="font-bold tracking-widest mr-2 no-underline text-neutral-400 dark:text-neutral-500 hover:text-brand-500 dark:hover:text-brand-400 transition-colors"
+                >
+                    Better Pterodactyl
+                </a>
+                <span className="opacity-50">|</span>
+                &nbsp;&copy; 2015 - {new Date().getFullYear()}&nbsp;
                 <a
                     rel={'noopener nofollow noreferrer'}
                     href={'https://pterodactyl.io'}

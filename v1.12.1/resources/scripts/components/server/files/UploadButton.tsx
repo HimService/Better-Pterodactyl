@@ -127,7 +127,7 @@ export default ({ className }: WithClassname) => {
                             >
                                 <CloudUploadIcon className={'w-10 h-10 flex-shrink-0'} />
                                 <p className={'font-header flex-1 text-lg text-neutral-100 text-center'}>
-                                    {t('server.files.drag_and_drop', 'Drag and drop files to upload.')}
+                                    {t('server.files.drag_and_drop', '將檔案拖曳到此處以上傳。')}
                                 </p>
                             </div>
                         </div>

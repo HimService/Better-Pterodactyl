@@ -33,7 +33,7 @@ export default () => {
     }, [error]);
 
     return (
-        <PageContentBlock title={t('dashboard.account_activity.header', 'Account Activity Log')}>
+        <PageContentBlock title={t('activity.header', 'Account Activity Log')}>
             <FlashMessageRender byKey={'account'} />
             {(filters.filters?.event || filters.filters?.ip) && (
                 <div className={'flex justify-end mb-2'}>

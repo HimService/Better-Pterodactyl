@@ -32,6 +32,12 @@ const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
     const { close, setProps } = useContext(DialogWrapperContext);
 
     useEffect(() => {
+        setProps((state) => ({
+            ...state,
+            title: t('dashboard.account_overview.enable_2fa'),
+            description: t('dashboard.account_overview.enable_2fa_description'),
+        }));
+
         getTwoFactorTokenData()
             .then(setToken)
             .catch((error) => clearAndAddHttpError(error));
@@ -124,8 +130,4 @@ const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
     );
 };
 
-export default asDialog({
-    title: 'Enable Two-Step Verification',
-    description:
-        "Help protect your account from unauthorized access. You'll be prompted for a verification code each time you sign in.",
-})(ConfigureTwoFactorForm);
+export default asDialog({})(ConfigureTwoFactorForm);

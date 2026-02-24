@@ -41,18 +41,7 @@ const ModalContainer = styled.div<{ alignTop?: boolean }>`
 
     margin-bottom: auto;
 
-    & > .close-icon {
-        ${tw`absolute right-0 p-2 text-white cursor-pointer opacity-50 transition-all duration-150 ease-linear hover:opacity-100`};
-        top: -2.5rem;
-
-        &:hover {
-            ${tw`transform rotate-90`}
-        }
-
-        & > svg {
-            ${tw`w-6 h-6`};
-        }
-    }
+    margin-bottom: auto;
 `;
 
 const Modal: React.FC<ModalProps> = ({
@@ -107,23 +96,6 @@ const Modal: React.FC<ModalProps> = ({
                 }}
             >
                 <ModalContainer alignTop={top}>
-                    {isDismissable && (
-                        <div className={'close-icon'} onClick={() => setRender(false)}>
-                            <svg
-                                xmlns={'http://www.w3.org/2000/svg'}
-                                fill={'none'}
-                                viewBox={'0 0 24 24'}
-                                stroke={'currentColor'}
-                            >
-                                <path
-                                    strokeLinecap={'round'}
-                                    strokeLinejoin={'round'}
-                                    strokeWidth={'2'}
-                                    d={'M6 18L18 6M6 6l12 12'}
-                                />
-                            </svg>
-                        </div>
-                    )}
                     {showSpinnerOverlay && (
                         <Fade timeout={150} appear in>
                             <div
@@ -143,16 +115,48 @@ const Modal: React.FC<ModalProps> = ({
                     )}
                     <div
                         css={[
-                            tw`p-4 sm:p-5 md:p-8 overflow-y-auto transition-all duration-300`,
+                            tw`p-4 sm:p-5 md:p-8 overflow-y-auto transition-all duration-300 relative`,
                             css`
                                 background-color: rgb(var(--bg-card));
                                 border: 1px solid rgb(var(--border-color));
                                 border-radius: var(--radius-card);
                                 box-shadow: var(--shadow-card);
                                 color: rgb(var(--text-secondary));
+
+                                & > .close-icon {
+                                    ${tw`absolute right-0 p-2 text-neutral-400 cursor-pointer opacity-50 transition-all duration-150 ease-linear hover:opacity-100`};
+                                    top: 0.75rem;
+                                    right: 0.75rem;
+                                    z-index: 50;
+
+                                    &:hover {
+                                        ${tw`transform rotate-90 text-white`}
+                                    }
+
+                                    & > svg {
+                                        ${tw`w-5 h-5`};
+                                    }
+                                }
                             `
                         ]}
                     >
+                        {isDismissable && (
+                            <div className={'close-icon'} onClick={() => setRender(false)}>
+                                <svg
+                                    xmlns={'http://www.w3.org/2000/svg'}
+                                    fill={'none'}
+                                    viewBox={'0 0 24 24'}
+                                    stroke={'currentColor'}
+                                >
+                                    <path
+                                        strokeLinecap={'round'}
+                                        strokeLinejoin={'round'}
+                                        strokeWidth={'2'}
+                                        d={'M6 18L18 6M6 6l12 12'}
+                                    />
+                                </svg>
+                            </div>
+                        )}
                         {children}
                     </div>
                 </ModalContainer>

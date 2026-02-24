@@ -75,8 +75,8 @@ export default () => {
                                     <FontAwesomeIcon icon={faKey} />
                                 </div>
                                 <div css={tw`ml-4 flex-1 overflow-hidden`}>
-                                    <p css={tw`text-sm break-words`} style={{ color: 'rgb(var(--text-primary))' }}>{key.description}</p>
-                                    <p css={tw`text-xs mt-1 uppercase`} style={{ color: 'rgb(var(--text-muted))' }}>
+                                    <p css={tw`text-sm break-words text-neutral-100 font-medium`}>{key.description}</p>
+                                    <p css={tw`text-xs mt-1 uppercase text-neutral-500`}>
                                         {t('dashboard.account_api.last_used', 'Last used:')}&nbsp;
                                         {key.lastUsedAt ? format(key.lastUsedAt, 'MMM do, yyyy HH:mm') : t('dashboard.account_api.never', 'Never')}
                                     </p>

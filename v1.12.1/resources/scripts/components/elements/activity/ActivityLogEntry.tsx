@@ -63,7 +63,7 @@ export default ({ activity, children }: Props) => {
                             to={`#${pathTo({ event: activity.event })}`}
                             className={'transition-colors duration-75 text-neutral-600 dark:text-neutral-400 active:text-brand-500 hover:text-brand-500 dark:active:text-cyan-400 dark:hover:text-cyan-400'}
                         >
-                            {activity.event}
+                            {t(`activity.event.${activity.event.replace(':', '.')}`, activity.event)}
                         </Link>
                         <div className={classNames(style.icons, 'group-hover:text-neutral-600 dark:group-hover:text-gray-300')}>
                             {activity.isApi && (
@@ -79,14 +79,14 @@ export default ({ activity, children }: Props) => {
                             {children}
                         </div>
                     </div>
-                    <p className={classNames(style.description, 'text-neutral-600 dark:text-gray-300')}>
-                        <Translate ns={'activity'} values={properties} i18nKey={activity.event.replace(':', '.')} />
+                    <p className={style.description}>
+                        <Translate values={properties} i18nKey={`activity.${activity.event.replace(':', '.')}`} />
                     </p>
-                    <div className={'mt-1 flex items-center text-sm text-neutral-500 dark:text-gray-400'}>
+                    <div className={'mt-1 flex items-center text-sm text-neutral-500 dark:text-gray-300'}>
                         {activity.ip && (
                             <span>
                                 {activity.ip}
-                                <span className={'text-neutral-400 dark:text-gray-500'}>&nbsp;|&nbsp;</span>
+                                <span className={'text-neutral-400 dark:text-gray-400'}>&nbsp;|&nbsp;</span>
                             </span>
                         )}
                         <Tooltip placement={'right'} content={format(activity.timestamp, 'MMM do, yyyy H:mm:ss')}>

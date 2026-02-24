@@ -47,15 +47,14 @@ const inputStyle = css<Props>`
     // Reset to normal styling.
     resize: none;
     ${tw`appearance-none outline-none w-full min-w-0`};
-    ${tw`px-4 py-3 rounded-xl text-sm transition-all duration-300`};
-    ${tw`bg-neutral-100/50 dark:bg-black/20 border border-neutral-300 dark:border-neutral-700`};
+    ${tw`px-4 py-3 rounded-2xl text-sm transition-all duration-300`};
+    ${tw`bg-neutral-900/40 border border-neutral-800 shadow-inner`};
     color: rgb(var(--text-primary));
-    box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 
     & + .input-help {
-        ${tw`mt-1.5 text-xs`};
+        ${tw`mt-2 text-xs font-medium`};
         color: rgb(var(--text-secondary));
-        ${(props) => props.hasError && tw`text-red-500`};
+        ${(props) => props.hasError && tw`text-red-400`};
     }
 
     &:required,
@@ -64,15 +63,15 @@ const inputStyle = css<Props>`
     }
 
     &:hover:not(:disabled):not(:focus):not(:read-only) {
-        ${tw`border-neutral-400 dark:border-neutral-600 bg-neutral-100 dark:bg-black/40`};
+        ${tw`border-neutral-700 bg-neutral-900/60 transition-colors duration-200`};
     }
 
     &:not(:disabled):not(:read-only):focus {
-        ${tw`bg-white dark:bg-black/60`};
+        ${tw`bg-neutral-900/80`};
         border-color: rgb(var(--color-brand-500));
-        box-shadow: 0 0 0 3px rgb(var(--color-brand-500) / 0.25), inset 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 0 4px rgb(var(--color-brand-600) / 0.15), inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
         ${(props) => props.hasError && tw`border-red-500`};
-        ${(props) => props.hasError && `box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);`};
+        ${(props) => props.hasError && `box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);`};
     }
 
     &:disabled {

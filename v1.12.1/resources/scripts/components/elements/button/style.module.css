@@ -1,23 +1,19 @@
 .button {
     @apply px-5 py-2.5 inline-flex items-center justify-center;
-    @apply rounded-full text-sm font-medium transition-all duration-300;
+    @apply rounded-xl text-sm font-semibold transition-all duration-300;
     @apply focus:outline-none focus:ring-4 focus:ring-brand-500/30;
     @apply shadow-sm scale-100;
 
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-
     &:active:not(:disabled) {
-        transform: scale(0.95);
+        @apply scale-[0.97];
     }
 
-    /* Sizing Controls */
     &.small {
-        @apply px-3 py-1.5 h-auto text-xs;
+        @apply px-3 py-1.5 h-auto text-xs rounded-lg;
     }
 
     &.large {
-        @apply px-6 py-3 text-base;
+        @apply px-8 py-4 text-base rounded-2xl;
     }
 
     &.secondary {
@@ -31,102 +27,75 @@
     }
 
     &:disabled {
-        @apply cursor-not-allowed opacity-60;
+        @apply cursor-not-allowed opacity-50 grayscale;
     }
 
     &.square {
-        @apply p-0 w-12 h-12 aspect-square;
+        @apply p-0 w-11 h-11 aspect-square rounded-xl;
 
         &.small {
-            @apply w-8 h-8;
+            @apply w-8 h-8 rounded-lg;
         }
     }
 }
 
 .primary {
-    background-color: rgb(var(--color-brand-600));
-    color: white;
+    @apply bg-indigo-600 text-white border border-indigo-500/50;
+    background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.1), transparent);
 
     &:hover:not(:disabled) {
-        background-color: rgb(var(--color-brand-700));
-        box-shadow: 0 4px 14px 0 rgb(var(--color-brand-500) / 0.39);
+        @apply bg-indigo-500 shadow-lg shadow-indigo-500/25 -translate-y-0.5;
     }
 
     &:active:not(:disabled) {
-        background-color: rgb(var(--color-brand-800));
-    }
-
-    &:disabled {
-        background-color: rgb(var(--color-brand-600) / 0.7);
+        @apply bg-indigo-700 translate-y-0;
     }
 
     &.secondary {
         background: transparent !important;
-        border: 1px solid rgb(var(--border-color));
-        color: rgb(var(--text-primary));
+        @apply border-indigo-500/50 text-indigo-400;
 
         &:hover:not(:disabled) {
-            background-color: rgb(var(--color-brand-600)) !important;
-            border-color: rgb(var(--color-brand-600)) !important;
-            color: white;
-            box-shadow: 0 4px 14px 0 rgb(var(--color-brand-500) / 0.39);
+            @apply bg-indigo-500/10 text-white border-indigo-400;
         }
     }
 }
 
 .text {
-    background-color: rgb(var(--bg-card-hover));
-    color: rgb(var(--text-secondary));
-    border: 1px solid rgb(var(--border-color));
+    @apply bg-neutral-800/40 text-neutral-300 border border-neutral-700/50 rounded-xl;
 
     &:hover:not(:disabled) {
-        background-color: rgb(var(--border-color));
-        color: rgb(var(--text-primary));
-    }
-
-    &:active:not(:disabled) {
-        background-color: rgb(var(--border-color));
+        @apply bg-neutral-800/70 text-white border-neutral-600;
+        @apply -translate-y-0.5 shadow-lg shadow-black/20;
     }
 
     &.secondary {
         background: transparent !important;
-        color: rgb(var(--text-secondary));
+        @apply border-transparent text-neutral-400;
 
         &:hover:not(:disabled) {
-            background-color: rgb(var(--bg-card-hover)) !important;
-            color: rgb(var(--text-primary));
+            @apply bg-neutral-800/50 text-white;
         }
-    }
-
-    &:disabled {
-        background-color: rgb(var(--bg-card-hover) / 0.7);
     }
 }
 
 .danger {
-    @apply bg-red-600 text-white;
+    @apply bg-red-600/10 text-red-500 border border-red-500/20 rounded-xl font-bold;
 
     &:hover:not(:disabled) {
-        @apply bg-red-700;
-        box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39);
+        @apply bg-red-600 text-white border-red-500 shadow-xl shadow-red-500/30 -translate-y-0.5;
     }
 
     &:active:not(:disabled) {
-        @apply bg-red-800;
+        @apply bg-red-700 translate-y-0;
     }
 
     &.secondary {
         background: transparent !important;
-        color: theme('colors.red.600');
-        border: 1px solid theme('colors.red.600');
+        @apply border-red-500/30 text-red-400;
 
         &:hover:not(:disabled) {
-            @apply bg-red-600 text-white !important;
-            box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39);
+            @apply bg-red-500/10 text-white border-red-400;
         }
-    }
-
-    &:disabled {
-        @apply bg-red-600/70 text-white/90;
     }
 }

@@ -6,8 +6,10 @@ import ResetPasswordContainer from '@/components/auth/ResetPasswordContainer';
 import LoginCheckpointContainer from '@/components/auth/LoginCheckpointContainer';
 import { NotFound } from '@/components/elements/ScreenBlock';
 import { useHistory, useLocation } from 'react-router';
+import { useTranslation } from 'react-i18next';
 
 export default () => {
+    const { t } = useTranslation();
     const history = useHistory();
     const location = useLocation();
     const { path } = useRouteMatch();
@@ -57,21 +59,24 @@ export default () => {
                         <img src={'/assets/svgs/pterodactyl.svg'} className="w-12 h-12 object-contain filter drop-shadow-md" alt="Logo" />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">Better Pterodactyl</h2>
-                        <p className="text-sm font-medium text-brand-300 uppercase tracking-widest mt-1">更好的管理介面</p>
+                        <h2 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">{t('auth.better_pterodactyl')}</h2>
+                        <p className="text-sm font-medium text-brand-300 uppercase tracking-widest mt-1">{t('auth.tagline')}</p>
                     </div>
+
                 </div>
 
                 {/* Center / Bottom Inspirational Typography */}
                 <div className="relative z-10 max-w-lg mb-12">
                     <h1 className="text-5xl lg:text-7xl font-bold text-white tracking-tighter leading-[1.05] drop-shadow-md">
-                        直覺<br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 to-indigo-400">方便</span><br />
-                        高效
+                        {t('auth.intuitive')}<br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 to-indigo-400">{t('auth.convenient')}</span><br />
+                        {t('auth.efficient')}
                     </h1>
+
                     <p className="mt-8 text-neutral-300 text-lg leading-relaxed font-normal opacity-90 max-w-sm">
-                        體驗全新伺服器管理介面。更好的介面。
+                        {t('auth.description')}
                     </p>
+
                 </div>
             </div>
 
@@ -83,7 +88,7 @@ export default () => {
                     <div className="p-4 bg-neutral-100 dark:bg-neutral-800/50 rounded-3xl shadow-sm border border-neutral-200 dark:border-neutral-800 mb-6">
                         <img src={'/assets/svgs/pterodactyl.svg'} className="w-16 h-16 drop-shadow-sm" alt="Logo" />
                     </div>
-                    <h2 className="text-3xl font-black text-neutral-900 dark:text-white tracking-tight">Welcome Back</h2>
+                    <h2 className="text-3xl font-black text-neutral-900 dark:text-white tracking-tight">{t('auth.welcome_back')}</h2>
                 </div>
 
                 {/* Form Container */}
