@@ -492,10 +492,10 @@
                             <div style="width: 64px; height: 64px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px;">
                                 <i class="fa fa-server"></i>
                             </div>
-                            <h3 style="margin: 0 0 8px 0; font-size: 1.25rem; font-weight: 700;">No Nodes Found</h3>
-                            <p style="color: var(--bp-text-muted); max-width: 300px; margin-bottom: 24px;">Start building your infrastructure by adding your first node to the panel.</p>
+                            <h3 style="margin: 0 0 8px 0; font-size: 1.25rem; font-weight: 700;">@lang('admin/index.no_nodes_found')</h3>
+                            <p style="color: var(--bp-text-muted); max-width: 300px; margin-bottom: 24px;">@lang('admin/index.no_nodes_desc')</p>
                             <a href="{{ route('admin.nodes.new') }}" class="action-btn" style="background: #3b82f6; border: none; padding: 12px 32px;">
-                                <i class="fa fa-plus"></i> Create First Node
+                                <i class="fa fa-plus"></i> @lang('admin/index.create_first_node')
                             </a>
                         </div>
                     @endif

@@ -30,6 +30,9 @@
                     window.SiteConfiguration = {!! json_encode($siteConfiguration) !!};
                 </script>
             @endif
+            <script>
+                window.SiteLocale = '{{ app()->getLocale() }}';
+            </script>
         @show
 
         @yield('assets')
