@@ -33,9 +33,14 @@
         <div class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title">@lang('admin/node.view.configuration_tab.configuration_file')</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" id="copyConfigBtn" data-toggle="tooltip" title="@lang('strings.copy')">
+                        <i class="fa fa-copy"></i>
+                    </button>
+                </div>
             </div>
             <div class="box-body">
-                <pre class="no-margin">{{ $node->getYamlConfiguration() }}</pre>
+                <pre class="no-margin" id="config_yaml">{{ $node->getYamlConfiguration() }}</pre>
             </div>
             <div class="box-footer">
                 <p class="no-margin">@lang('admin/node.view.configuration_tab.configuration_file_help')</p>
@@ -61,6 +66,26 @@
 @section('footer-scripts')
     @parent
     <script>
+    $('#copyConfigBtn').on('click', function () {
+        const text = $('#config_yaml').text();
+        const $btn = $(this);
+        const originalHtml = $btn.html();
+
+        navigator.clipboard.writeText(text).then(function () {
+            $btn.html('<i class="fa fa-check"></i>').addClass('text-success');
+            setTimeout(function () {
+                $btn.html(originalHtml).removeClass('text-success');
+            }, 2000);
+        }).catch(function (err) {
+            console.error('Could not copy text: ', err);
+            swal({
+                title: '@lang('strings.error')',
+                text: 'Could not copy to clipboard.',
+                type: 'error'
+            });
+        });
+    });
+
     $('#configTokenBtn').on('click', function (event) {
         $.ajax({
             method: 'POST',
