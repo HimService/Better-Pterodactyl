@@ -1,0 +1,45 @@
+<?php
+
+return [
+    'index' => [
+        'title' => 'Application API',
+        'description' => 'Control access credentials for managing this panel via the API.',
+        'list' => 'Credentials List',
+        'create_new' => 'Create New Credentials',
+        'key' => 'Key',
+        'memo' => 'Memo',
+        'last_used' => 'Last Used',
+        'created' => 'Created',
+        'created_by' => 'Created By',
+        'revoke_key_title' => 'Revoke API Key',
+        'revoke_key_text' => 'Once revoked, any application currently using this API key will stop working.',
+        'revoked_text' => 'API key has been revoked.',
+        'whoops' => 'Whoops!',
+        'revoke_error' => 'An error was encountered while attempting to revoke this key.',
+    ],
+    'new' => [
+        'header' => 'Create API Key',
+        'header_help' => 'Create a new application API key.',
+        'node_help' => 'Once you have configured the new credentials, you will not be able to go back and edit them. If you need to make changes later, you will need to create a new set of credentials.',
+        'create_credentials' => 'Create Credentials',
+    ],
+    'permissions' => [
+        'read' => 'Read',
+        'read_write' => 'Read & Write',
+        'none' => 'None',
+        'select_permissions' => 'Select Permissions',
+    ],
+    'resources' => [
+        'locations' => 'Locations',
+        'nodes' => 'Nodes',
+        'servers' => 'Servers',
+        'users' => 'Users',
+        'allocations' => 'Allocations',
+        'nests' => 'Nests',
+        'eggs' => 'Eggs',
+        'node_allocations' => 'Node Allocations',
+        'server_databases' => 'Server Databases',
+        'server_variables' => 'Server Variables',
+        'database_hosts' => 'Database Hosts',
+    ],
+];

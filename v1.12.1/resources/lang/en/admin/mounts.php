@@ -1,0 +1,35 @@
+<?php
+
+return [
+    'index' => [
+        'title' => 'Mounts',
+        'description' => 'Configure and manage mount points for servers.',
+        'list' => 'Mount List',
+        'search' => 'Search Mounts',
+        'create_new' => 'Create New Mount',
+        'source' => 'Source',
+        'target' => 'Target',
+        'read_only' => 'Read Only',
+        'user_mountable' => 'User Mountable',
+        'nodes' => 'Nodes',
+        'servers' => 'Servers',
+        'name_help' => 'The name of the mount, used to identify this mount point.',
+        'description_help' => 'A short description of the purpose of this mount point.',
+        'source_help' => 'The path on the host system to be mounted.',
+        'target_help' => 'The path inside the container to be mounted.',
+        'read_only_help' => 'Whether this path should be mounted as read-only.',
+        'user_mountable_help' => 'Whether to allow users to mount this mount point on their servers themselves.',
+    ],
+    'view' => [
+        'details' => 'Mount Details',
+        'unique_id' => 'Unique ID',
+        'add_eggs' => 'Add Eggs',
+        'add_nodes' => 'Add Nodes',
+        'select_eggs' => 'Select Eggs...',
+        'select_nodes' => 'Select Nodes...',
+        'egg_detached' => 'Egg detached.',
+        'node_detached' => 'Node detached.',
+        'true' => 'True',
+        'false' => 'False',
+    ],
+];

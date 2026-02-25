@@ -100,6 +100,7 @@ return [
     'seconds' => '秒',
     'minutes' => '分',
     'under_maintenance' => 'メンテナンス中',
+    'save_changes' => '変更を保存',
     'days' => [
         'sun' => '日曜日',
         'mon' => '月曜日',

@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'permissions' => [
+        'websocket_*' => 'Allows access to the websocket for this server.',
+        'control_console' => 'Allows the user to send data to the server console.',
+        'control_start' => 'Allows the user to start the server instance.',
+        'control_stop' => 'Allows the user to stop the server instance.',
+        'control_restart' => 'Allows the user to restart the server instance.',
+        'control_kill' => 'Allows the user to kill the server instance.',
+        'user_create' => 'Allows the user to create new user accounts for the server.',
+        'user_read' => 'Allows the user to view users associated with this server.',
+        'user_update' => 'Allows the user to modify other users associated with this server.',
+        'user_delete' => 'Allows the user to delete other users associated with this server.',
+        'file_create' => 'Allows the user to create new files and directories.',
+        'file_read' => 'Allows the user to view files and folders associated with this server instance, as well as view their contents.',
+        'file_update' => 'Allows the user to update files and folders associated with the server.',
+        'file_delete' => 'Allows the user to delete files and directories.',
+        'file_archive' => 'Allows the user to create file archives and decompress existing archives.',
+        'file_sftp' => 'Allows the user to perform the above file actions using an SFTP client.',
+        'allocation_read' => 'Allows access to the server allocation management pages.',
+        'allocation_update' => 'Allows the user to modify the server\'s allocations.',
+        'database_create' => 'Allows the user to create new databases for this server.',
+        'database_read' => 'Allows the user to view server databases.',
+        'database_update' => 'Allows the user to modify databases. If the user does not have "View Password" permission they will not be able to modify the password.',
+        'database_delete' => 'Allows the user to delete a database instance.',
+        'database_view_password' => 'Allows a user to view a database password in the system.',
+        'schedule_create' => 'Allows a user to create new schedules for the server.',
+        'schedule_read' => 'Allows a user to view schedules for the server.',
+        'schedule_update' => 'Allows a user to modify existing server schedules.',
+        'schedule_delete' => 'Allows a user to delete schedules for the server.',
+    ],
+];

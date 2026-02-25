@@ -101,6 +101,7 @@ return [
     'seconds' => '秒',
     'minutes' => '分鐘',
     'under_maintenance' => '維護中',
+    'save_changes' => '儲存變更',
     'days' => [
         'sun' => '星期日',
         'mon' => '星期一',
