@@ -16,7 +16,33 @@ Better Pterodactyl 是一個專注於 Pterodactyl 面板前端（React）介面�
 
 ### 3. 本地化支持 (Localization)
 - **完整的繁體中文修正**: 修正原始翻譯中生硬的語句，採用更符合開發者習慣的專業術語。
-- **全局語系一致性**: 確保所有新增組件均支持 i18next 語系架構，提升翻譯語言的易達性
+- **全局語系一致性**: 確保所有新增組件均支持 i18next 語系架構，提升翻譯語言的易達性。
+- **多語系支持**: 目前支援繁體中文 (`zh`)、英文 (`en`) 與日文 (`ja`)。
+
+---
+
+## 語系設定 (Language Configuration)
+
+本項目支援多國語言，您可以根據需求進行切換：
+
+### 1. 調整登入頁面語言
+由於登入前無法讀取使用者設定，我們提供了一個專用的前端設定檔：
+- **路徑**: `resources/scripts/config.ts`
+- **操作**: 修改 `login_language` 欄位（可選：`zh`, `en`, `ja`）。
+```typescript
+const config = {
+    login_language: 'ja', // 將這裡改為您預設想要的語言
+    // ...
+};
+```
+
+### 2. 調整系統全局語系
+您可以透過 Pterodactyl 的管理員面板或 `.env` 進行調整：
+- **環境變數**: 修改 `.env` 中的 `APP_LOCALE=zh`。
+- **管理員面板**: 於 `Settings` -> `Basic` -> `Default Language` 進行選擇。
+
+### 3. 個人語言偏好
+登入後，使用者可在個人的 `Account Settings` 中設定自己偏好使用的介面語言。
 
 ---
 
