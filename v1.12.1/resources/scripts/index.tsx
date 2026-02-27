@@ -13,4 +13,27 @@ import './i18n';
 // @see https://github.com/gaearon/react-hot-loader#hook-support
 setConfig({ reloadHooks: false });
 
-ReactDOM.render(<App />, document.getElementById('app'));
+import AdminRadarWrapper from '@/components/admin/AdminRadarWrapper';
+
+import { StoreProvider } from 'easy-peasy';
+import { store } from '@/state';
+import { ThemeProvider } from '@/context/ThemeContext';
+import GlobalStylesheet from '@/assets/css/GlobalStylesheet';
+
+const appRoot = document.getElementById('app');
+if (appRoot) {
+    ReactDOM.render(<App />, appRoot);
+}
+
+const adminRadarRoot = document.getElementById('admin-radar-root');
+if (adminRadarRoot) {
+    // @ts-ignore
+    ReactDOM.render(
+        <StoreProvider store={store}>
+            <ThemeProvider>
+                <AdminRadarWrapper />
+            </ThemeProvider>
+        </StoreProvider>,
+        adminRadarRoot
+    );
+}

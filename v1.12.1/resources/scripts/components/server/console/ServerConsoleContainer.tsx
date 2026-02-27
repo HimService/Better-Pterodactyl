@@ -52,13 +52,18 @@ const ServerConsoleContainer = () => {
             <div className={'grid grid-cols-4 gap-4 sm:gap-6 mb-6'}>
                 <div
                     className={classNames(
-                        'flex col-span-4 lg:col-span-3 rounded-[1.25rem] p-1 bg-black/40 ring-1 ring-white/5 backdrop-blur-md shadow-2xl transition-all duration-1000',
+                        'flex col-span-4 lg:col-span-3 rounded-[1.25rem] p-1 bg-black/40 ring-1 backdrop-blur-md shadow-2xl transition-all duration-1000',
                         {
-                            'shadow-[0_0_40px_rgba(16,185,129,0.15)] ring-emerald-500/40': status === 'running',
+                            'shadow-[0_0_40px_rgba(16,185,129,0.15)] ring-emerald-500/40': status === 'running' && !description?.toLowerCase().includes('['),
                             'shadow-[0_0_40px_rgba(245,158,11,0.15)] ring-yellow-500/40': status === 'starting',
-                            'shadow-[0_0_40px_rgba(239,68,68,0.15)] ring-red-500/40': status === 'stopping'
+                            'shadow-[0_0_40px_rgba(239,68,68,0.15)] ring-red-500/40': status === 'stopping',
+                            'ring-[var(--brand-main)]/40 shadow-[var(--brand-glow)]': !!description?.toLowerCase().includes('[')
                         }
                     )}
+                    style={{
+                        boxShadow: description?.toLowerCase().includes('[') ? '0 0 40px var(--brand-glow)' : undefined,
+                        borderColor: description?.toLowerCase().includes('[') ? 'var(--brand-main)' : undefined
+                    }}
                 >
                     <div className="w-full h-full rounded-xl overflow-hidden bg-black/90 border border-transparent">
                         <Spinner.Suspense>

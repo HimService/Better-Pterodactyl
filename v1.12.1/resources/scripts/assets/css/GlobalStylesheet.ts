@@ -2,8 +2,31 @@ import tw from 'twin.macro';
 import { createGlobalStyle } from 'styled-components/macro';
 // @ts-expect-error untyped font file
 import font from '@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2';
+import config from '../../config';
+
+const hexToRgb = (hex: string): string => {
+    try {
+        let h = hex.replace('#', '');
+        if (h.length === 3) {
+            h = h.split('').map(c => c + c).join('');
+        }
+        const r = parseInt(h.slice(0, 2), 16);
+        const g = parseInt(h.slice(2, 4), 16);
+        const b = parseInt(h.slice(4, 6), 16);
+        return isNaN(r) || isNaN(g) || isNaN(b) ? '139, 92, 246' : `${r}, ${g}, ${b}`;
+    } catch {
+        return '139, 92, 246'; // Fallback to indigo-500
+    }
+};
+
+const primaryRgb = hexToRgb(config?.theme?.primary_color || '#8b5cf6');
 
 export default createGlobalStyle`
+    :root {
+        --color-brand-500: ${primaryRgb};
+        --color-brand-600: ${primaryRgb};
+    }
+
     @font-face {
         font-family: 'IBM Plex Sans';
         font-style: normal;

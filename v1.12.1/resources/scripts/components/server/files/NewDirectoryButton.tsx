@@ -21,10 +21,6 @@ interface Values {
     directoryName: string;
 }
 
-const schema = object().shape({
-    directoryName: string().required('A valid directory name must be provided.'),
-});
-
 const generateDirectoryData = (name: string): FileObject => ({
     key: `dir_${name.split('/', 1)[0] ?? name}`,
     name: name.replace(/^(\/*)/, '').split('/', 1)[0] ?? name,
@@ -68,14 +64,27 @@ const NewDirectoryDialog = asDialog({
     };
 
     return (
-        <Formik onSubmit={submit} validationSchema={schema} initialValues={{ directoryName: '' }}>
+        <Formik
+            onSubmit={submit}
+            validationSchema={object().shape({
+                directoryName: string().required(t('server.files.valid_directory_name')),
+            })}
+            initialValues={{ directoryName: '' }}
+        >
             {({ submitForm, values }) => (
                 <>
                     <FlashMessageRender key={'files:directory-modal'} />
                     <Form css={tw`m-0`}>
-                        <Field autoFocus id={'directoryName'} name={'directoryName'} label={t('server.files.directory_name')} />
+                        <Field
+                            autoFocus
+                            id={'directoryName'}
+                            name={'directoryName'}
+                            label={t('server.files.directory_name')}
+                        />
                         <p css={tw`mt-2 text-sm md:text-base break-all`}>
-                            <span css={tw`text-neutral-200`}>{t('server.files.create_directory_help')}&nbsp;</span>
+                            <span css={tw`text-neutral-200 uppercase text-[10px] font-bold tracking-wider mr-1`}>
+                                {t('server.files.create_directory_help')}
+                            </span>
                             <Code>
                                 /home/container/
                                 <span css={tw`text-cyan-200`}>

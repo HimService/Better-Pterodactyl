@@ -176,6 +176,22 @@
             {!! Theme::js('vendor/select2/select2.full.min.js?t={cache-version}') !!}
             {!! Theme::js('js/admin/functions.js?t={cache-version}') !!}
             <script src="/js/autocomplete.js" type="application/javascript"></script>
+            
+            @if(Route::currentRouteName() === 'admin.index')
+                {{-- Better Pterodactyl React Assets - Only on Overview --}}
+                @if(isset($asset))
+                    {!! $asset->js('main.js') !!}
+                @else
+                    <script src="/assets/main.js" type="application/javascript"></script>
+                @endif
+
+                <script>
+                    @if(!is_null(Auth::user()))
+                        window.PterodactylUser = {!! json_encode(Auth::user()->toVueObject()) !!};
+                    @endif
+                    window.SiteLocale = '{{ app()->getLocale() }}';
+                </script>
+            @endif
 
             @if(Auth::user()->root_admin)
                 <script>

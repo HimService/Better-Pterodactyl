@@ -11,6 +11,8 @@ import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import config from '@/config';
 
 interface Values {
     username: string;
@@ -76,40 +78,54 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
             })}
         >
             {({ isSubmitting, setSubmitting, submitForm }) => (
-                <LoginFormContainer title={t('auth.login.title', 'Login to Continue')} css={tw`w-full flex`}>
-                    <Field type={'text'} label={t('auth.login.username', 'Username or Email')} name={'username'} disabled={isSubmitting} />
-                    <div css={tw`mt-6`}>
-                        <Field type={'password'} label={t('auth.login.password', 'Password')} name={'password'} disabled={isSubmitting} />
-                    </div>
-                    <div css={tw`mt-6`}>
-                        <Button type={'submit'} size={'xlarge'} isLoading={isSubmitting} disabled={isSubmitting}>
-                            {t('auth.login.login_button', 'Login')}
-                        </Button>
-                    </div>
-                    {recaptchaEnabled && (
-                        <Reaptcha
-                            ref={ref}
-                            size={'invisible'}
-                            sitekey={siteKey || '_invalid_key'}
-                            onVerify={(response) => {
-                                setToken(response);
-                                submitForm();
-                            }}
-                            onExpire={() => {
-                                setSubmitting(false);
-                                setToken('');
-                            }}
-                        />
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                    className="w-full relative"
+                >
+                    {config.login_visuals.glow_borders && (
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-brand-500 to-indigo-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200 animate-tilt pointer-events-none"></div>
                     )}
-                    <div css={tw`mt-6 text-center`}>
-                        <Link
-                            to={'/auth/password'}
-                            css={tw`text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-600`}
-                        >
-                            {t('auth.login.forgot_password', 'Forgot password?')}
-                        </Link>
-                    </div>
-                </LoginFormContainer>
+                    <LoginFormContainer
+                        title={t('auth.login.title', 'Login to Continue')}
+                        className={config.login_visuals.glow_borders ? 'relative group' : 'relative'}
+                        css={tw`w-full flex`}
+                    >
+                        <Field type={'text'} label={t('auth.login.username', 'Username or Email')} name={'username'} disabled={isSubmitting} />
+                        <div css={tw`mt-6`}>
+                            <Field type={'password'} label={t('auth.login.password', 'Password')} name={'password'} disabled={isSubmitting} />
+                        </div>
+                        <div css={tw`mt-6`}>
+                            <Button type={'submit'} size={'xlarge'} isLoading={isSubmitting} disabled={isSubmitting}>
+                                {t('auth.login.login_button', 'Login')}
+                            </Button>
+                        </div>
+                        {recaptchaEnabled && (
+                            <Reaptcha
+                                ref={ref}
+                                size={'invisible'}
+                                sitekey={siteKey || '_invalid_key'}
+                                onVerify={(response) => {
+                                    setToken(response);
+                                    submitForm();
+                                }}
+                                onExpire={() => {
+                                    setSubmitting(false);
+                                    setToken('');
+                                }}
+                            />
+                        )}
+                        <div css={tw`mt-6 text-center`}>
+                            <Link
+                                to={'/auth/password'}
+                                css={tw`text-xs text-neutral-500 tracking-wide no-underline uppercase hover:text-neutral-600`}
+                            >
+                                {t('auth.login.forgot_password', 'Forgot password?')}
+                            </Link>
+                        </div>
+                    </LoginFormContainer>
+                </motion.div>
             )}
         </Formik>
     );

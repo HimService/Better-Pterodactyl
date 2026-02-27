@@ -25,12 +25,18 @@ const NavItemStyle = styled(NavLink)`
     &:hover {
         color: rgb(var(--text-primary));
         background-color: rgb(var(--bg-card-hover));
+        &:active,
+        &:hover,
+        &.active {
+            box-shadow: inset 0 -2px var(--brand-main);
+        }
+box-shadow: 0 4px 12px var(--brand-glow);
     }
 
     &.active {
         color: white;
-        background-color: rgb(var(--color-brand-600));
-        box-shadow: 0 4px 12px rgba(var(--color-brand-600), 0.3);
+        background-color: var(--brand-main);
+        box-shadow: 0 4px 12px var(--brand-glow);
     }
 `;
 
@@ -46,7 +52,7 @@ const AdminNavItemStyle = styled.a`
 
 export default () => {
     const { t } = useTranslation('frontend');
-    const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
+    const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data?.rootAdmin || false);
 
     return (
         <SidebarContainer>

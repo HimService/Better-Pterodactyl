@@ -40,7 +40,7 @@ const RightNavigation = styled.div`
         &:active,
         &:hover,
         &.active {
-            box-shadow: inset 0 -2px rgb(var(--color-brand-600));
+            box-shadow: inset 0 -2px var(--brand-main);
         }
     }
 `;

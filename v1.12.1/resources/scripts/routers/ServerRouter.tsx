@@ -22,6 +22,12 @@ import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import PermissionRoute from '@/components/elements/PermissionRoute';
 import routes from '@/routers/routes';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components/macro';
+
+const BrandingContainer = styled.div<{ $color?: string }>`
+    --brand-main: ${props => props.$color || 'var(--color-brand-500)'};
+    --brand-glow: ${props => props.$color ? `${props.$color}33` : 'rgba(var(--color-brand-500), 0.2)'};
+`;
 
 export default () => {
     const { t } = useTranslation();
@@ -65,10 +71,44 @@ export default () => {
         };
     }, [match.params.id]);
 
+    const description = ServerContext.useStoreState((state) => state.server.data?.description);
+
+    const branding = React.useMemo(() => {
+        if (!description) return { color: undefined, tag: undefined };
+
+        const tags: Record<string, string> = {
+            'survival': '#10b981', // Emerald
+            'combat': '#ef4444',   // Red
+            'creative': '#3b82f6', // Blue
+            'horror': '#7c3aed',   // Violet
+            'vanilla': '#f59e0b',  // Amber
+        };
+
+        const foundTag = Object.keys(tags).find(t => description.toLowerCase().includes(`[${t}]`));
+        return {
+            tag: foundTag,
+            color: foundTag ? tags[foundTag] : undefined
+        };
+    }, [description]);
+
     return (
-        <div key={'server-router'} className="flex w-full min-h-screen transition-colors duration-300">
+        <BrandingContainer $color={branding.color} key={'server-router'} className="flex w-full min-h-screen transition-colors duration-300 relative bg-[#020617]">
+            {/* Atmospheric Background Layer */}
+            {branding.color && (
+                <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
+                    <div
+                        className="absolute -top-[10%] -left-[10%] w-[50rem] h-[50rem] rounded-full filter blur-[120px] animate-pulse"
+                        style={{ backgroundColor: `${branding.color}33` }}
+                    />
+                    <div
+                        className="absolute -bottom-[10%] -right-[10%] w-[40rem] h-[40rem] rounded-full filter blur-[150px] animate-pulse"
+                        style={{ backgroundColor: `${branding.color}22` }}
+                    />
+                </div>
+            )}
+
             <Sidebar />
-            <div className="flex flex-col flex-1 w-full overflow-hidden">
+            <div className="flex flex-col flex-1 w-full overflow-hidden relative z-10">
                 <NavigationBar />
                 {!uuid || !id ? (
                     error ? (
@@ -85,13 +125,13 @@ export default () => {
                                         .filter((route) => !!route.name)
                                         .map((route) =>
                                             route.permission ? (
-                                                <Can key={route.path} action={route.permission} matchAny>
-                                                    <NavLink to={to(route.path, true)} exact={route.exact}>
+                                                <Can key={route.path} action={route.permission} matchAny primary>
+                                                    <NavLink to={to(route.path, true)} exact={route.exact} activeStyle={{ color: branding.color }}>
                                                         {t(`navigation.${route.name!.toLowerCase().replace(/\s/g, '_')}`)}
                                                     </NavLink>
                                                 </Can>
                                             ) : (
-                                                <NavLink key={route.path} to={to(route.path, true)} exact={route.exact}>
+                                                <NavLink key={route.path} to={to(route.path, true)} exact={route.exact} activeStyle={{ color: branding.color }}>
                                                     {t(`navigation.${route.name!.toLowerCase().replace(/\s/g, '_')}`)}
                                                 </NavLink>
                                             )
@@ -129,6 +169,6 @@ export default () => {
                     </>
                 )}
             </div>
-        </div>
+        </BrandingContainer>
     );
 };

@@ -23,18 +23,24 @@
     @apply flex flex-col w-full h-full;
 
     &>.container {
-        @apply p-2 sm:p-4 bg-transparent min-h-[16rem] flex-1 font-mono text-sm;
+        @apply p-2 sm:p-4 min-h-[16rem] flex-1 font-mono text-sm overflow-hidden;
+        background-color: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
         border: none;
 
         & #terminal {
             @apply h-full;
 
+            &::-webkit-scrollbar {
+                @apply w-1.5;
+            }
+
             &::-webkit-scrollbar-track {
-                @apply w-2;
+                @apply bg-transparent;
             }
 
             &::-webkit-scrollbar-thumb {
-                @apply bg-neutral-800 dark:bg-gray-900;
+                @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
             }
         }
     }
@@ -46,10 +52,43 @@
     & .command_input {
         @apply relative px-4 pl-11 pr-4 py-3 w-full font-mono text-sm;
         @apply focus:ring-0 outline-none focus-visible:outline-none;
-        @apply transition-colors duration-200;
-        background-color: rgba(255, 255, 255, 0.03);
+        @apply transition-all duration-200;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(12px);
         border: none;
         border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+        &:focus {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+    }
+
+    & .shortcut_container {
+        @apply flex items-center gap-2 p-2 px-4 overflow-x-auto whitespace-nowrap;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.03);
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+
+        &::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari and Opera */
+        }
+
+        & button {
+            @apply px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-200;
+            @apply bg-white/5 text-neutral-400 border border-white/5;
+
+            &:hover {
+                @apply bg-white/10 text-neutral-200 border-white/10 scale-105;
+            }
+
+            &:active {
+                @apply scale-95;
+            }
+        }
     }
 }
 

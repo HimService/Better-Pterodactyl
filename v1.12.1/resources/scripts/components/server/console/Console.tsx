@@ -15,7 +15,8 @@ import { debounce } from 'debounce';
 import { usePersistedState } from '@/plugins/usePersistedState';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import classNames from 'classnames';
-import { ChevronDoubleRightIcon } from '@heroicons/react/solid';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTerminal, faCode, faQuestionCircle, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 
 import 'xterm/css/xterm.css';
@@ -66,8 +67,8 @@ export default () => {
     const scrollDownHelperAddon = new ScrollDownHelperAddon();
     const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
     const [canSendCommands] = usePermissions(['control.console']);
-    const serverId = ServerContext.useStoreState((state) => state.server.data!.id);
-    const isTransferring = ServerContext.useStoreState((state) => state.server.data!.isTransferring);
+    const serverId = ServerContext.useStoreState((state) => state.server.data?.id);
+    const isTransferring = ServerContext.useStoreState((state) => state.server.data?.isTransferring || false);
     const [history, setHistory] = usePersistedState<string[]>(`${serverId}:command_history`, []);
     const [historyIndex, setHistoryIndex] = useState(-1);
     // SearchBarAddon has hardcoded z-index: 999 :(
@@ -210,6 +211,20 @@ export default () => {
             </div>
             {canSendCommands && (
                 <div className={'relative'}>
+                    <div className={styles.shortcut_container}>
+                        <button onClick={() => instance?.send('send command', 'status')}>
+                            <FontAwesomeIcon icon={faTerminal} className={'mr-1.5 opacity-70'} />
+                            Status
+                        </button>
+                        <button onClick={() => instance?.send('send command', 'version')}>
+                            <FontAwesomeIcon icon={faCode} className={'mr-1.5 opacity-70'} />
+                            Version
+                        </button>
+                        <button onClick={() => instance?.send('send command', 'help')}>
+                            <FontAwesomeIcon icon={faQuestionCircle} className={'mr-1.5 opacity-70'} />
+                            Help
+                        </button>
+                    </div>
                     <input
                         className={classNames('peer', styles.command_input, 'text-neutral-100 placeholder-neutral-500 font-medium')}
                         type={'text'}
@@ -226,7 +241,7 @@ export default () => {
                             styles.command_icon
                         )}
                     >
-                        <ChevronDoubleRightIcon className={'w-4 h-4'} />
+                        <FontAwesomeIcon icon={faAngleDoubleRight} className={'w-4 h-4'} />
                     </div>
                 </div>
             )}

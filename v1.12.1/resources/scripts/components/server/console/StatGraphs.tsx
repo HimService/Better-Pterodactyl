@@ -7,7 +7,8 @@ import { useChart, useChartTickLabel } from '@/components/server/console/chart';
 import { useTranslation } from 'react-i18next';
 import { hexToRgba } from '@/lib/helpers';
 import { bytesToString } from '@/lib/formatters';
-import { CloudDownloadIcon, CloudUploadIcon } from '@heroicons/react/solid';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCloudDownloadAlt, faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 import { theme } from 'twin.macro';
 import ChartBlock from '@/components/server/console/ChartBlock';
 import Tooltip from '@/components/elements/tooltip/Tooltip';
@@ -81,10 +82,10 @@ export default () => {
                 legend={
                     <>
                         <Tooltip arrow content={t('server.console.inbound', 'Inbound')}>
-                            <CloudDownloadIcon className={'mr-2 w-4 h-4 text-yellow-400'} />
+                            <FontAwesomeIcon icon={faCloudDownloadAlt} className={'mr-2 w-4 h-4 text-yellow-400'} />
                         </Tooltip>
                         <Tooltip arrow content={t('server.console.outbound', 'Outbound')}>
-                            <CloudUploadIcon className={'w-4 h-4 text-cyan-400'} />
+                            <FontAwesomeIcon icon={faCloudUploadAlt} className={'w-4 h-4 text-cyan-400'} />
                         </Tooltip>
                     </>
                 }
