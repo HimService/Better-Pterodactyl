@@ -28,7 +28,26 @@
         "metadata": "メタデータ",
         "error_boundary": "このビューのレンダリング中にエラーが発生しました。ページを更新してください。",
         "access_denied": "アクセス拒否",
-        "no_permission": "このページにアクセスする権限がありません。"
+        "no_permission": "このページにアクセスする権限がありません。",
+        "copied": "クリップボードにコピーしました。",
+        "copied_with_text": "「{{text}}」をクリップボードにコピーしました。"
+    },
+    "public_status": {
+        "title": "サービスステータス",
+        "description": "全ノードの現在の稼働状況と負荷を確認します。",
+        "nodes": "ノードリスト",
+        "online": "オンライン",
+        "offline": "オフライン",
+        "maintenance": "メンテナンス中",
+        "memory": "メモリ",
+        "disk": "ディスク",
+        "location": "場所",
+        "all_operational": "すべてのシステムが正常に稼働しています",
+        "partial_maintenance": "一部のシステムがメンテナンス中です",
+        "degraded_performance": "一部のシステムで問題が発生しています",
+        "last_checked": "最終確認",
+        "operational": "正常稼働中",
+        "no_nodes": "現在、ステータスを公開しているノードはありません。"
     },
     "auth": {
         "welcome_back": "おかえりなさい",
@@ -135,6 +154,7 @@
             "folder_upload_error": "フォルダのアップロードはサポートされていません。",
             "create_directory": "ディレクトリを作成",
             "create_directory_help": "このディレクトリは次に作成されます:",
+            "valid_directory_name": "有効なディレクトリ名を指定する必要があります。",
             "home": "home",
             "container": "container"
         },
@@ -427,6 +447,7 @@
         "system_theme": "システムテーマ",
         "dashboard": "ダッシュボード",
         "admin": "管理エリア",
+        "account_deleted": "アカウントが削除されました。",
         "account_settings": "アカウント設定",
         "sign_out": "ログアウト",
         "servers": "サーバー",
@@ -503,6 +524,15 @@
             "update_password_button": "パスワードを更新"
         },
         "header": "ダッシュボード",
+        "batch_mode": "一括モード",
+        "exit_batch_mode": "一括モードを終了",
+        "select_all": "すべて選択",
+        "deselect_all": "すべて選択解除",
+        "servers_selected": "選択されたサーバー",
+        "batch_actions": "一括操作",
+        "start_all": "すべて起動",
+        "stop_all": "すべて停止",
+        "restart_all": "すべて再起動",
         "showing_others_servers": "他の人のサーバーを表示中",
         "showing_your_servers": "自分のサーバーを表示中",
         "no_other_servers": "表示する他のサーバーはありません。",
@@ -803,6 +833,33 @@
                 "day_week": "日（週）"
             },
             "delete_task_confirm": "このタスクを削除してもよろしいですか？この操作は取り消せません。"
+        }
+    },
+    "admin": {
+        "announcements": {
+            "title": "グローバルアナウンス管理",
+            "subtitle": "複数のお知らせを管理する (Manage multiple announcements)",
+            "enable_label": "このお知らせを有効にする",
+            "type_label": "お知らせの種類",
+            "message_label": "お知らせの内容",
+            "message_placeholder": "お知らせ内容を入力...",
+            "link_label": "リンク URL",
+            "add_button": "お知らせを追加",
+            "empty_message": "現在お知らせはありません。右上をクリックして追加してください！",
+            "active": "有効 (Active)",
+            "inactive": "無効 (Inactive)",
+            "status_active": "このお知らせは現在表示されています",
+            "status_inactive": "このお知らせは非表示です",
+            "save_button": "変更を保存",
+            "saving": "保存中...",
+            "success_message": "お知らせを保存しました",
+            "error_message": "保存に失敗しました。再試行してください",
+            "types": {
+                "info": "一般情報（青）",
+                "warning": "警告情報（黄色）",
+                "danger": "危険情報（赤）",
+                "success": "成功情報（緑）"
+            }
         }
     },
     "common": {

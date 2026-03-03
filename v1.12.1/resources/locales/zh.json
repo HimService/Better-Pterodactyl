@@ -28,7 +28,26 @@
     "metadata": "元數據",
     "error_boundary": "應用程式在渲染此視圖時遇到錯誤。請嘗試重新整理頁面。",
     "access_denied": "存取遭拒",
-    "no_permission": "您沒有權限存取此頁面。"
+    "no_permission": "您沒有權限存取此頁面。",
+    "copied": "已複製文字到剪貼簿。",
+    "copied_with_text": "已複製「{{text}}」到剪貼簿。"
+  },
+  "public_status": {
+    "title": "服務狀態",
+    "description": "查看所有節點的當前運行狀態和負載。",
+    "nodes": "節點列表",
+    "online": "線上",
+    "offline": "離線",
+    "maintenance": "維護中",
+    "memory": "記憶體",
+    "disk": "磁碟",
+    "location": "位置",
+    "all_operational": "所有系統正常運行",
+    "partial_maintenance": "部分系統維護中",
+    "degraded_performance": "部分系統出現問題",
+    "last_checked": "最後檢查",
+    "operational": "運行正常",
+    "no_nodes": "目前沒有任何節點公開狀態。"
   },
   "auth": {
     "welcome_back": "歡迎回來",
@@ -135,6 +154,7 @@
       "folder_upload_error": "不支援上傳資料夾。",
       "create_directory": "建立資料夾",
       "create_directory_help": "此資料夾將被建立在",
+      "valid_directory_name": "必須提供有效的目錄名稱。",
       "home": "home",
       "container": "container"
     },
@@ -481,18 +501,6 @@
       "enable_2fa": "啟用雙步驟驗證",
       "enable_2fa_description": "協助保護您的帳號免於受未經授權的存取。每次登入時各項操作將會要求您輸入驗證碼。",
       "password": "密碼",
-      "must_enter_password": "您必須輸入您的帳戶密碼才能繼續。",
-      "2fa_enabled_title": "已啟用雙步驟驗證",
-      "recovery_codes_help": "請將下方的恢復碼安全地儲存。如果您遺失了手機存取權，您可以使用這些備用代碼登入。",
-      "recovery_codes_warning": "這些恢復碼將不會再顯示。",
-      "qr_code_help": "使用您選擇的雙步驟驗證應用程式掃描上方的 QR 碼。然後在下方的欄位中輸入產生的 6 位數代碼。",
-      "account_password": "帳戶密碼",
-      "waiting_for_qr": "正在等待 QR 碼載入...",
-      "must_enter_code_and_password": "您必須輸入 6 位數驗證碼和密碼才能繼續。",
-      "must_provide_password": "您必須提供您目前的帳戶密碼。",
-      "email_updated": "您的主要電子郵件位址已更新。",
-      "email": "電子郵件",
-      "confirm_password": "確認密碼",
       "update_email_button": "更新電子郵件",
       "must_provide_current_password": "您必須提供您目前的密碼。",
       "password_confirmation_mismatch": "密碼確認與您輸入的新密碼不相符。",
@@ -503,6 +511,15 @@
       "update_password_button": "更新密碼"
     },
     "header": "儀表板",
+    "batch_mode": "批量模式",
+    "exit_batch_mode": "退出批量模式",
+    "select_all": "全選",
+    "deselect_all": "取消全選",
+    "servers_selected": "已選擇伺服器",
+    "batch_actions": "批量操作",
+    "start_all": "全部啟動",
+    "stop_all": "全部停止",
+    "restart_all": "全部重啟",
     "showing_others_servers": "顯示其他人的伺服器",
     "showing_your_servers": "顯示您的伺服器",
     "no_other_servers": "沒有其他伺服器可供顯示。",
@@ -803,6 +820,50 @@
         "day_week": "日 (星期)"
       },
       "delete_task_confirm": "您確定要刪除此任務嗎？此操作無法還原。"
+    }
+  },
+  "admin": {
+    "announcements": {
+      "title": "全域公告管理",
+      "subtitle": "管理多個系統公告 (Manage multiple announcements)",
+      "enable_label": "啟用此公告",
+      "type_label": "公告類型",
+      "message_label": "公告內容",
+      "message_placeholder": "輸入公告內容...",
+      "link_label": "連結網址",
+      "add_button": "新增公告",
+      "empty_message": "目前沒有公告。點擊右上角新增一個吧！",
+      "active": "已啟用 (Active)",
+      "inactive": "未啟用 (Inactive)",
+      "status_active": "此公告目前顯示中",
+      "status_inactive": "此公告已隱藏",
+      "save_button": "儲存變更",
+      "saving": "儲存中...",
+      "success_message": "公告已成功儲存",
+      "error_message": "儲存失敗，請重試",
+      "types": {
+        "info": "一般資訊 (藍色)",
+        "warning": "警告資訊 (黃色)",
+        "danger": "危險資訊 (紅色)",
+        "success": "成功資訊 (綠色)"
+      }
+    },
+    "status": {
+      "title": "狀態頁面設定",
+      "subtitle": "管理顯示在公共狀態頁面的節點",
+      "header_node": "節點名稱",
+      "header_status": "顯示狀態",
+      "node_id": "ID",
+      "showing": "顯示中",
+      "hidden": "已隱藏",
+      "save_button": "儲存設定",
+      "saving": "儲存中...",
+      "success": "儲存成功",
+      "error": "儲存失敗",
+      "server_error": "儲存時發生伺服器錯誤。",
+      "unexpected_error": "發生預期外的錯誤。",
+      "no_nodes": "目前沒有任何節點。",
+      "loading": "載入中..."
     }
   },
   "common": {

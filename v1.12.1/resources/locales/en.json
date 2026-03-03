@@ -28,7 +28,26 @@
         "metadata": "Metadata",
         "error_boundary": "An error occurred while rendering this view. Please try refreshing the page.",
         "access_denied": "Access Denied",
-        "no_permission": "You do not have permission to access this page."
+        "no_permission": "You do not have permission to access this page.",
+        "copied": "Copied text to clipboard.",
+        "copied_with_text": "Copied \"{{text}}\" to clipboard."
+    },
+    "public_status": {
+        "title": "Service Status",
+        "description": "Monitor the current operational status and load of all nodes.",
+        "nodes": "Node List",
+        "online": "Online",
+        "offline": "Offline",
+        "maintenance": "Maintenance",
+        "memory": "Memory",
+        "disk": "Disk",
+        "location": "Location",
+        "all_operational": "All Systems Operational",
+        "partial_maintenance": "Partial System Maintenance",
+        "degraded_performance": "Some Systems Experiencing Issues",
+        "last_checked": "Last checked",
+        "operational": "Operational",
+        "no_nodes": "No nodes are currently sharing their status."
     },
     "auth": {
         "welcome_back": "Welcome Back",
@@ -135,6 +154,7 @@
             "folder_upload_error": "Folder uploads are not supported.",
             "create_directory": "Create Directory",
             "create_directory_help": "This directory will be created in",
+            "valid_directory_name": "A valid directory name must be provided.",
             "home": "home",
             "container": "container"
         },
@@ -503,6 +523,15 @@
             "update_password_button": "Update Password"
         },
         "header": "Dashboard",
+        "batch_mode": "Batch Mode",
+        "exit_batch_mode": "Exit Batch Mode",
+        "select_all": "Select All",
+        "deselect_all": "Deselect All",
+        "servers_selected": "Servers Selected",
+        "batch_actions": "Batch Actions",
+        "start_all": "Start All",
+        "stop_all": "Stop All",
+        "restart_all": "Restart All",
         "showing_others_servers": "Showing Servers of Others",
         "showing_your_servers": "Showing Your Servers",
         "no_other_servers": "There are no other servers to display.",
@@ -803,6 +832,33 @@
                 "day_week": "Day of Week"
             },
             "delete_task_confirm": "Are you sure you want to delete this task? This operation cannot be undone."
+        }
+    },
+    "admin": {
+        "announcements": {
+            "title": "Global Announcement",
+            "subtitle": "Manage multiple announcements",
+            "enable_label": "Enable this announcement",
+            "type_label": "Announcement Type",
+            "message_label": "Announcement Message",
+            "message_placeholder": "Enter announcement message...",
+            "link_label": "Link URL",
+            "add_button": "Add Announcement",
+            "empty_message": "There are currently no announcements. Click top right to add one!",
+            "active": "Active",
+            "inactive": "Inactive",
+            "status_active": "This announcement is currently displayed",
+            "status_inactive": "This announcement is hidden",
+            "save_button": "Save Changes",
+            "saving": "Saving...",
+            "success_message": "Announcements saved successfully",
+            "error_message": "Failed to save announcements. Please try again.",
+            "types": {
+                "info": "Information (Blue)",
+                "warning": "Warning (Yellow)",
+                "danger": "Danger (Red)",
+                "success": "Success (Green)"
+            }
         }
     },
     "common": {
