@@ -47,7 +47,9 @@
         "degraded_performance": "一部のシステムで問題が発生しています",
         "last_checked": "最終確認",
         "operational": "正常稼働中",
-        "no_nodes": "現在、ステータスを公開しているノードはありません。"
+        "no_nodes": "現在、ステータスを公開しているノードはありません。",
+        "servers": "サーバー総数",
+        "active_servers": "実行中サーバー"
     },
     "auth": {
         "welcome_back": "おかえりなさい",

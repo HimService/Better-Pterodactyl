@@ -47,7 +47,9 @@
     "degraded_performance": "部分系統出現問題",
     "last_checked": "最後檢查",
     "operational": "運行正常",
-    "no_nodes": "目前沒有任何節點公開狀態。"
+    "no_nodes": "目前沒有任何節點公開狀態。",
+    "servers": "伺服器數量",
+    "active_servers": "運行中伺服器"
   },
   "auth": {
     "welcome_back": "歡迎回來",

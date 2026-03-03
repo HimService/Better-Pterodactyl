@@ -47,7 +47,9 @@
         "degraded_performance": "Some Systems Experiencing Issues",
         "last_checked": "Last checked",
         "operational": "Operational",
-        "no_nodes": "No nodes are currently sharing their status."
+        "no_nodes": "No nodes are currently sharing their status.",
+        "servers": "Total Servers",
+        "active_servers": "Active Servers"
     },
     "auth": {
         "welcome_back": "Welcome Back",
