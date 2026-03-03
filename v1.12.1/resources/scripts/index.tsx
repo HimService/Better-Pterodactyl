@@ -14,6 +14,9 @@ import './i18n';
 setConfig({ reloadHooks: false });
 
 import AdminRadarWrapper from '@/components/admin/AdminRadarWrapper';
+import AnnouncementManager from '@/components/admin/AnnouncementManager';
+import StatusManager from '@/components/admin/StatusManager';
+import AnnouncementBanner from '@/components/elements/AnnouncementBanner';
 
 import { StoreProvider } from 'easy-peasy';
 import { store } from '@/state';
@@ -27,11 +30,16 @@ if (appRoot) {
 
 const adminRadarRoot = document.getElementById('admin-radar-root');
 if (adminRadarRoot) {
+    const isAnnouncements = window.location.pathname.includes('/admin/announcements');
+    const isStatus = window.location.pathname.includes('/admin/status');
+
     // @ts-ignore
     ReactDOM.render(
         <StoreProvider store={store}>
             <ThemeProvider>
-                <AdminRadarWrapper />
+                <GlobalStylesheet />
+                <AnnouncementBanner />
+                {isAnnouncements ? <AnnouncementManager /> : (isStatus ? <StatusManager /> : <AdminRadarWrapper />)}
             </ThemeProvider>
         </StoreProvider>,
         adminRadarRoot

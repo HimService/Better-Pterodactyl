@@ -4,7 +4,7 @@ import { ServerPowerState } from '@/api/server/getServerResourceUsage';
 import tw from 'twin.macro';
 import styled, { keyframes } from 'styled-components/macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShieldAlt } from '@fortawesome/free-solid-svg-icons';
+import { faServer } from '@fortawesome/free-solid-svg-icons';
 
 export interface RadarServerData {
     id: number;
@@ -218,7 +218,7 @@ const TotalLoadRadar: React.FC<TotalLoadRadarProps> = ({ servers, nodes = [], on
 
                 {/* Central Panel Hub - Visual Background */}
                 <div className="flex flex-col items-center justify-center z-10 bg-neutral-900 border border-emerald-500/50 rounded-full w-14 h-14 shadow-[0_0_40px_rgba(16,185,129,0.4)] backdrop-blur-md">
-                    <FontAwesomeIcon icon={faShieldAlt} className="text-emerald-400 text-xl" />
+                    <FontAwesomeIcon icon={faServer} className="text-emerald-400 text-xl" />
                 </div>
 
                 <svg className="absolute w-[500px] h-[500px] overflow-visible pointer-events-auto" viewBox="0 0 500 500">

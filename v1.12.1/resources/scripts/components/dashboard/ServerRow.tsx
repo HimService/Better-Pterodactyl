@@ -110,13 +110,48 @@ const StatusPill = ({ status, isSuspended, isTransferring }: { status: ServerPow
 
 type Timer = ReturnType<typeof setInterval>;
 
-export default function ServerRow({ server, className, isBatchMode, isSelected, onSelect }: { server: Server; className?: string; isBatchMode?: boolean; isSelected?: boolean; onSelect?: (id: string) => void }) {
+export default function ServerRow({ server, className, isBatchMode, isSelected, onSelect, isBatchProcessing, batchActionType }: { server: Server; className?: string; isBatchMode?: boolean; isSelected?: boolean; onSelect?: (id: string) => void; isBatchProcessing?: boolean; batchActionType?: 'start' | 'stop' | 'restart' | 'kill' | null }) {
     const { t } = useTranslation();
     const { addFlash, clearFlashes } = useFlash();
     const interval = useRef<Timer>(null) as React.MutableRefObject<Timer>;
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
     const [stats, setStats] = useState<ServerStats | null>(null);
     const [isActionLoading, setIsActionLoading] = useState(false);
+    const [optimisticStatus, setOptimisticStatus] = useState<ServerPowerState | null>(null);
+
+    // Apply optimistic status from batch actions
+    useEffect(() => {
+        if (isBatchProcessing && batchActionType) {
+            if (batchActionType === 'start') setOptimisticStatus('starting');
+            if (batchActionType === 'stop' || batchActionType === 'kill') setOptimisticStatus('stopping');
+            if (batchActionType === 'restart') setOptimisticStatus('starting');
+        }
+    }, [isBatchProcessing, batchActionType]);
+
+    // Clear optimistic status when stats catches up or after timeout
+    useEffect(() => {
+        if (!optimisticStatus) return;
+
+        let timeout: Timer;
+        if (
+            (optimisticStatus === 'starting' && (stats?.status === 'starting' || stats?.status === 'running')) ||
+            (optimisticStatus === 'stopping' && (stats?.status === 'stopping' || stats?.status === 'offline'))
+        ) {
+            setOptimisticStatus(null);
+        } else {
+            // Fallback to clear it after 15 seconds if it didn't catch up
+            timeout = setTimeout(() => {
+                setOptimisticStatus(null);
+            }, 15000);
+        }
+
+        return () => {
+            if (timeout) clearTimeout(timeout);
+        };
+    }, [stats?.status, optimisticStatus]);
+
+    // Derived status
+    const displayStatus = optimisticStatus || stats?.status;
 
     const getStats = () =>
         getServerResourceUsage(server.uuid)
@@ -142,6 +177,9 @@ export default function ServerRow({ server, className, isBatchMode, isSelected, 
         e.preventDefault();
         e.stopPropagation();
         setIsActionLoading(true);
+        if (action === 'start') setOptimisticStatus('starting');
+        if (action === 'stop' || action === 'kill') setOptimisticStatus('stopping');
+        if (action === 'restart') setOptimisticStatus('starting');
         clearFlashes('dashboard');
 
         // Reverting to lowercase actions and server.id (short identifier)
@@ -192,7 +230,7 @@ export default function ServerRow({ server, className, isBatchMode, isSelected, 
                     </div>
                 </div>
             )}
-            <StatusDot $status={stats?.status} />
+            <StatusDot $status={displayStatus} />
 
             {/* Left Section: Icon, Name, IPs */}
             <div css={tw`flex items-center flex-1 min-w-0 w-full sm:w-auto`}>
@@ -205,7 +243,7 @@ export default function ServerRow({ server, className, isBatchMode, isSelected, 
                         <ServerName>
                             {server.name}
                         </ServerName>
-                        <StatusPill status={stats?.status} isSuspended={isSuspended} isTransferring={server.isTransferring} />
+                        <StatusPill status={displayStatus} isSuspended={isSuspended} isTransferring={server.isTransferring} />
                     </div>
 
                     <div css={tw`flex items-center justify-start gap-2 max-w-full overflow-hidden`}>
@@ -250,25 +288,25 @@ export default function ServerRow({ server, className, isBatchMode, isSelected, 
                     onClick={(e) => e.stopPropagation()}
                 >
                     <ActionButton
-                        disabled={isActionLoading || stats?.status === 'running' || stats?.status === 'starting'}
+                        disabled={isActionLoading || displayStatus === 'running' || displayStatus === 'starting'}
                         onClick={(e) => onPowerAction(e, 'start')}
-                        css={stats?.status === 'offline' ? tw`text-green-500 bg-green-500/10 hover:bg-green-500/20` : undefined}
+                        css={displayStatus === 'offline' ? tw`text-green-500 bg-green-500/10 hover:bg-green-500/20` : undefined}
                     >
                         <FontAwesomeIcon icon={faPlay} className={'text-[10px]'} />
                     </ActionButton>
                     <ActionButton
-                        disabled={isActionLoading || !stats?.status || stats?.status === 'offline'}
+                        disabled={isActionLoading || !displayStatus || displayStatus === 'offline'}
                         onClick={(e) => onPowerAction(e, 'restart')}
-                        css={stats?.status === 'running' ? tw`text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20` : undefined}
+                        css={displayStatus === 'running' ? tw`text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20` : undefined}
                     >
                         <FontAwesomeIcon icon={faRedo} className={'text-[10px]'} />
                     </ActionButton>
                     <ActionButton
-                        disabled={isActionLoading || stats?.status === 'offline'}
-                        onClick={(e) => onPowerAction(e, stats?.status === 'stopping' ? 'kill' : 'stop')}
-                        css={stats?.status === 'running' ? tw`text-red-500 bg-red-500/10 hover:bg-red-500/20` : undefined}
+                        disabled={isActionLoading || displayStatus === 'offline'}
+                        onClick={(e) => onPowerAction(e, displayStatus === 'stopping' ? 'kill' : 'stop')}
+                        css={displayStatus === 'running' ? tw`text-red-500 bg-red-500/10 hover:bg-red-500/20` : undefined}
                     >
-                        <FontAwesomeIcon icon={stats?.status === 'stopping' ? faSkull : faStop} className={'text-[10px]'} />
+                        <FontAwesomeIcon icon={displayStatus === 'stopping' ? faSkull : faStop} className={'text-[10px]'} />
                     </ActionButton>
                 </div>
             )}

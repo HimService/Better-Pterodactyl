@@ -1,5 +1,36 @@
 @extends('layouts.admin')
 
+@php
+    if (request()->isMethod('post') && request()->is('admin/announcements')) {
+        try {
+            $jsonPayload = request()->getContent();
+            $decoded = json_decode($jsonPayload, true);
+            if (!is_array($decoded)) {
+                header('Content-Type: application/json', true, 400);
+                echo json_encode(['error' => 'Invalid JSON payload. Expected an array.']);
+                exit;
+            }
+            
+            // Save the new array to the file
+            file_put_contents(public_path('announcement.json'), $jsonPayload);
+
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true]);
+            exit;
+        } catch (\Exception $e) {
+            header('Content-Type: application/json', true, 500);
+            echo json_encode(['error' => $e->getMessage()]);
+            exit;
+        }
+    }
+
+    // Load current announcement for the UI
+    $announcementPath = public_path('announcement.json');
+    $currentAnnouncement = file_exists($announcementPath) 
+        ? json_decode(file_get_contents($announcementPath), true)
+        : ['enabled' => false, 'type' => 'info', 'message' => '', 'link' => ''];
+@endphp
+
 @section('title')
     @lang('admin/index.common.administration')
 @endsection
@@ -7,47 +38,98 @@
 @section('content-header')
     <h1 style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
         <div>
-            @lang('admin/index.title')
-            <small>@lang('admin/index.subtitle')</small>
+            @if(Route::is('admin.announcements'))
+                @lang('admin/index.announcements')
+                <small>@lang('admin/index.announcements_help')</small>
+            @else
+                @lang('admin/index.title')
+                <small>@lang('admin/index.subtitle')</small>
+            @endif
         </div>
-        <div class="bp-pro-greeting" id="admin-greeting">@lang('admin/index.welcome')</div>
+        @if(Route::is('admin.index'))
+            <div class="bp-pro-greeting" id="admin-greeting">@lang('admin/index.welcome')</div>
+        @endif
     </h1>
 @endsection
 
 @section('content')
 @php
+    // 1. Fetch Nodes using Eloquent (Source of truth)
     try {
-        if (class_exists('\Pterodactyl\Models\Node')) {
-            $nodes = $nodes ?? \Pterodactyl\Models\Node::all();
-        } else {
-            $nodes = collect(app('db')->table('nodes')->get());
-        }
+        $nodes = \Pterodactyl\Models\Node::all();
     } catch (\Exception $e) {
-        $nodes = collect(app('db')->table('nodes')->get());
+        $nodes = collect(\DB::table('nodes')->get());
     }
 
+    // 2. Main Dashboard Stats
     try {
-        $serversCount = app('db')->table('servers')->count();
-        $usersCount = app('db')->table('users')->count();
-        $allocationsCount = app('db')->table('allocations')->count();
-        $usedAllocationsCount = app('db')->table('allocations')->whereNotNull('server_id')->count();
+        $serversCount = \Pterodactyl\Models\Server::count();
+        $usersCount = \Pterodactyl\Models\User::count();
+        $allocationsCount = \Pterodactyl\Models\Allocation::count();
+        $usedAllocationsCount = \Pterodactyl\Models\Allocation::whereNotNull('server_id')->count();
         
         $totalMemory = $nodes->sum('memory');
         $totalDisk = $nodes->sum('disk');
-        $usedMemory = app('db')->table('servers')->sum('memory');
-        $usedDisk = app('db')->table('servers')->sum('disk');
+        $usedMemory = \Pterodactyl\Models\Server::sum('memory');
+        $usedDisk = \Pterodactyl\Models\Server::sum('disk');
         
         $memoryPercent = $totalMemory > 0 ? round(($usedMemory / $totalMemory) * 100) : 0;
         $diskPercent = $totalDisk > 0 ? round(($usedDisk / $totalDisk) * 100) : 0;
     } catch (\Exception $e) {
-        $serversCount = 0;
-        $usersCount = 0;
-        $allocationsCount = 0;
-        $usedAllocationsCount = 0;
-        $memoryPercent = 0;
-        $diskPercent = 0;
+        $dashboardError = $e->getMessage();
+    }
+
+    // 3. Radar Specific Data
+    $radarNodes = collect([]);
+    $radarServers = collect([]);
+    try {
+        $radarNodes = $nodes->map(function($n) {
+            $secret = '';
+            try {
+                if (is_object($n) && method_exists($n, 'getDecryptedKey')) {
+                    $secret = $n->getDecryptedKey();
+                } elseif (isset($n->daemon_token)) {
+                    $secret = \Crypt::decrypt($n->daemon_token);
+                }
+            } catch (\Exception $e) {
+                // Fallback to raw if decryption fails, though this shouldn't happen
+                $secret = $n->daemon_token ?? '';
+            }
+            
+            return [
+                'id' => $n->id,
+                'name' => $n->name,
+                'is_maintenance' => (bool) ($n->maintenance_mode ?? $n->maintenance ?? false),
+                'daemon_token' => $secret,
+            ];
+        });
+
+        $radarServers = \Pterodactyl\Models\Server::with('node')
+            ->orderBy('id', 'desc')
+            ->limit(100)
+            ->get()
+            ->map(function($s) {
+                return [
+                    'id' => $s->id,
+                    'uuid' => $s->uuid,
+                    'name' => $s->name,
+                    'node' => $s->node->name ?? 'Unknown',
+                    'is_maintenance' => (bool) ($s->node->maintenance_mode ?? $s->node->maintenance ?? false),
+                    'limits' => ['memory' => $s->memory],
+                ];
+            });
+    } catch (\Exception $e) {
+        $radarError = $e->getMessage();
     }
 @endphp
+
+<script>
+    window.AdminRadarNodes = @json($radarNodes);
+    window.AdminRadarServers = @json($radarServers);
+    window.CurrentAnnouncement = @json($currentAnnouncement);
+    @if(isset($dashboardError)) console.error('Better Pterodactyl: Dashboard Stats Error:', "{{ $dashboardError }}"); @endif
+    @if(isset($radarError)) console.error('Better Pterodactyl: Radar Data Error:', "{{ $radarError }}"); @endif
+</script>
 <style>
     /* Better Pterodactyl Admin v2 Styling */
     :root {
@@ -119,7 +201,7 @@
         flex-direction: column;
         gap: 10px;
         transition: all 0.2s;
-        height: 100%;
+        height: 140px; /* Fixed height for consistency */
     }
     .bp-stat-card:hover {
         border-color: rgba(255, 255, 255, 0.2);
@@ -395,6 +477,46 @@
 </style>
 
 
+
+<style>
+    /* Force scrolling recovery for Admin Dashboard */
+    html, body {
+        overflow: auto !important;
+    }
+    .wrapper, .content-wrapper {
+        overflow: visible !important;
+    }
+</style>
+<script>
+    // Inject server & node data for React Radar
+    window.AdminRadarServers = {!! json_encode($radarServers ?? []) !!};
+    window.AdminRadarNodes = {!! json_encode($radarNodes ?? []) !!};
+    
+    // Emergency Scroll & Layout Fix
+    (function() {
+        const recoverScroll = () => {
+            document.body.classList.remove('fixed');
+            document.body.style.overflow = 'auto';
+            document.documentElement.style.overflow = 'auto';
+            
+            // Fix AdminLTE wrapper issues
+            const wrappers = document.querySelectorAll('.wrapper, .content-wrapper');
+            wrappers.forEach(el => {
+                el.style.overflow = 'visible';
+            });
+        };
+        
+        recoverScroll();
+        window.addEventListener('load', recoverScroll);
+        // Periodic check to override any late-loading scripts
+        const interval = setInterval(recoverScroll, 2000);
+        setTimeout(() => clearInterval(interval), 10000);
+    })();
+</script>
+
+<div id="admin-radar-root"></div>
+
+@if(Route::is('admin.index'))
 <div class="row" style="margin-bottom: 24px;">
     <div class="col-xs-12 col-sm-6 col-md-3">
         <div class="bp-stat-card">
@@ -425,7 +547,9 @@
         </div>
     </div>
 </div>
+@endif
 
+@if(Route::is('admin.index'))
 <div class="row">
     <div class="col-md-8">
         <!-- Global Resource Usage -->
@@ -472,19 +596,81 @@
                 <div class="text-muted" style="font-size: 0.8rem;">{{ $nodes->count() }} Nodes Total</div>
             </div>
             <div class="bp-card-v2-body">
+                <!-- Heatmap Legend -->
+                <div style="display: flex; gap: 12px; margin-bottom: 20px; font-size: 0.75rem; color: var(--bp-text-muted);">
+                    <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 8px; height: 8px; border-radius: 2px; background: #10b981;"></div> Safe (< 70%)</div>
+                    <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 8px; height: 8px; border-radius: 2px; background: #f59e0b;"></div> Warning (70-90%)</div>
+                    <div style="display: flex; align-items: center; gap: 6px;"><div style="width: 8px; height: 8px; border-radius: 2px; background: #ef4444;"></div> Critical (> 90%)</div>
+                </div>
                 <div class="node-pulse-grid">
                     @foreach($nodes as $node)
-                        <a href="{{ route('admin.nodes.view', $node->id) }}" class="node-pulse-card node-status-item" data-id="{{ $node->id }}" data-secret="{{ method_exists($node, 'getDecryptedKey') ? $node->getDecryptedKey() : '' }}" data-location="{{ $node->scheme }}://{{ $node->fqdn }}:{{ $node->daemonListen }}/api/system">
-                            <div class="node-pulse-header">
-                                <div class="node-pulse-name">{{ $node->name }}</div>
-                                <div class="node-pulse-status" id="node-status-{{ $node->id }}"></div>
+                        @php
+                            $nodeUsedMemory = app('db')->table('servers')->where('node_id', $node->id)->sum('memory');
+                            $nodeUsedDisk = app('db')->table('servers')->where('node_id', $node->id)->sum('disk');
+                            $nodeMemoryPercent = $node->memory > 0 ? ($nodeUsedMemory / $node->memory) * 100 : 0;
+                            $nodeDiskPercent = $node->disk > 0 ? ($nodeUsedDisk / $node->disk) * 100 : 0;
+                            $maxUsage = max($nodeMemoryPercent, $nodeDiskPercent);
+                            $accentColor = '#10b981';
+                            if ($maxUsage > 90) $accentColor = '#ef4444';
+                            else if ($maxUsage > 70) $accentColor = '#f59e0b';
+                        @endphp
+                        <a href="{{ route('admin.nodes.view', $node->id) }}" class="node-pulse-card node-status-item" data-id="{{ $node->id }}" data-secret="{{ is_object($node) && method_exists($node, 'getDecryptedKey') ? $node->getDecryptedKey() : (is_array($node) ? ($node['daemon_token'] ?? '') : ($node->daemon_token ?? '')) }}" data-location="{{ $node->scheme ?? 'http' }}://{{ $node->fqdn ?? '127.0.0.1' }}:{{ $node->daemonListen ?? '8080' }}/api/system" style="background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 24px; transition: all 0.2s ease-in-out; display: block; text-decoration: none; position: relative; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);">
+                            <!-- Subtle State Border Hover -->
+                            <div class="state-accent" style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: {{ $nodeMemoryPercent > 90 ? '#f85149' : ($nodeMemoryPercent > 70 ? '#d29922' : '#238636') }}; opacity: 0.8;"></div>
+                            
+                            <div class="node-pulse-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="min-width: 0; padding-left: 8px;">
+                                    <div class="node-pulse-name" style="font-size: 1.1rem; font-weight: 700; color: #f0f6fc; letter-spacing: -0.01em; margin-bottom: 4px;">{{ $node->name }}</div>
+                                    <div style="font-size: 0.75rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #8b949e; opacity: 0.8;">{{ $node->fqdn }}</div>
+                                </div>
+                                <div class="node-pulse-status" id="node-status-{{ $node->id }}" style="width: 12px; height: 12px; border-radius: 50%; background: #21262d; border: 2px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 4px rgba(0,0,0,0.5); transition: all 0.3s ease;"></div>
                             </div>
-                            <div class="node-pulse-body">
-                                <div class="node-pulse-fqdn">{{ $node->fqdn }}</div>
-                                <div class="node-pulse-info"><i class="fa fa-map-marker"></i> {{ (isset($node->location) && is_object($node->location)) ? ($node->location->short ?? 'Local') : (isset($node->location_id) ? 'Location #'.$node->location_id : 'Local') }}</div>
-                                <div class="node-pulse-info"><i class="fa fa-microchip"></i> {{ number_format($node->memory / 1024, 1) }} GB RAM</div>
-                                <div class="node-pulse-info"><i class="fa fa-database"></i> {{ number_format($node->disk / 1024, 1) }} GB Disk</div>
+                            
+                            <div class="node-pulse-body" style="display: flex; flex-direction: column; gap: 20px; padding-left: 8px;">
+                                <!-- RAM Section -->
+                                <div style="position: relative;">
+                                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                                        <span style="font-size: 0.65rem; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.1em;">MEM</span>
+                                        <span style="font-size: 0.95rem; font-weight: 700; font-family: ui-monospace, monospace; color: #f0f6fc;">{{ round($nodeMemoryPercent) }}<small style="font-size: 0.65rem; opacity: 0.6; margin-left: 2px;">%</small></span>
+                                    </div>
+                                    <div style="height: 4px; background: rgba(48, 54, 61, 0.4); border-radius: 2px; overflow: hidden;">
+                                        <div style="height: 100%; width: {{ min($nodeMemoryPercent, 100) }}%; background: {{ $nodeMemoryPercent > 90 ? '#f85149' : ($nodeMemoryPercent > 70 ? '#d29922' : '#238636') }}; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Disk Section -->
+                                <div style="position: relative;">
+                                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                                        <span style="font-size: 0.65rem; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.1em;">DISK</span>
+                                        <span style="font-size: 0.95rem; font-weight: 700; font-family: ui-monospace, monospace; color: #f0f6fc;">{{ round($nodeDiskPercent) }}<small style="font-size: 0.65rem; opacity: 0.6; margin-left: 2px;">%</small></span>
+                                    </div>
+                                    <div style="height: 4px; background: rgba(48, 54, 61, 0.4); border-radius: 2px; overflow: hidden;">
+                                        <div style="height: 100%; width: {{ min($nodeDiskPercent, 100) }}%; background: {{ $nodeDiskPercent > 90 ? '#f85149' : ($nodeDiskPercent > 70 ? '#d29922' : '#238636') }}; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                                    </div>
+                                </div>
                             </div>
+                            
+                            <style>
+                                .node-pulse-card:hover {
+                                    border-color: #8b949e !important;
+                                    background: #161b22 !important;
+                                    transform: translateY(-4px);
+                                    box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important;
+                                }
+                                .node-pulse-card:hover .node-pulse-name {
+                                    color: #58a6ff;
+                                }
+                                .node-pulse-status.online {
+                                    background: #238636 !important;
+                                    box-shadow: 0 0 15px rgba(35, 134, 54, 0.8), inset 0 0 5px rgba(255,255,255,0.2) !important;
+                                    border: 2px solid rgba(255,255,255,0.1) !important;
+                                }
+                                .node-pulse-status.offline {
+                                    background: #da3633 !important;
+                                    box-shadow: 0 0 15px rgba(218, 54, 51, 0.8), inset 0 0 5px rgba(255,255,255,0.2) !important;
+                                    border: 2px solid rgba(255,255,255,0.1) !important;
+                                }
+                            </style>
                         </a>
                     @endforeach
                     @if($nodes->isEmpty())
@@ -567,24 +753,24 @@
             <div class="bp-card-v2-body" style="padding: 16px 24px;">
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <div class="health-item">
-                        <div class="health-icon" style="color: #3b82f6; width: 28px; height: 28px; font-size: 12px;"><i class="fa fa-tasks"></i></div>
+                        <div class="health-icon" style="color: #3b82f6; width: 32px; height: 32px; font-size: 14px;"><i class="fa fa-tasks"></i></div>
                         <div class="health-info">
-                            <span class="health-label" style="font-size: 0.65rem;">@lang('admin/index.health_worker')</span>
-                            <span class="health-status" style="font-size: 0.7rem;">Operational</span>
+                            <span class="health-label">@lang('admin/index.health_worker')</span>
+                            <span class="health-status">Operational</span>
                         </div>
                     </div>
                     <div class="health-item">
-                        <div class="health-icon" style="color: #10b981; width: 28px; height: 28px; font-size: 12px;"><i class="fa fa-database"></i></div>
+                        <div class="health-icon" style="color: #10b981; width: 32px; height: 32px; font-size: 14px;"><i class="fa fa-database"></i></div>
                         <div class="health-info">
-                            <span class="health-label" style="font-size: 0.65rem;">@lang('admin/index.health_db')</span>
-                            <span class="health-status" style="font-size: 0.7rem;">Healthy</span>
+                            <span class="health-label">@lang('admin/index.health_db')</span>
+                            <span class="health-status">Healthy</span>
                         </div>
                     </div>
                     <div class="health-item">
-                        <div class="health-icon" style="color: #ef4444; width: 28px; height: 28px; font-size: 12px;"><i class="fa fa-bolt"></i></div>
+                        <div class="health-icon" style="color: #ef4444; width: 32px; height: 32px; font-size: 14px;"><i class="fa fa-bolt"></i></div>
                         <div class="health-info">
-                            <span class="health-label" style="font-size: 0.65rem;">@lang('admin/index.health_redis')</span>
-                            <span class="health-status" style="font-size: 0.7rem;">Active</span>
+                            <span class="health-label">@lang('admin/index.health_redis')</span>
+                            <span class="health-status">Active</span>
                         </div>
                     </div>
                 </div>
@@ -593,7 +779,7 @@
     </div>
     <div class="col-md-4">
         <!-- About Theme -->
-        <div class="bp-card-v2" style="background: linear-gradient(135deg, #111827 0%, #1e1b4b 100%); border-color: rgba(99, 102, 241, 0.3); height: 100%;">
+        <div class="bp-card-v2" style="background: linear-gradient(135deg, #111827 0%, #1e1b4b 100%); border-color: rgba(99, 102, 241, 0.3);">
             <div class="bp-card-v2-header">
                 <div class="bp-card-v2-title"><i class="fa fa-info-circle" style="color: #6366f1;"></i> @lang('admin/index.about_theme')</div>
             </div>
@@ -611,7 +797,7 @@
     </div>
     <div class="col-md-4">
         <!-- System Information -->
-        <div class="bp-card-v2" style="height: 100%;">
+        <div class="bp-card-v2">
             <div class="bp-card-v2-header">
                 <div class="bp-card-v2-title"><i class="fa fa-server" style="color: #10b981;"></i> @lang('admin/index.system_information')</div>
             </div>
@@ -638,9 +824,11 @@
         </div>
     </div>
 </div>
+@endif
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        @if(Route::is('admin.index'))
         const greetingElement = document.getElementById('admin-greeting');
         if (greetingElement) {
             const hour = new Date().getHours();
@@ -653,11 +841,15 @@
             const adminStr = @json(__('admin/index.greetings.administrator'));
             greetingElement.innerHTML = `${greeting}, ${adminStr}!`;
         }
+        @endif
 
         // Check node status
         const nodes = document.querySelectorAll('.node-status-item');
         let onlineCount = 0;
         const totalCount = nodes.length;
+        
+        // Initialize AdminRadarNodeStatuses for React to consume
+        window.AdminRadarNodeStatuses = {};
 
         nodes.forEach(function(node) {
             const location = node.getAttribute('data-location');
@@ -665,6 +857,20 @@
             const id = node.getAttribute('data-id');
             const statusDot = document.getElementById('node-status-' + id);
             
+            // Function to handle status updates
+            const setStatus = (isOnline) => {
+                if (isOnline) {
+                    statusDot.classList.add('online');
+                    statusDot.classList.remove('offline');
+                    onlineCount++;
+                } else {
+                    statusDot.classList.add('offline');
+                    statusDot.classList.remove('online');
+                }
+                window.AdminRadarNodeStatuses[id] = isOnline;
+                updateTotalCount();
+            };
+
             fetch(location, {
                 method: 'GET',
                 headers: {
@@ -675,17 +881,14 @@
                 mode: 'cors'
             })
             .then(response => {
-                if (response.ok) {
-                    statusDot.classList.add('online');
-                    onlineCount++;
-                } else {
-                    statusDot.classList.add('offline');
+                if (response.status === 403) {
+                    console.error(`Better Pterodactyl: Node ${id} returned 403 Forbidden. This usually means the secret is invalid or Wings rejected the IP. Secret length: ${secret ? secret.length : 0}`);
                 }
-                updateTotalCount();
+                setStatus(response.status === 200 || response.status === 204);
             })
-            .catch(error => {
-                statusDot.classList.add('offline');
-                updateTotalCount();
+            .catch(err => {
+                console.error(`Better Pterodactyl: Error checking node ${id}:`, err);
+                setStatus(false);
             });
         });
 
@@ -694,6 +897,10 @@
             if (countDisplay) {
                 countDisplay.innerHTML = `${onlineCount} / ${totalCount}`;
             }
+            // Trigger a custom event for React to listen to if it needs immediate updates
+            window.dispatchEvent(new CustomEvent('radar:node-status-update', { 
+                detail: { onlineCount, totalCount, statuses: window.AdminRadarNodeStatuses } 
+            }));
         }
     });
 </script>

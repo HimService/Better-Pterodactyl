@@ -63,8 +63,10 @@ return [
         'servers' => 'サーバー',
         'users' => 'ユーザー',
         'mounts' => 'マウント',
-        'nests' => 'Nest',
+        'nests' => 'ネスト (Nests)',
     ],
+    'announcements' => 'お知らせシステム',
+    'announcements_help' => 'サイト全体に表示されるシステムお知らせを管理します。',
     'sidebar' => [
         'basic_administration' => '基本管理',
         'management' => '管理',

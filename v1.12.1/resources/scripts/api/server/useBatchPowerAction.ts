@@ -12,9 +12,11 @@ export const useBatchPowerAction = () => {
     const { addFlash, clearFlashes } = useFlash();
     const [isBatching, setIsBatching] = useState(false);
     const [batchResults, setBatchResults] = useState<BatchResult>({});
+    const [currentAction, setCurrentAction] = useState<'start' | 'stop' | 'restart' | 'kill' | null>(null);
 
     const runBatchAction = async (serverIds: string[], action: 'start' | 'stop' | 'restart' | 'kill') => {
         setIsBatching(true);
+        setCurrentAction(action);
         clearFlashes('dashboard');
 
         const initialResults: BatchResult = {};
@@ -38,6 +40,7 @@ export const useBatchPowerAction = () => {
             addFlash({ key: 'dashboard', type: 'error', message: 'An unexpected error occurred during batch operation.' });
         } finally {
             setIsBatching(false);
+            setCurrentAction(null);
             // Optionally clear success results after a delay
             setTimeout(() => setBatchResults({}), 5000);
         }
@@ -46,6 +49,7 @@ export const useBatchPowerAction = () => {
     return {
         isBatching,
         batchResults,
+        currentAction,
         runBatchAction,
     };
 };

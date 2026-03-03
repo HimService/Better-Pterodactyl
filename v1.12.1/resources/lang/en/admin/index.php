@@ -65,6 +65,9 @@ return [
         'mounts' => 'Mounts',
         'nests' => 'Nests',
     ],
+    'announcements' => 'Announcements',
+    'status_settings' => 'Status Page Settings',
+    'announcements_help' => 'Manage global panel announcements.',
     'sidebar' => [
         'basic_administration' => 'Basic Administration',
         'management' => 'Management',

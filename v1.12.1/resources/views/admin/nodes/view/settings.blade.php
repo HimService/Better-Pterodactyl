@@ -60,10 +60,17 @@
                         </div>
                     </div>
                     <div class="form-group col-xs-12">
-                        <label for="public" class="control-label">@lang('admin/node.view.settings_tab.allow_auto_allocation') <sup><a data-toggle="tooltip" data-placement="top" title="@lang('admin/node.view.settings_tab.allow_auto_allocation_help')">?</a></sup></label>
+                        <label for="public" class="control-label">@lang('admin/node.view.settings_tab.allow_auto_allocation') <sup><a data-toggle="tooltip" data-placement="top" data-container="body" title="@lang('admin/node.view.settings_tab.allow_auto_allocation_help')">?</a></sup></label>
                         <div>
                             <input type="radio" name="public" value="1" {{ (old('public', $node->public)) ? 'checked' : '' }} id="public_1" checked> <label for="public_1" style="padding-left:5px;">@lang('strings.yes')</label><br />
                             <input type="radio" name="public" value="0" {{ (old('public', $node->public)) ? '' : 'checked' }} id="public_0"> <label for="public_0" style="padding-left:5px;">@lang('strings.no')</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-xs-12">
+                        <label for="display_on_status_page" class="control-label">@lang('admin/node.new.display_on_status_page') <sup><a data-toggle="tooltip" data-placement="top" data-container="body" title="@lang('admin/node.new.display_on_status_page_help')">?</a></sup></label>
+                        <div>
+                            <input type="radio" name="display_on_status_page" value="1" {{ (old('display_on_status_page', $displayOnStatusPage ?? true) == 1) ? 'checked' : '' }} id="display_on_status_page_1"> <label for="display_on_status_page_1" style="padding-left:5px;">@lang('strings.yes')</label><br />
+                            <input type="radio" name="display_on_status_page" value="0" {{ (old('display_on_status_page', $displayOnStatusPage ?? true) == 0) ? 'checked' : '' }} id="display_on_status_page_0"> <label for="display_on_status_page_0" style="padding-left:5px;">@lang('strings.no')</label>
                         </div>
                     </div>
                     <div class="form-group col-xs-12">
@@ -231,6 +238,13 @@
 
 @section('footer-scripts')
     @parent
+    <style>
+        .tooltip-inner {
+            max-width: none !important;
+            white-space: nowrap !important;
+            text-align: left;
+        }
+    </style>
     <script>
     $('[data-toggle="popover"]').popover({
         placement: 'auto'

@@ -55,6 +55,8 @@ return [
         'name_help' => '節點名稱，主要用於辨別，建議使用簡短、易記的名稱。',
         'ssl_help_http' => '使用 HTTP 連接',
         'ssl_help_ssl' => '使用 SSL 連接',
+        'display_on_status_page' => '在狀態頁面顯示',
+        'display_on_status_page_help' => '啟用後，此節點將顯示在公開的狀態頁面上。',
 
     ],
     'view' => [

@@ -23,7 +23,7 @@ import getServerResourceUsage from '@/api/server/getServerResourceUsage';
 export default function DashboardContainer() {
     const { t } = useTranslation();
     const { search } = useLocation();
-    const { isBatching, runBatchAction } = useBatchPowerAction();
+    const { isBatching, runBatchAction, batchResults, currentAction: currentBatchAction } = useBatchPowerAction();
     const defaultPage = Number(new URLSearchParams(search).get('page') || '1');
 
     const [page, setPage] = useState(!isNaN(defaultPage) && defaultPage > 0 ? defaultPage : 1);
@@ -153,6 +153,8 @@ export default function DashboardContainer() {
                                         isBatchMode={isBatchMode}
                                         isSelected={selectedServers.includes(server.id)}
                                         onSelect={() => toggleServerSelection(server.id)}
+                                        isBatchProcessing={batchResults[server.id] === 'processing'}
+                                        batchActionType={currentBatchAction}
                                     />
                                 ))}
 

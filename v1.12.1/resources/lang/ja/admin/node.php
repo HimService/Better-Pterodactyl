@@ -55,6 +55,8 @@ return [
         'name_help' => 'ノード名。主に識別用です。短く覚えやすい名前にすることをお勧めします。',
         'ssl_help_http' => 'HTTP接続を使用',
         'ssl_help_ssl' => 'SSL接続を使用',
+        'display_on_status_page' => 'ステータスページに表示',
+        'display_on_status_page_help' => '有効にすると、このノードは公開ステータスページに表示されます。',
 
     ],
     'view' => [

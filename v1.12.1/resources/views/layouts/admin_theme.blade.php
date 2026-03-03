@@ -115,6 +115,22 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     background-color: #020617; /* Tailwind Slate-950 */
     box-shadow: 2px 0 10px rgba(0,0,0,0.5);
     padding-top: 56px !important; /* Sync with header height */
+    position: fixed !important;
+    height: 100vh !important;
+    overflow-y: auto !important;
+    z-index: 1020;
+}
+
+/* Custom Scrollbar for Sidebar */
+.skin-blue .main-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.skin-blue .main-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.skin-blue .main-sidebar::-webkit-scrollbar-thumb {
+    background-color: #334155;
+    border-radius: 10px;
 }
 
 .skin-blue .wrapper, .skin-blue .main-sidebar, .skin-blue .left-side {

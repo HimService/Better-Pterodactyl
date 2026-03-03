@@ -225,23 +225,25 @@ export default () => {
                             Help
                         </button>
                     </div>
-                    <input
-                        className={classNames('peer', styles.command_input, 'text-neutral-100 placeholder-neutral-500 font-medium')}
-                        type={'text'}
-                        placeholder={t('server.console.type_command', 'Type a command...')}
-                        aria-label={t('server.console.command_input_aria', 'Console command input.')}
-                        disabled={!instance || !connected}
-                        onKeyDown={handleCommandKeyDown}
-                        autoCorrect={'off'}
-                        autoCapitalize={'none'}
-                    />
-                    <div
-                        className={classNames(
-                            'text-neutral-500 peer-focus:text-neutral-100 peer-focus:animate-pulse',
-                            styles.command_icon
-                        )}
-                    >
-                        <FontAwesomeIcon icon={faAngleDoubleRight} className={'w-4 h-4'} />
+                    <div className={'relative'}>
+                        <input
+                            className={classNames('peer', styles.command_input, 'text-neutral-100 placeholder-neutral-500 font-medium')}
+                            type={'text'}
+                            placeholder={t('server.console.type_command', 'Type a command...')}
+                            aria-label={t('server.console.command_input_aria', 'Console command input.')}
+                            disabled={!instance || !connected}
+                            onKeyDown={handleCommandKeyDown}
+                            autoCorrect={'off'}
+                            autoCapitalize={'none'}
+                        />
+                        <div
+                            className={classNames(
+                                'text-neutral-500 peer-focus:text-neutral-100 peer-focus:animate-pulse',
+                                styles.command_icon
+                            )}
+                        >
+                            <FontAwesomeIcon icon={faAngleDoubleRight} className={'w-4 h-4'} />
+                        </div>
                     </div>
                 </div>
             )}

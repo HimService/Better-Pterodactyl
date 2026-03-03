@@ -71,7 +71,7 @@
                 <section class="sidebar">
                     <ul class="sidebar-menu">
                         <li class="header">@lang('admin/index.sidebar.basic_administration')</li>
-                        <li class="{{ Route::currentRouteName() !== 'admin.index' ?: 'active' }}">
+                        <li class="{{ Route::is('admin.index') ? 'active' : '' }}">
                             <a href="{{ route('admin.index') }}">
                                 <i class="fa fa-home"></i> <span>@lang('admin/index.common.overview')</span>
                             </a>
@@ -79,6 +79,16 @@
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.settings') ?: 'active' }}">
                             <a href="{{ route('admin.settings')}}">
                                 <i class="fa fa-wrench"></i> <span>@lang('strings.settings')</span>
+                            </a>
+                        </li>
+                        <li class="{{ Route::is('admin.announcements') ? 'active' : '' }}">
+                            <a href="{{ route('admin.announcements') }}">
+                                <i class="fa fa-bullhorn"></i> <span>@lang('admin/index.announcements')</span>
+                            </a>
+                        </li>
+                        <li class="{{ Route::is('admin.status') ? 'active' : '' }}">
+                            <a href="{{ route('admin.status') }}">
+                                <i class="fa fa-server"></i> <span>@lang('admin/index.status_settings')</span>
                             </a>
                         </li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.api') ?: 'active' }}">
@@ -177,20 +187,20 @@
             {!! Theme::js('js/admin/functions.js?t={cache-version}') !!}
             <script src="/js/autocomplete.js" type="application/javascript"></script>
             
-            @if(Route::currentRouteName() === 'admin.index')
-                {{-- Better Pterodactyl React Assets - Only on Overview --}}
-                @if(isset($asset))
-                    {!! $asset->js('main.js') !!}
-                @else
-                    <script src="/assets/main.js" type="application/javascript"></script>
-                @endif
-
+            @if(Route::currentRouteName() === 'admin.index' || Route::currentRouteName() === 'admin.announcements' || Route::currentRouteName() === 'admin.status')
                 <script>
                     @if(!is_null(Auth::user()))
                         window.PterodactylUser = {!! json_encode(Auth::user()->toVueObject()) !!};
                     @endif
                     window.SiteLocale = '{{ app()->getLocale() }}';
                 </script>
+
+                {{-- Better Pterodactyl React Assets - Only on Overview & Announcements --}}
+                @if(isset($asset))
+                    {!! $asset->js('main.js') !!}
+                @else
+                    <script src="/assets/main.js" type="application/javascript"></script>
+                @endif
             @endif
 
             @if(Auth::user()->root_admin)

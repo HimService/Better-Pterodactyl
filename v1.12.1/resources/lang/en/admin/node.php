@@ -55,6 +55,8 @@ return [
         'name_help' => 'Node name, mainly used for identification, a short and easy-to-remember name is recommended.',
         'ssl_help_http' => 'Use HTTP Connection',
         'ssl_help_ssl' => 'Use SSL Connection',
+        'display_on_status_page' => 'Display on Status Page',
+        'display_on_status_page_help' => 'If enabled, this node will be visible on the public status page.',
 
     ],
     'view' => [

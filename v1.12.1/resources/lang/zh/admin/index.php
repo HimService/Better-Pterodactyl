@@ -65,6 +65,9 @@ return [
         'mounts' => '掛載',
         'nests' => '巢 (Nests)',
     ],
+    'announcements' => '公告系統',
+    'status_settings' => '狀態頁面設定',
+    'announcements_help' => '管理全站顯示的系統公告橫幅。',
     'sidebar' => [
         'basic_administration' => '基礎管理',
         'management' => '管理',

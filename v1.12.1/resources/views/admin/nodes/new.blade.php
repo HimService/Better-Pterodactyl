@@ -55,6 +55,20 @@
                         <p class="text-muted small">@lang('admin/node.new.visibility_help')</p>
                     </div>
                     <div class="form-group">
+                        <label class="form-label">@lang('admin/node.new.display_on_status_page')</label>
+                        <div>
+                            <div class="radio radio-success radio-inline">
+                                <input type="radio" id="pStatusPageTrue" value="1" name="display_on_status_page" {{ (old('display_on_status_page', $displayOnStatusPage ?? true) == 1) ? 'checked' : '' }}>
+                                <label for="pStatusPageTrue"> @lang('strings.yes') </label>
+                            </div>
+                            <div class="radio radio-danger radio-inline">
+                                <input type="radio" id="pStatusPageFalse" value="0" name="display_on_status_page" {{ (old('display_on_status_page', $displayOnStatusPage ?? true) == 0) ? 'checked' : '' }}>
+                                <label for="pStatusPageFalse"> @lang('strings.no') </label>
+                            </div>
+                        </div>
+                        <p class="text-muted small">@lang('admin/node.new.display_on_status_page_help')</p>
+                    </div>
+                    <div class="form-group">
                         <label for="pFQDN" class="form-label">@lang('admin/node.new.fqdn')</label>
                         <input type="text" name="fqdn" id="pFQDN" class="form-control" value="{{ old('fqdn') }}"/>
                         <p class="text-muted small">@lang('admin/node.new.fqdn_help')</p>
@@ -169,6 +183,13 @@
 
 @section('footer-scripts')
     @parent
+    <style>
+        .tooltip-inner {
+            max-width: none !important;
+            white-space: nowrap !important;
+            text-align: left;
+        }
+    </style>
     <script>
         $('#pLocationId').select2();
     </script>
