@@ -515,11 +515,17 @@ Route::post('/update/execute', function () {
                 rename($resNew, base_path('resources'));
                 rename($routesNew, base_path('routes'));
                 
-                // 7. Restore backup (except version.json)
+                // 7. Restore backup (except version.json and PHP logic files)
                 if (is_dir($backupPath)) {
                     $files = \Illuminate\Support\Facades\File::allFiles($backupPath);
                     foreach ($files as $file) {
-                        if ($file->getFilename() === 'version.json') continue;
+                        $filename = $file->getFilename();
+                        $extension = strtolower($file->getExtension());
+                        
+                        // Skip version markers and PHP logic/helpers to use the NEW versions from update
+                        if ($filename === 'version.json' || $extension === 'php') {
+                            continue;
+                        }
                         
                         $relativePath = str_replace($backupPath, '', $file->getRealPath());
                         $targetPath = base_path('resources/settings' . $relativePath);
