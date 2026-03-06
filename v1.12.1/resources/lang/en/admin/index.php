@@ -67,8 +67,11 @@ return [
     ],
     'announcements' => 'Announcements',
     'status_settings' => 'Status Page Settings',
+    'economy_settings' => 'Economy System Settings',
     'announcements_help' => 'Manage global panel announcements.',
     'sidebar' => [
+        'better_pterodactyl' => 'Better Pterodactyl',
+        'discord_login' => 'Discord Login',
         'basic_administration' => 'Basic Administration',
         'management' => 'Management',
         'service_management' => 'Service Management',

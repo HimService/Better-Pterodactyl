@@ -67,8 +67,11 @@ return [
     ],
     'announcements' => '公告系統',
     'status_settings' => '狀態頁面設定',
+    'economy_settings' => '經濟系統設定',
     'announcements_help' => '管理全站顯示的系統公告橫幅。',
     'sidebar' => [
+        'better_pterodactyl' => 'Better Pterodactyl',
+        'discord_login' => 'Discord 登入',
         'basic_administration' => '基礎管理',
         'management' => '管理',
         'service_management' => '服務管理',

@@ -32,7 +32,7 @@ return [
         'public' => 'Public',
         'private' => 'Private',
         'fqdn' => 'FQDN',
-        'fqdn_help' => 'Enter the domain name used to connect to the daemon (e.g., <code>node.example.com</code>). An IP address can only be used if not using SSL.',
+        'fqdn_help' => 'Please enter domain name (e.g <code>node.example.com</code>) to be used for connecting to the daemon. An IP address may only be used if you are not using SSL for this node.',
         'ssl' => 'Communicate Over SSL',
         'ssl_help' => 'In most cases, you should choose to use an SSL connection. If using an IP address or if you don\'t want to use SSL at all, choose an HTTP connection.',
         'ssl_secure_error' => 'Your panel is currently configured to use a secure connection. For the browser to connect to your node, it <strong>must</strong> use an SSL connection.',

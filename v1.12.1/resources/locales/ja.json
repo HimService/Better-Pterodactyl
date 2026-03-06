@@ -49,7 +49,31 @@
         "operational": "正常稼働中",
         "no_nodes": "現在、ステータスを公開しているノードはありません。",
         "servers": "サーバー総数",
-        "active_servers": "実行中サーバー"
+        "active_servers": "実行中サーバー",
+        "system_load": "システム負荷",
+        "memory_detail": "メモリ詳細",
+        "disk_usage": "ディスク使用量",
+        "used_space": "使用済みスペース",
+        "network_traffic": "ネットワークトラフィック",
+        "inbound": "インバウンド",
+        "outbound": "アウトバウンド",
+        "load_average_help": "30秒ごとに更新",
+        "total": "合計",
+        "online_servers": "オンライン",
+        "offline_servers": "オフライン",
+        "total_servers": "サーバー総数",
+        "node_info": "ノード詳細情報",
+        "os_version": "OSバージョン",
+        "kernel": "カーネル",
+        "uptime": "稼働時間",
+        "uptime_none": "データなし",
+        "hardware_resources": "ハードウェアリソース",
+        "memory_real_usage": "メモリ (実使用量)",
+        "disk_real_usage": "ディスク (実使用量)",
+        "allocation_stats": "割り当て統計",
+        "server_online": "オンライン",
+        "server_offline": "オフライン",
+        "server_total": "合計"
     },
     "auth": {
         "welcome_back": "おかえりなさい",
@@ -862,6 +886,30 @@
                 "danger": "危険情報（赤）",
                 "success": "成功情報（緑）"
             }
+        }
+    },
+    "economy": {
+        "store": "ポイントストア",
+        "balance": "残高",
+        "points": "ポイント",
+        "buy": "購入",
+        "purchase": "購入の確認",
+        "purchase_success": "購入に成功しました！",
+        "redeem_code_title": "プロモコードを利用する",
+        "enter_code": "コードを入力...",
+        "redeem": "利用する",
+        "redeeming": "利用しています...",
+        "redeem_success": "コードの利用に成功しました！{{amount}} {{type}} を受け取りました。",
+        "disabled": "現在、経済システムは無効になっています。",
+        "create_server": "サーバーを作成する",
+        "purchase_desc": "{{amount}}{{unit}} の {{title}} を購入してもよろしいですか？これには {{price}} ポイントかかります。",
+        "resources": {
+            "cpu": "CPU",
+            "ram": "RAM",
+            "disk": "ディスク",
+            "backups": "バックアップスロット",
+            "allocations": "ポートスロット",
+            "slots": "サーバースロット"
         }
     },
     "common": {
