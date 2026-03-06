@@ -31,7 +31,8 @@ const UpdateManager = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('/admin/update/check');
+            // Add cache buster to URL
+            const response = await fetch(`/admin/update/check?t=${Date.now()}`);
             const data = await response.json();
             setInfo(data);
         } catch (e) {
@@ -122,6 +123,9 @@ const UpdateManager = () => {
                 });
                 const data = await response.json();
                 if (data.success) {
+                    // Force UI update locally to prevent perceived "stickiness"
+                    setInfo(prev => prev ? { ...prev, has_backups: false } : null);
+
                     (window as any).swal({
                         title: '清理完畢',
                         text: '備份資料夾已成功刪除。',

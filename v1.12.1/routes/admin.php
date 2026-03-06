@@ -426,8 +426,19 @@ Route::post('/update/cleanup', function () {
         $resOld = base_path('resources_old');
         $routesOld = base_path('routes_old');
         
-        if (is_dir($resOld)) \Illuminate\Support\Facades\File::deleteDirectory($resOld);
-        if (is_dir($routesOld)) \Illuminate\Support\Facades\File::deleteDirectory($routesOld);
+        // Use rm -rf for a more definitive deletion in Linux environments
+        if (is_dir($resOld)) shell_exec('rm -rf ' . escapeshellarg($resOld));
+        if (is_dir($routesOld)) shell_exec('rm -rf ' . escapeshellarg($routesOld));
+        
+        clearstatcache();
+        
+        // Verify if they still exist
+        if (is_dir($resOld) || is_dir($routesOld)) {
+            return response()->json([
+                'success' => false, 
+                'error' => '無法刪除部分備份資料夾，請檢查權限 (Permission denied).'
+            ], 403);
+        }
         
         return response()->json(['success' => true]);
     } catch (\Exception $e) {
