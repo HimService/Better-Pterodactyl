@@ -15,6 +15,7 @@ interface VersionInfo {
     local: string;
     remote: string;
     updatable: boolean;
+    has_backups?: boolean;
 }
 
 const UpdateManager = () => {
@@ -22,6 +23,7 @@ const UpdateManager = () => {
     const [info, setInfo] = useState<VersionInfo | null>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [cleaning, setCleaning] = useState(false);
     const [status, setStatus] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
 
@@ -92,6 +94,51 @@ const UpdateManager = () => {
                 });
             } finally {
                 setUpdating(false);
+            }
+        });
+    };
+
+    const handleCleanup = async () => {
+        if (cleaning) return;
+
+        (window as any).swal({
+            title: '確定要清理備份嗎？',
+            text: '這將會永久刪除 resources_old 與 routes_old 資料夾。請確保新版本運行正常。',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: '確定刪除',
+            cancelButtonText: '取消'
+        }, async (confirmed: boolean) => {
+            if (!confirmed) return;
+
+            setCleaning(true);
+            try {
+                const response = await fetch('/admin/update/cleanup', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': (document.querySelector('meta[name="_token"]') as any)?.content || ''
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    (window as any).swal({
+                        title: '清理完畢',
+                        text: '備份資料夾已成功刪除。',
+                        type: 'success'
+                    });
+                    checkVersion();
+                } else {
+                    throw new Error(data.error || '清理時發生錯誤。');
+                }
+            } catch (err: any) {
+                (window as any).swal({
+                    title: '清理失敗',
+                    text: err.message,
+                    type: 'error'
+                });
+            } finally {
+                setCleaning(false);
             }
         });
     };
@@ -171,7 +218,7 @@ const UpdateManager = () => {
                                     <FontAwesomeIcon icon={faExclamationTriangle} className="mt-1 flex-shrink-0" />
                                     <div>
                                         <strong className="block mb-1 text-amber-400">重要提示 (Important):</strong>
-                                        更新將會刪除並替換 <code>resources</code> 與 <code>routes</code> 資料夾。
+                                        更新將會備份並替換 <code>resources</code> 與 <code>routes</code> 資料夾。
                                         如果您曾手動修改過這些資料夾內的檔案，您的更改將會丟失。
                                         正在進行中的 <code>yarn build</code> 可能會導致面板短暫無法造訪。
                                     </div>
@@ -198,6 +245,24 @@ const UpdateManager = () => {
                                 </div>
                                 <h3 className="text-white text-3xl font-black mb-4">您的系統已是最新版</h3>
                                 <p className="text-neutral-400">目前沒有可用的更新，請保持關注以獲取未來更新。</p>
+                            </div>
+                        )}
+
+                        {info?.has_backups && (
+                            <div className="mt-12 p-8 bg-black/40 border border-white/5 rounded-[2rem] text-center max-w-lg mx-auto">
+                                <h4 className="text-white text-lg font-bold mb-2">備份資料夾偵測</h4>
+                                <p className="text-neutral-400 text-sm mb-6">
+                                    系統偵測到舊版本的備份資料夾 (routes_old, resources_old)。
+                                    確認新版本運行正常後，您可以手動清理它們。
+                                </p>
+                                <button
+                                    onClick={handleCleanup}
+                                    disabled={cleaning}
+                                    className="px-6 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-bold text-xs transition-all flex items-center gap-2 mx-auto"
+                                >
+                                    <FontAwesomeIcon icon={cleaning ? faSync : faHistory} spin={cleaning} />
+                                    {cleaning ? '正在清理...' : '立即清理舊備份'}
+                                </button>
                             </div>
                         )}
 

@@ -413,11 +413,26 @@ Route::get('/update/check', function () {
         'local' => $localVersion,
         'remote' => $remoteVersion,
         'updatable' => $remoteId > $localId,
+        'has_backups' => is_dir(base_path('resources_old')) || is_dir(base_path('routes_old')),
         'debug' => [
             'local_id' => $localId,
             'remote_id' => $remoteId
         ]
     ]);
+});
+
+Route::post('/update/cleanup', function () {
+    try {
+        $resOld = base_path('resources_old');
+        $routesOld = base_path('routes_old');
+        
+        if (is_dir($resOld)) \Illuminate\Support\Facades\File::deleteDirectory($resOld);
+        if (is_dir($routesOld)) \Illuminate\Support\Facades\File::deleteDirectory($routesOld);
+        
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
 });
 
 Route::post('/update/execute', function () {
@@ -495,8 +510,7 @@ Route::post('/update/execute', function () {
                 // 8. Final Cleanup & Permissions
                 \Illuminate\Support\Facades\File::deleteDirectory($extractPath);
                 \Illuminate\Support\Facades\File::deleteDirectory($backupPath);
-                \Illuminate\Support\Facades\File::deleteDirectory($resOld);
-                \Illuminate\Support\Facades\File::deleteDirectory($routesOld);
+                // We preserve $resOld and $routesOld for manual verification
                 unlink($tempZip);
 
                 // Permissions
