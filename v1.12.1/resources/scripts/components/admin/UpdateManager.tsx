@@ -118,13 +118,14 @@ const UpdateManager = () => {
                 const response = await fetch('/admin/update/cleanup', {
                     method: 'POST',
                     headers: {
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': (document.querySelector('meta[name="_token"]') as any)?.content || ''
                     }
                 });
                 const data = await response.json();
                 if (data.success) {
                     // Force UI update locally to prevent perceived "stickiness"
-                    setInfo(prev => prev ? { ...prev, has_backups: false } : null);
+                    setInfo((prev: VersionInfo | null) => prev ? { ...prev, has_backups: false } : null);
 
                     (window as any).swal({
                         title: '清理完畢',
@@ -210,6 +211,7 @@ const UpdateManager = () => {
                                     建議您立即更新以獲取最新的功能與安全性修復。
                                 </p>
                                 <button
+                                    type="button"
                                     onClick={handleUpdate}
                                     disabled={updating}
                                     className="px-10 py-4 bg-gradient-to-br from-violet-600 to-indigo-600 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-black text-lg shadow-[0_10px_30px_rgba(139,92,246,0.3)] transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-3 mx-auto"
@@ -236,6 +238,7 @@ const UpdateManager = () => {
                                 <h3 className="text-white text-2xl font-bold mb-4">檢查失敗</h3>
                                 <p className="text-neutral-400 mb-8">{error}</p>
                                 <button
+                                    type="button"
                                     onClick={checkVersion}
                                     className="px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-bold transition-all border border-white/10"
                                 >
@@ -260,6 +263,7 @@ const UpdateManager = () => {
                                     確認新版本運行正常後，您可以手動清理它們。
                                 </p>
                                 <button
+                                    type="button"
                                     onClick={handleCleanup}
                                     disabled={cleaning}
                                     className="px-6 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-bold text-xs transition-all flex items-center gap-2 mx-auto"
