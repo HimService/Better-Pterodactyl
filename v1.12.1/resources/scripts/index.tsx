@@ -16,6 +16,8 @@ import AnnouncementManager from '@/components/admin/AnnouncementManager';
 import StatusManager from '@/components/admin/StatusManager';
 import EconomyManager from '@/components/admin/EconomyManager';
 import DiscordManager from '@/components/admin/DiscordManager';
+import PluginManager from '@/components/admin/PluginManager';
+import UpdateManager from '@/components/admin/UpdateManager';
 import AnnouncementBanner from '@/components/elements/AnnouncementBanner';
 
 import { StoreProvider } from 'easy-peasy';
@@ -34,6 +36,8 @@ if (adminRadarRoot) {
     const isStatus = window.location.pathname.includes('/admin/status');
     const isEconomy = window.location.pathname.includes('/admin/economy');
     const isDiscord = window.location.pathname.includes('/admin/discord');
+    const isPlugins = window.location.pathname.includes('/admin/plugins');
+    const isUpdate = window.location.pathname.includes('/admin/update');
 
     // @ts-ignore
     ReactDOM.render(
@@ -41,7 +45,7 @@ if (adminRadarRoot) {
             <ThemeProvider>
                 <GlobalStylesheet />
                 <AnnouncementBanner />
-                {isAnnouncements ? <AnnouncementManager /> : (isStatus ? <StatusManager /> : (isEconomy ? <EconomyManager /> : (isDiscord ? <DiscordManager /> : <AdminRadarWrapper />)))}
+                {isAnnouncements ? <AnnouncementManager /> : (isStatus ? <StatusManager /> : (isEconomy ? <EconomyManager /> : (isDiscord ? <DiscordManager /> : (isPlugins ? <PluginManager /> : (isUpdate ? <UpdateManager /> : <AdminRadarWrapper />)))))}
             </ThemeProvider>
         </StoreProvider>,
         adminRadarRoot

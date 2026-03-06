@@ -7,6 +7,7 @@ import { ApplicationStore } from '@/state';
 import Tooltip from '@/components/elements/tooltip/Tooltip';
 import tw, { styled } from 'twin.macro';
 import { useTranslation } from 'react-i18next';
+import PluginSlot from '@/components/elements/plugins/PluginSlot';
 
 const SidebarContainer = styled.div`
     ${tw`hidden md:flex flex-col w-20 max-h-screen h-screen sticky top-0 border-r transition-all duration-300 z-[60]`};
@@ -14,8 +15,12 @@ const SidebarContainer = styled.div`
     border-color: rgb(var(--border-color, 230 230 230));
 `;
 
-const SidebarNav = styled.nav`
+const SidebarNavTop = styled.nav`
     ${tw`flex flex-col flex-1 items-center justify-end py-6 gap-6`};
+`;
+
+const SidebarNavBottom = styled.nav`
+    ${tw`flex flex-col items-center py-6 mt-auto gap-6`};
 `;
 
 const NavItemStyle = styled(NavLink)`
@@ -50,14 +55,14 @@ const AdminNavItemStyle = styled.a`
     }
 `;
 
-export default () => {
+const Sidebar = () => {
     const { t } = useTranslation('frontend');
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data?.rootAdmin || false);
     const economyEnabled = useStoreState((state: ApplicationStore) => state.user.data?.economyEnabled || false);
 
     return (
         <SidebarContainer>
-            <SidebarNav>
+            <SidebarNavTop>
                 <Tooltip placement="right" content={t('navigation.servers', 'Servers')}>
                     <NavItemStyle to={'/'} exact>
                         <FontAwesomeIcon icon={faServer} size={'lg'} />
@@ -78,6 +83,10 @@ export default () => {
                     </NavItemStyle>
                 </Tooltip>
 
+                <PluginSlot id="sidebar" />
+            </SidebarNavTop>
+
+            <SidebarNavBottom>
                 {rootAdmin && (
                     <Tooltip placement="right" content={t('navigation.admin_panel', 'Admin Panel')}>
                         <AdminNavItemStyle href={'/admin'}>
@@ -85,7 +94,9 @@ export default () => {
                         </AdminNavItemStyle>
                     </Tooltip>
                 )}
-            </SidebarNav>
+            </SidebarNavBottom>
         </SidebarContainer>
     );
 };
+
+export default Sidebar;
