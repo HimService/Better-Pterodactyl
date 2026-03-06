@@ -17,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { useBatchPowerAction } from '@/api/server/useBatchPowerAction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faRedo, faStop } from '@fortawesome/free-solid-svg-icons';
-import TotalLoadRadar, { RadarServerData } from '@/components/dashboard/TotalLoadRadar';
 import getServerResourceUsage from '@/api/server/getServerResourceUsage';
 
 export default function DashboardContainer() {
@@ -40,7 +39,6 @@ export default function DashboardContainer() {
 
     const [isBatchMode, setIsBatchMode] = useState(false);
     const [selectedServers, setSelectedServers] = useState<string[]>([]);
-    const [radarData, setRadarData] = useState<RadarServerData[]>([]);
 
     const toggleServerSelection = (id: string) => {
         setSelectedServers((prev: string[]) =>
@@ -48,30 +46,6 @@ export default function DashboardContainer() {
         );
     };
 
-    // Aggregate stats for the radar
-    useEffect(() => {
-        if (!servers || isBatchMode) return;
-
-        const interval = setInterval(() => {
-            // Light poll for radar stats (only top 20 or current page to avoid overload)
-            const visibleServers = servers.items.slice(0, 20);
-            Promise.all(visibleServers.map(s =>
-                getServerResourceUsage(s.uuid)
-                    .then(stats => ({
-                        id: s.id,
-                        name: s.name,
-                        cpu: stats.cpuUsagePercent,
-                        ram: s.limits.memory === 0 ? 0 : (stats.memoryUsageInBytes / (s.limits.memory * 1024 * 1024)) * 100,
-                        status: stats.status
-                    }))
-                    .catch(() => null)
-            )).then(results => {
-                setRadarData(results.filter(r => r !== null) as RadarServerData[]);
-            });
-        }, 5000); // 5s pulse for radar data
-
-        return () => clearInterval(interval);
-    }, [servers?.items, isBatchMode]);
 
 
     useEffect(() => {

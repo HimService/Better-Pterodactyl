@@ -23,7 +23,7 @@ export default ({ title, copyOnClick, icon, color, className, children }: StatBl
             <div className={classNames(
                 styles.stat_block,
                 className,
-                'bg-white/5 dark:bg-[#0a0a0c]/80 backdrop-blur-xl border border-black/10 dark:border-white/5 shadow-xl transition-all duration-300 hover:bg-white/10 dark:hover:bg-[#121215]/90 hover:shadow-2xl hover:border-black/20 dark:hover:border-white/10 group cursor-pointer'
+                'bg-white/80 dark:bg-[#0a0a0c]/80 backdrop-blur-xl border border-black/10 dark:border-white/5 shadow-xl transition-all duration-300 hover:bg-white dark:hover:bg-[#121215]/90 hover:shadow-2xl hover:border-black/20 dark:hover:border-white/10 group cursor-pointer'
             )}>
                 <div className={classNames(styles.status_bar, color || 'bg-neutral-400 dark:bg-gray-600')} />
                 <div className={classNames(
@@ -41,10 +41,10 @@ export default ({ title, copyOnClick, icon, color, className, children }: StatBl
                     />
                 </div>
                 <div className={'flex flex-col justify-center overflow-hidden w-full relative z-10'}>
-                    <p className={'font-header font-semibold tracking-wide leading-tight text-[11px] md:text-xs text-neutral-500 dark:text-neutral-400 uppercase'}>{title}</p>
+                    <p className={'font-header font-semibold tracking-wide leading-tight text-[11px] md:text-xs text-neutral-500 uppercase'}>{title}</p>
                     <div
                         ref={ref}
-                        className={'h-[1.75rem] w-full font-bold text-neutral-800 dark:text-gray-50 truncate transition-colors duration-300 group-hover:text-primary-500'}
+                        className={'h-[1.75rem] w-full font-bold text-neutral-800 dark:text-gray-50 truncate transition-colors duration-300 group-hover:text-brand-500'}
                         style={{ fontSize }}
                     >
                         {children}

@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faServer } from '@fortawesome/free-solid-svg-icons';
 
 export interface RadarServerData {
-    id: number;
+    id: number | string;
     uuid: string;
     name: string;
     cpu: number; // Percentage
@@ -140,6 +140,8 @@ const TotalLoadRadar: React.FC<TotalLoadRadarProps> = ({ servers, nodes = [], on
         const points = servers.map((server) => {
             const nodeCenter = centers.find(c => c.name === (server.node || 'Unknown')) || centers[0];
 
+            if (!nodeCenter) return null;
+
             // Random-ish but stable distribution around the node center
             const charCodeSum = server.uuid.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
             const serverAngle = (charCodeSum % 360) * (Math.PI / 180);
@@ -164,7 +166,7 @@ const TotalLoadRadar: React.FC<TotalLoadRadarProps> = ({ servers, nodes = [], on
                 isOffline: isServerOffline,
                 size: Math.min(4 + ((server.ram || 0) / 100) * 8, 20),
             };
-        });
+        }).filter(p => p !== null);
 
         return { serverPoints: points, nodeCenters: centers };
     }, [servers, nodes, nodeStatuses]);
@@ -410,8 +412,8 @@ const TotalLoadRadar: React.FC<TotalLoadRadarProps> = ({ servers, nodes = [], on
                     </div>
                     <div className="w-px h-8 bg-white/10 mx-1"></div>
                     <div className="flex flex-col items-end">
-                        <span tw="text-neutral-500 mr-2">Online Nodes:</span>
-                        <span tw="text-brand-400 font-mono">
+                        <span css={tw`text-neutral-500 mr-2`}>Online Nodes:</span>
+                        <span css={tw`text-brand-400 font-mono`}>
                             {nodeCenters.filter(n => !n.isOffline).length} / {nodeCenters.length}
                         </span>
                     </div>

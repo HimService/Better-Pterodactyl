@@ -47,3 +47,25 @@ export function encodePathSegments(path: string): string {
 export function hashToPath(hash: string): string {
     return hash.length > 0 ? decodeURIComponent(hash.substr(1)) : '/';
 }
+
+/**
+ * Formats MB into a human-readable string (MB, GB, TB).
+ */
+export function formatMB(mb: number): string {
+    if (mb <= 0) return '0 MB';
+    if (mb < 1024) return `${mb} MB`;
+    if (mb < 1024 * 1024) return `${(mb / 1024).toFixed(2)} GB`;
+    return `${(mb / (1024 * 1024)).toFixed(2)} TB`;
+}
+
+/**
+ * Formats bytes into a human-readable string.
+ */
+export function bytesToSize(bytes: number, decimals = 2): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}

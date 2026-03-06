@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faServer, faCheckCircle, faSave, faTimesCircle, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faServer, faCheckCircle, faSave, faTimesCircle, faEye, faEyeSlash, faVial } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import Switch from '@/components/elements/Switch';
 
@@ -53,16 +53,23 @@ interface NodeStatus {
 const StatusManager = () => {
     const { t } = useTranslation();
     const [nodes, setNodes] = useState<NodeStatus[]>([]);
+    const [webhookUrl, setWebhookUrl] = useState('');
+    const [alertsEnabled, setAlertsEnabled] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [testing, setTesting] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         fetch('/admin/status/nodes')
             .then(res => res.json())
             .then(data => {
-                if (Array.isArray(data)) {
+                if (data.nodes) {
+                    setNodes(data.nodes);
+                    setWebhookUrl(data.webhook_url || '');
+                    setAlertsEnabled(data.alerts_enabled || false);
+                } else if (Array.isArray(data)) {
                     setNodes(data);
                 }
             })
@@ -74,12 +81,53 @@ const StatusManager = () => {
         setNodes(nodes.map(n => n.id === id ? { ...n, public: visible } : n));
     };
 
+    const handleTestWebhook = async () => {
+        if (!webhookUrl) return;
+        setTesting(true);
+        try {
+            const response = await fetch('/admin/status/test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': (document.querySelector('meta[name="_token"]') as any)?.content || ''
+                },
+                body: JSON.stringify({ webhook_url: webhookUrl }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                (window as any).swal({
+                    title: '發送成功',
+                    text: '測試通知已發送！請檢查您的 Webhook 頻道。',
+                    type: 'success'
+                });
+            } else {
+                (window as any).swal({
+                    title: '發送失敗',
+                    text: data.error || '不明錯誤',
+                    type: 'error'
+                });
+            }
+        } catch (err: any) {
+            (window as any).swal({
+                title: '發生錯誤',
+                text: err.message,
+                type: 'error'
+            });
+        } finally {
+            setTesting(false);
+        }
+    };
+
     const handleSave = async () => {
         setSaving(true);
         setStatus('idle');
         try {
-            // We save the list of VISIBLE node IDs
             const visibleNodeIds = nodes.filter(n => n.public).map(n => n.id);
+            const payload = {
+                nodes: visibleNodeIds,
+                webhook_url: webhookUrl,
+                alerts_enabled: alertsEnabled
+            };
 
             const response = await fetch('/admin/status', {
                 method: 'POST',
@@ -87,17 +135,27 @@ const StatusManager = () => {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': (document.querySelector('meta[name="_token"]') as any)?.content || ''
                 },
-                body: JSON.stringify(visibleNodeIds),
+                body: JSON.stringify(payload),
             });
 
             if (response.ok) {
                 setStatus('success');
                 setErrorMessage(null);
+                (window as any).swal({
+                    title: '儲存成功',
+                    text: '狀態頁面設定已更新。',
+                    type: 'success'
+                });
                 setTimeout(() => setStatus('idle'), 3000);
             } else {
                 const data = await response.json().catch(() => ({}));
                 setStatus('error');
                 setErrorMessage(data.error || '儲存時發生伺服器錯誤。');
+                (window as any).swal({
+                    title: '儲存失敗',
+                    text: data.error || '儲存時發生伺服器錯誤。',
+                    type: 'error'
+                });
             }
         } catch (err: any) {
             console.error(err);
@@ -149,14 +207,67 @@ const StatusManager = () => {
                                 </div>
                                 <Switch
                                     name={`node-${node.id}`}
-                                    defaultChecked={node.public}
-                                    onChange={(e) => handleToggle(node.id, e.target.checked)}
+                                    checked={node.public}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleToggle(node.id, e.target.checked)}
                                 />
                             </div>
                         </NodeRow>
                     ))}
                 </Card>
             )}
+
+            <Card>
+                <h3 style={{ color: 'white', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' }}>故障通知 (Webhook)</h3>
+                <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>當節點離線時，自動發送通知到 Discord 或 Telegram。</p>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', color: '#9ca3af', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem' }}>Webhook URL</label>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <input
+                            type="text"
+                            value={webhookUrl}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWebhookUrl(e.target.value)}
+                            placeholder="https://discord.com/api/webhooks/..."
+                            style={{ flex: 1, backgroundColor: '#1f2937', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '0.75rem', padding: '0.75rem 1rem', color: 'white', outline: 'none' }}
+                        />
+                        <button
+                            type="button"
+                            onClick={handleTestWebhook}
+                            disabled={testing || !webhookUrl}
+                            style={{
+                                padding: '0 1.5rem',
+                                backgroundColor: '#4b5563',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '0.75rem',
+                                cursor: (testing || !webhookUrl) ? 'not-allowed' : 'pointer',
+                                fontSize: '0.875rem',
+                                fontWeight: 600,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                transition: 'background-color 0.2s',
+                                opacity: testing ? 0.7 : 1
+                            }}
+                        >
+                            <FontAwesomeIcon icon={faVial} spin={testing} />
+                            {testing ? '測試中' : '測試發送'}
+                        </button>
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1f2937', padding: '1rem', borderRadius: '1rem' }}>
+                    <div>
+                        <span style={{ color: 'white', fontWeight: 600, display: 'block' }}>啟用故障通知</span>
+                        <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>切換是否在節點斷線時發送通知</span>
+                    </div>
+                    <Switch
+                        name="alerts_enabled"
+                        checked={alertsEnabled}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAlertsEnabled(e.target.checked)}
+                    />
+                </div>
+            </Card>
 
             <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 9999 }}>
                 <button

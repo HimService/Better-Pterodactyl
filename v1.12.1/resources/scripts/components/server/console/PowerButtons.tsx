@@ -55,10 +55,10 @@ export default ({ className }: PowerButtonProps) => {
                 <div className="flex-1 w-full">
                     <button
                         className={classNames(
-                            'w-full block px-4 py-3 rounded-xl font-bold tracking-wide transition-all duration-300 shadow-lg text-sm sm:text-base',
+                            'w-full block px-4 py-3 rounded-xl font-bold tracking-wide transition-all duration-300 shadow-sm text-sm sm:text-base',
                             status === 'offline'
                                 ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5 border border-emerald-400/50'
-                                : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed opacity-50'
+                                : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 cursor-not-allowed border border-transparent dark:border-neutral-700/50'
                         )}
                         disabled={status !== 'offline'}
                         onClick={onButtonClick.bind(this, 'start')}
@@ -71,9 +71,9 @@ export default ({ className }: PowerButtonProps) => {
                 <div className="flex-1 w-full">
                     <button
                         className={classNames(
-                            'w-full block px-4 py-3 rounded-xl font-bold tracking-wide transition-all duration-300 shadow-lg text-sm sm:text-base',
+                            'w-full block px-4 py-3 rounded-xl font-bold tracking-wide transition-all duration-300 shadow-sm text-sm sm:text-base',
                             !status
-                                ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed opacity-50'
+                                ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 cursor-not-allowed border border-transparent dark:border-neutral-700/50'
                                 : 'bg-indigo-500 hover:bg-indigo-400 text-white shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 border border-indigo-400/50'
                         )}
                         disabled={!status}
@@ -87,9 +87,9 @@ export default ({ className }: PowerButtonProps) => {
                 <div className="flex-1 w-full">
                     <button
                         className={classNames(
-                            'w-full block px-4 py-3 rounded-xl font-bold tracking-wide transition-all duration-300 shadow-lg text-sm sm:text-base',
+                            'w-full block px-4 py-3 rounded-xl font-bold tracking-wide transition-all duration-300 shadow-sm text-sm sm:text-base',
                             status === 'offline'
-                                ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed opacity-50'
+                                ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 cursor-not-allowed border border-transparent dark:border-neutral-700/50'
                                 : 'bg-red-500 hover:bg-red-400 text-white shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-0.5 border border-red-400/50'
                         )}
                         disabled={status === 'offline'}

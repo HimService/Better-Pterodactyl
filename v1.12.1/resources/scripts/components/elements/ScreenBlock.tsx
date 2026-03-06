@@ -14,6 +14,7 @@ interface BaseProps {
     message: string;
     onRetry?: () => void;
     onBack?: () => void;
+    children?: React.ReactNode;
 }
 
 interface PropsWithRetry extends BaseProps {
@@ -40,7 +41,7 @@ const ActionButton = styled(Button)`
     }
 `;
 
-const ScreenBlock = ({ title, image, message, onBack, onRetry }: ScreenBlockProps) => (
+const ScreenBlock = ({ title, image, message, onBack, onRetry, children }: ScreenBlockProps) => (
     <PageContentBlock>
         <div css={tw`flex justify-center`}>
             <div
@@ -59,6 +60,7 @@ const ScreenBlock = ({ title, image, message, onBack, onRetry }: ScreenBlockProp
                 <img src={image} css={tw`w-2/3 h-auto select-none mx-auto`} />
                 <h2 css={tw`mt-10 text-neutral-900 font-bold text-4xl`}>{title}</h2>
                 <p css={tw`text-sm text-neutral-700 mt-2`}>{message}</p>
+                {children}
             </div>
         </div>
     </PageContentBlock>

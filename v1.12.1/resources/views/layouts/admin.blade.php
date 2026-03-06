@@ -81,6 +81,12 @@
                                 <i class="fa fa-wrench"></i> <span>@lang('strings.settings')</span>
                             </a>
                         </li>
+                        <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.api') ?: 'active' }}">
+                            <a href="{{ route('admin.api.index')}}">
+                                <i class="fa fa-gamepad"></i> <span>@lang('admin/index.common.application_api')</span>
+                            </a>
+                        </li>
+                        <li class="header">@lang('admin/index.sidebar.better_pterodactyl')</li>
                         <li class="{{ Route::is('admin.announcements') ? 'active' : '' }}">
                             <a href="{{ route('admin.announcements') }}">
                                 <i class="fa fa-bullhorn"></i> <span>@lang('admin/index.announcements')</span>
@@ -91,9 +97,14 @@
                                 <i class="fa fa-server"></i> <span>@lang('admin/index.status_settings')</span>
                             </a>
                         </li>
-                        <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.api') ?: 'active' }}">
-                            <a href="{{ route('admin.api.index')}}">
-                                <i class="fa fa-gamepad"></i> <span>@lang('admin/index.common.application_api')</span>
+                        <li class="{{ Route::is('admin.economy') ? 'active' : '' }}">
+                            <a href="{{ route('admin.economy') }}">
+                                <i class="fa fa-money"></i> <span>@lang('admin/index.economy_settings')</span>
+                            </a>
+                        </li>
+                        <li class="{{ Route::is('admin.discord') ? 'active' : '' }}">
+                            <a href="{{ route('admin.discord') }}">
+                                <i class="fa fa-plug"></i> <span>@lang('admin/index.sidebar.discord_login')</span>
                             </a>
                         </li>
                         <li class="header">@lang('admin/index.sidebar.management')</li>
@@ -187,7 +198,7 @@
             {!! Theme::js('js/admin/functions.js?t={cache-version}') !!}
             <script src="/js/autocomplete.js" type="application/javascript"></script>
             
-            @if(Route::currentRouteName() === 'admin.index' || Route::currentRouteName() === 'admin.announcements' || Route::currentRouteName() === 'admin.status')
+            @if(Route::currentRouteName() === 'admin.index' || Route::currentRouteName() === 'admin.announcements' || Route::currentRouteName() === 'admin.status' || Route::currentRouteName() === 'admin.economy' || Route::currentRouteName() === 'admin.discord')
                 <script>
                     @if(!is_null(Auth::user()))
                         window.PterodactylUser = {!! json_encode(Auth::user()->toVueObject()) !!};

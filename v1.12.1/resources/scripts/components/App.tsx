@@ -49,9 +49,13 @@ const App = () => {
             language: PterodactylUser.language,
             rootAdmin: PterodactylUser.root_admin,
             useTotp: PterodactylUser.use_totp,
+            points: 0, // Fallback to 0, will be refreshed
             createdAt: new Date(PterodactylUser.created_at),
             updatedAt: new Date(PterodactylUser.updated_at),
         });
+
+        // Refresh points asynchronously
+        store.getActions().user.refreshPoints();
     }
 
     if (!store.getState().settings.data) {

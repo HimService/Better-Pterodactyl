@@ -162,7 +162,11 @@ const AnnouncementManager = () => {
         // Validation: enforce message being non-empty for enabled announcements
         const invalid = announcements.find(a => a.enabled && !a.message.trim());
         if (invalid) {
-            alert('Enabled announcements cannot have an empty message.');
+            (window as any).swal({
+                title: '驗證失敗',
+                text: '啟用的公告內容不能為空。',
+                type: 'error'
+            });
             return;
         }
 
@@ -183,11 +187,21 @@ const AnnouncementManager = () => {
             if (response.ok) {
                 setStatus('success');
                 setErrorMessage(null);
+                (window as any).swal({
+                    title: '儲存成功',
+                    text: '公告設定已更新。',
+                    type: 'success'
+                });
                 setTimeout(() => setStatus('idle'), 3000);
             } else {
                 const data = await response.json().catch(() => ({}));
                 setStatus('error');
-                setErrorMessage(data.error || 'Server error occurred while saving.');
+                setErrorMessage(data.error || '儲存時發生伺服器錯誤。');
+                (window as any).swal({
+                    title: '儲存失敗',
+                    text: data.error || '儲存時發生伺服器錯誤。',
+                    type: 'error'
+                });
             }
         } catch (err: any) {
             console.error(err);
@@ -287,7 +301,7 @@ const AnnouncementManager = () => {
                                             type="text"
                                             placeholder="https://..."
                                             value={announcement.link}
-                                            onChange={(e) => handleUpdate(announcement.id, 'link', e.target.value)}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdate(announcement.id, 'link', e.target.value)}
                                         />
                                     </div>
                                 </div>

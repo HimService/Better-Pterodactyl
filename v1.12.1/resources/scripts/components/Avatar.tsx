@@ -1,6 +1,6 @@
 import React from 'react';
 import BoringAvatar, { AvatarProps } from 'boring-avatars';
-import { useStoreState } from '@/state/hooks';
+import { useStoreState } from 'easy-peasy';
 
 const palette = ['#FFAD08', '#EDD75A', '#73B06F', '#0C8F8F', '#587291'];
 

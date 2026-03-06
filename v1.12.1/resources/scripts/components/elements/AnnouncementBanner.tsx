@@ -23,7 +23,7 @@ const AnnouncementBanner = () => {
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
-                    setAnnouncements(data.filter(a => a.enabled && a.message?.trim().length > 0));
+                    setAnnouncements(data.filter(a => a.enabled && a.message && a.message.trim().length > 0));
                 } else if (data && data.enabled && data.message) {
                     setAnnouncements([data as Announcement]);
                 }

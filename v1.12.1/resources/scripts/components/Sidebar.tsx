@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faServer, faUserCog, faCogs } from '@fortawesome/free-solid-svg-icons';
+import { faServer, faUserCog, faCogs, faStore } from '@fortawesome/free-solid-svg-icons';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import Tooltip from '@/components/elements/tooltip/Tooltip';
@@ -53,6 +53,7 @@ const AdminNavItemStyle = styled.a`
 export default () => {
     const { t } = useTranslation('frontend');
     const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data?.rootAdmin || false);
+    const economyEnabled = useStoreState((state: ApplicationStore) => state.user.data?.economyEnabled || false);
 
     return (
         <SidebarContainer>
@@ -62,6 +63,14 @@ export default () => {
                         <FontAwesomeIcon icon={faServer} size={'lg'} />
                     </NavItemStyle>
                 </Tooltip>
+
+                {economyEnabled && (
+                    <Tooltip placement="right" content={t('economy.store', 'Resource Store')}>
+                        <NavItemStyle to={'/economy'}>
+                            <FontAwesomeIcon icon={faStore} size={'lg'} />
+                        </NavItemStyle>
+                    </Tooltip>
+                )}
 
                 <Tooltip placement="right" content={t('navigation.account', 'Account')}>
                     <NavItemStyle to={'/account'}>

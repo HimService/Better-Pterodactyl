@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCogs, faLayerGroup, faSignOutAlt, faMoon, faSun, faDesktop } from '@fortawesome/free-solid-svg-icons';
+import { faCogs, faLayerGroup, faSignOutAlt, faMoon, faSun, faDesktop, faCoins } from '@fortawesome/free-solid-svg-icons';
 import { useStoreState } from 'easy-peasy';
 import { useTheme } from '@/context/ThemeContext';
 import { ApplicationStore } from '@/state';
@@ -142,6 +142,12 @@ export default () => {
                             <FontAwesomeIcon icon={getThemeIcon()} />
                         </button>
                     </Tooltip>
+                    {user && user.economyEnabled && (
+                        <div className={'flex items-center gap-2 px-4 py-2 bg-yellow-400/10 text-yellow-500 rounded-lg text-sm font-bold'}>
+                            <FontAwesomeIcon icon={faCoins} className={'text-yellow-400'} />
+                            <span>{user.points}</span>
+                        </div>
+                    )}
                     <Tooltip placement={'bottom'} content={t('navigation.account_settings', 'Account Settings')}>
                         <NavLink to={'/account'}>
                             <span className={'flex items-center w-5 h-5'}>

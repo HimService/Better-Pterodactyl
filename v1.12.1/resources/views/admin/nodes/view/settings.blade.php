@@ -78,7 +78,7 @@
                         <div>
                             <input type="text" autocomplete="off" name="fqdn" class="form-control" value="{{ old('fqdn', $node->fqdn) }}" />
                         </div>
-                        <p class="text-muted"><small>Please enter domain name (e.g <code>node.example.com</code>) to be used for connecting to the daemon. An IP address may only be used if you are not using SSL for this node.
+                        <p class="text-muted"><small>@lang('admin/node.new.fqdn_help')
                                 <a tabindex="0" data-toggle="popover" data-trigger="focus" title="@lang('admin/node.new.fqdn')?" data-content="@lang('admin/node.view.settings_tab.why_fqdn')">@lang('strings.why')?</a>
                             </small></p>
                     </div>

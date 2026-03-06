@@ -12,6 +12,8 @@ import styled, { css } from 'styled-components/macro';
 import { useTranslation } from 'react-i18next';
 import useFlash from '@/plugins/useFlash';
 import CopyOnClick from '@/components/elements/CopyOnClick';
+import { getIconForServer } from '@/lib/IconMapping';
+import Sparkline from '@/components/elements/Sparkline';
 
 const isAlarmState = (current: number, limit: number): boolean => limit > 0 && current / (limit * 1024 * 1024) >= 0.9;
 
@@ -68,7 +70,7 @@ const ServerName = styled.h3`
 `;
 
 const StatLabel = styled.span`
-    ${tw`text-[10px] uppercase font-bold tracking-widest`};
+    ${tw`text-[10px] uppercase font-bold tracking-widest whitespace-nowrap`};
     color: rgb(var(--text-secondary));
 `;
 
@@ -118,6 +120,9 @@ export default function ServerRow({ server, className, isBatchMode, isSelected, 
     const [stats, setStats] = useState<ServerStats | null>(null);
     const [isActionLoading, setIsActionLoading] = useState(false);
     const [optimisticStatus, setOptimisticStatus] = useState<ServerPowerState | null>(null);
+    const [cpuHistory, setCpuHistory] = useState<number[]>([]);
+    const [ramHistory, setRamHistory] = useState<number[]>([]);
+    const [diskHistory, setDiskHistory] = useState<number[]>([]);
 
     // Apply optimistic status from batch actions
     useEffect(() => {
@@ -155,7 +160,12 @@ export default function ServerRow({ server, className, isBatchMode, isSelected, 
 
     const getStats = () =>
         getServerResourceUsage(server.uuid)
-            .then((data) => setStats(data))
+            .then((data) => {
+                setStats(data);
+                setCpuHistory((prev: number[]) => [...prev.slice(-19), data.cpuUsagePercent]);
+                setRamHistory((prev: number[]) => [...prev.slice(-19), data.memoryUsageInBytes]);
+                setDiskHistory((prev: number[]) => [...prev.slice(-19), data.diskUsageInBytes]);
+            })
             .catch((error) => console.error(error));
 
     useEffect(() => {
@@ -235,7 +245,7 @@ export default function ServerRow({ server, className, isBatchMode, isSelected, 
             {/* Left Section: Icon, Name, IPs */}
             <div css={tw`flex items-center flex-1 min-w-0 w-full sm:w-auto`}>
                 <IconContainer css={tw`mr-5`}>
-                    <FontAwesomeIcon icon={faServer} size={'1x'} />
+                    <FontAwesomeIcon icon={getIconForServer(server.dockerImage, server.name)} size={'1x'} />
                 </IconContainer>
 
                 <div css={tw`flex flex-col min-w-0 flex-1`}>
@@ -312,44 +322,68 @@ export default function ServerRow({ server, className, isBatchMode, isSelected, 
             )}
 
             {/* Right Section: Stats */}
-            <div css={tw`flex items-center justify-end w-full sm:w-[320px] lg:w-[420px] flex-shrink-0 gap-4 lg:gap-6`}>
+            <div css={tw`flex items-center justify-end w-full sm:w-[420px] lg:w-[600px] flex-shrink-0 gap-3 lg:gap-6`}>
                 {!stats || isSuspended ? (
                     !isSuspended && !server.isTransferring && !server.status && <Spinner size={'small'} />
                 ) : (
                     <React.Fragment>
-                        <div css={tw`flex-1 min-w-0`}>
-                            <div css={tw`flex justify-between items-end mb-1`}>
-                                <div css={tw`flex items-center gap-1.5`}>
-                                    <FontAwesomeIcon icon={faMicrochip} css={tw`text-[10px] hidden lg:block`} style={{ color: 'rgb(var(--text-secondary))' }} />
-                                    <StatLabel css={tw`hidden sm:block`}>{t('dashboard.server_row.cpu', 'CPU')}</StatLabel>
+                        {/* CPU */}
+                        <div css={tw`flex flex-col gap-1 w-[110px] lg:w-[160px] flex-shrink-0`}>
+                            <div css={tw`flex justify-between items-center h-5`}>
+                                <div css={tw`flex items-center gap-1.5 min-w-0`}>
+                                    <FontAwesomeIcon icon={faMicrochip} css={tw`text-[10px] hidden lg:block flex-shrink-0`} style={{ color: 'rgb(var(--text-secondary))' }} />
+                                    <StatLabel css={tw`hidden lg:block truncate`}>{t('dashboard.server_row.cpu', 'CPU')}</StatLabel>
                                 </div>
-                                <StatValue $alarm={alarms.cpu}>{stats.cpuUsagePercent.toFixed(1)}%</StatValue>
+                                <div css={tw`flex items-center gap-2 flex-shrink-0 ml-auto`}>
+                                    <StatValue $alarm={alarms.cpu} css={tw`whitespace-nowrap m-0`}>{stats.cpuUsagePercent.toFixed(1)}%</StatValue>
+                                    <Sparkline data={cpuHistory} width={40} height={14} limit={server.limits.cpu || 100} />
+                                </div>
                             </div>
                             <ProgressBarContainer>
                                 <ProgressBar $percent={server.limits.cpu === 0 ? 0 : (stats.cpuUsagePercent / server.limits.cpu) * 100} $alarm={alarms.cpu} />
                             </ProgressBarContainer>
                         </div>
 
-                        <div css={tw`flex-1 min-w-0`}>
-                            <div css={tw`flex justify-between items-end mb-1`}>
-                                <div css={tw`flex items-center gap-1.5`}>
-                                    <FontAwesomeIcon icon={faMemory} css={tw`text-[10px] hidden lg:block`} style={{ color: 'rgb(var(--text-secondary))' }} />
-                                    <StatLabel css={tw`hidden sm:block`}>{t('dashboard.server_row.memory', 'Memory')}</StatLabel>
+                        {/* Memory */}
+                        <div css={tw`flex flex-col gap-1 w-[140px] lg:w-[190px] flex-shrink-0`}>
+                            <div css={tw`flex justify-between items-center h-5`}>
+                                <div css={tw`flex items-center gap-1.5 min-w-0`}>
+                                    <FontAwesomeIcon icon={faMemory} css={tw`text-[10px] hidden lg:block flex-shrink-0`} style={{ color: 'rgb(var(--text-secondary))' }} />
+                                    <StatLabel css={tw`hidden lg:block truncate`}>{t('dashboard.server_row.memory', 'Memory')}</StatLabel>
                                 </div>
-                                <StatValue $alarm={alarms.memory}>{bytesToString(stats.memoryUsageInBytes)}</StatValue>
+                                <div css={tw`flex items-center gap-2 flex-shrink-0 ml-auto`}>
+                                    <StatValue $alarm={alarms.memory} css={tw`whitespace-nowrap m-0`}>{bytesToString(stats.memoryUsageInBytes)}</StatValue>
+                                    <Sparkline
+                                        data={ramHistory}
+                                        width={40}
+                                        height={14}
+                                        limit={mbToBytes(server.limits.memory) || (Math.max(...ramHistory, 1))}
+                                        color={'#9a7fef'}
+                                    />
+                                </div>
                             </div>
                             <ProgressBarContainer>
                                 <ProgressBar $percent={server.limits.memory === 0 ? 0 : (stats.memoryUsageInBytes / mbToBytes(server.limits.memory)) * 100} $alarm={alarms.memory} />
                             </ProgressBarContainer>
                         </div>
 
-                        <div css={tw`flex-1 min-w-0 hidden sm:block`}>
-                            <div css={tw`flex justify-between items-end mb-1`}>
-                                <div css={tw`flex items-center gap-1.5`}>
-                                    <FontAwesomeIcon icon={faHdd} css={tw`text-[10px] hidden lg:block`} style={{ color: 'rgb(var(--text-secondary))' }} />
-                                    <StatLabel>{t('dashboard.server_row.disk', 'Disk')}</StatLabel>
+                        {/* Disk */}
+                        <div css={tw`flex-col gap-1 w-[140px] lg:w-[190px] flex-shrink-0 hidden sm:flex`}>
+                            <div css={tw`flex justify-between items-center h-5`}>
+                                <div css={tw`flex items-center gap-1.5 min-w-0`}>
+                                    <FontAwesomeIcon icon={faHdd} css={tw`text-[10px] hidden lg:block flex-shrink-0`} style={{ color: 'rgb(var(--text-secondary))' }} />
+                                    <StatLabel css={tw`hidden lg:block truncate`}>{t('dashboard.server_row.disk', 'Disk')}</StatLabel>
                                 </div>
-                                <StatValue $alarm={alarms.disk}>{bytesToString(stats.diskUsageInBytes)}</StatValue>
+                                <div css={tw`flex items-center gap-2 flex-shrink-0 ml-auto`}>
+                                    <StatValue $alarm={alarms.disk} css={tw`whitespace-nowrap m-0`}>{bytesToString(stats.diskUsageInBytes)}</StatValue>
+                                    <Sparkline
+                                        data={diskHistory}
+                                        width={40}
+                                        height={14}
+                                        limit={mbToBytes(server.limits.disk) || (Math.max(...diskHistory, 1))}
+                                        color={'#6bcad8'}
+                                    />
+                                </div>
                             </div>
                             <ProgressBarContainer>
                                 <ProgressBar $percent={server.limits.disk === 0 ? 0 : (stats.diskUsageInBytes / mbToBytes(server.limits.disk)) * 100} $alarm={alarms.disk} />

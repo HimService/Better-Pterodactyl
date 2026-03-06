@@ -41,6 +41,12 @@
             @if(Route::is('admin.announcements'))
                 @lang('admin/index.announcements')
                 <small>@lang('admin/index.announcements_help')</small>
+            @elseif(Route::is('admin.status'))
+                @lang('admin/index.status_settings')
+                <small>@lang('admin/index.subtitle')</small>
+            @elseif(Route::is('admin.economy'))
+                @lang('admin/index.economy_settings')
+                <small>@lang('admin/index.subtitle')</small>
             @else
                 @lang('admin/index.title')
                 <small>@lang('admin/index.subtitle')</small>

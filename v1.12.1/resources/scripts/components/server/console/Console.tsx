@@ -16,7 +16,7 @@ import { usePersistedState } from '@/plugins/usePersistedState';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTerminal, faCode, faQuestionCircle, faAngleDoubleRight } from '@fortawesome/free-solid-svg-icons';
+import { faTerminal, faCode, faQuestionCircle, faAngleDoubleRight, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 
 import 'xterm/css/xterm.css';
@@ -84,18 +84,18 @@ export default () => {
         switch (status) {
             // Sent by either the source or target node if a failure occurs.
             case 'failure':
-                terminal.writeln(TERMINAL_PRELUDE + t('server.console.transfer_failed', 'Transfer has failed.') + '\u001b[0m');
+                terminal.writeln('\r' + TERMINAL_PRELUDE + t('server.console.transfer_failed', 'Transfer has failed.') + '\u001b[0m');
                 return;
         }
     };
 
     const handleDaemonErrorOutput = (line: string) =>
         terminal.writeln(
-            TERMINAL_PRELUDE + '\u001b[1m\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m'
+            '\r' + TERMINAL_PRELUDE + '\u001b[1m\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/i, '') + '\u001b[0m'
         );
 
     const handlePowerChangeEvent = (state: string) =>
-        terminal.writeln(TERMINAL_PRELUDE + t('server.console.server_status', 'Server marked as {{status}}...', { status: state }) + '\u001b[0m');
+        terminal.writeln('\r' + TERMINAL_PRELUDE + t('server.console.server_status', 'Server marked as {{status}}...', { status: state }) + '\u001b[0m');
 
     const handleCommandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'ArrowUp') {
@@ -140,7 +140,15 @@ export default () => {
             // Activate Unicode 11 for proper emoji and special character width handling
             terminal.unicode.activeVersion = '11';
 
-            fitAddon.fit();
+            setTimeout(() => {
+                if (terminal.element) {
+                    try {
+                        fitAddon.fit();
+                    } catch (e) {
+                        console.warn('fitAddon.fit() failed:', e);
+                    }
+                }
+            }, 100);
             searchBar.addNewStyle(zIndex);
 
             // Add support for capturing keys
@@ -164,7 +172,11 @@ export default () => {
         'resize',
         debounce(() => {
             if (terminal.element) {
-                fitAddon.fit();
+                try {
+                    fitAddon.fit();
+                } catch (e) {
+                    console.warn('fitAddon.fit() failed on resize:', e);
+                }
             }
         }, 100)
     );
@@ -204,9 +216,11 @@ export default () => {
     return (
         <div className={classNames(styles.terminal, 'relative')}>
             <SpinnerOverlay visible={!connected} size={'large'} />
-            <div className={classNames(styles.container, { 'rounded-b': !canSendCommands })}>
+            <div
+                className={classNames(styles.container, styles.overflows_container, { 'rounded-b': !canSendCommands })}
+            >
                 <div className={'h-full'}>
-                    <div id={styles.terminal} ref={ref} />
+                    <div id={'terminal-container'} ref={ref} />
                 </div>
             </div>
             {canSendCommands && (
@@ -224,10 +238,14 @@ export default () => {
                             <FontAwesomeIcon icon={faQuestionCircle} className={'mr-1.5 opacity-70'} />
                             Help
                         </button>
+                        <button onClick={() => window.open(`${window.location.pathname}/console-popout`, '_blank', 'width=900,height=600')}>
+                            <FontAwesomeIcon icon={faExternalLinkAlt} className={'mr-1.5 opacity-70'} />
+                            Popout
+                        </button>
                     </div>
-                    <div className={'relative'}>
+                    <div className={classNames('relative', styles.overflows_container)}>
                         <input
-                            className={classNames('peer', styles.command_input, 'text-neutral-100 placeholder-neutral-500 font-medium')}
+                            className={classNames('peer', styles.command_input, 'text-neutral-200 placeholder-neutral-500 font-medium')}
                             type={'text'}
                             placeholder={t('server.console.type_command', 'Type a command...')}
                             aria-label={t('server.console.command_input_aria', 'Console command input.')}

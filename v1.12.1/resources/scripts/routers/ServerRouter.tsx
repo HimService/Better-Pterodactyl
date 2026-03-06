@@ -2,6 +2,7 @@ import TransferListener from '@/components/server/TransferListener';
 import React, { useEffect, useState } from 'react';
 import { NavLink, Route, Switch, useRouteMatch } from 'react-router-dom';
 import NavigationBar from '@/components/NavigationBar';
+import AnnouncementBanner from '@/components/elements/AnnouncementBanner';
 import Sidebar from '@/components/Sidebar';
 import TransitionRouter from '@/TransitionRouter';
 import WebsocketHandler from '@/components/server/WebsocketHandler';
@@ -91,8 +92,10 @@ export default () => {
         };
     }, [description]);
 
+    const isPopout = location.pathname.endsWith('/console-popout');
+
     return (
-        <BrandingContainer $color={branding.color} key={'server-router'} className="flex w-full min-h-screen transition-colors duration-300 relative bg-[#020617]">
+        <BrandingContainer $color={branding.color} key={'server-router'} className="flex w-full min-h-screen transition-colors duration-300 relative">
             {/* Atmospheric Background Layer */}
             {branding.color && (
                 <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
@@ -107,9 +110,10 @@ export default () => {
                 </div>
             )}
 
-            <Sidebar />
+            {!isPopout && <Sidebar />}
             <div className="flex flex-col flex-1 w-full overflow-hidden relative z-10">
-                <NavigationBar />
+                {!isPopout && <NavigationBar />}
+                {!isPopout && <AnnouncementBanner />}
                 {!uuid || !id ? (
                     error ? (
                         <ServerError message={error} />
@@ -118,52 +122,69 @@ export default () => {
                     )
                 ) : (
                     <>
-                        <CSSTransition timeout={150} classNames={'fade'} appear in>
-                            <SubNavigation>
-                                <div>
-                                    {routes.server
-                                        .filter((route) => !!route.name)
-                                        .map((route) =>
-                                            route.permission ? (
-                                                <Can key={route.path} action={route.permission} matchAny primary>
-                                                    <NavLink to={to(route.path, true)} exact={route.exact} activeStyle={{ color: branding.color }}>
-                                                        {t(`navigation.${route.name!.toLowerCase().replace(/\s/g, '_')}`)}
-                                                    </NavLink>
-                                                </Can>
-                                            ) : (
-                                                <NavLink key={route.path} to={to(route.path, true)} exact={route.exact} activeStyle={{ color: branding.color }}>
-                                                    {t(`navigation.${route.name!.toLowerCase().replace(/\s/g, '_')}`)}
-                                                </NavLink>
-                                            )
-                                        )}
-                                    {rootAdmin && (
-                                        // eslint-disable-next-line react/jsx-no-target-blank
-                                        <a href={`/admin/servers/view/${serverId}`} target={'_blank'}>
-                                            <FontAwesomeIcon icon={faExternalLinkAlt} />
-                                        </a>
-                                    )}
-                                </div>
-                            </SubNavigation>
-                        </CSSTransition>
                         <InstallListener />
                         <TransferListener />
                         <WebsocketHandler />
-                        {inConflictState && (!rootAdmin || (rootAdmin && !location.pathname.endsWith(`/server/${id}`))) ? (
-                            <ConflictStateRenderer />
+                        {!isPopout ? (
+                            <>
+                                <CSSTransition timeout={150} classNames={'fade'} appear in>
+                                    <SubNavigation>
+                                        <div>
+                                            {routes.server
+                                                .filter((route) => !!route.name)
+                                                .map((route) =>
+                                                    route.permission ? (
+                                                        <Can key={route.path} action={route.permission} matchAny primary>
+                                                            <NavLink to={to(route.path, true)} exact={route.exact} activeStyle={{ color: branding.color }}>
+                                                                {t(`navigation.${route.name!.toLowerCase().replace(/\s/g, '_')}`)}
+                                                            </NavLink>
+                                                        </Can>
+                                                    ) : (
+                                                        <NavLink key={route.path} to={to(route.path, true)} exact={route.exact} activeStyle={{ color: branding.color }}>
+                                                            {t(`navigation.${route.name!.toLowerCase().replace(/\s/g, '_')}`)}
+                                                        </NavLink>
+                                                    )
+                                                )}
+                                            {rootAdmin && (
+                                                // eslint-disable-next-line react/jsx-no-target-blank
+                                                <a href={`/admin/servers/view/${serverId}`} target={'_blank'}>
+                                                    <FontAwesomeIcon icon={faExternalLinkAlt} />
+                                                </a>
+                                            )}
+                                        </div>
+                                    </SubNavigation>
+                                </CSSTransition>
+                                {inConflictState && (!rootAdmin || (rootAdmin && !location.pathname.endsWith(`/server/${id}`))) ? (
+                                    <ConflictStateRenderer />
+                                ) : (
+                                    <ErrorBoundary>
+                                        <TransitionRouter>
+                                            <Switch location={location}>
+                                                {routes.server.map(({ path, permission, component: Component }: any) => (
+                                                    <PermissionRoute key={path} permission={permission} path={to(path)} exact>
+                                                        <Spinner.Suspense>
+                                                            <Component />
+                                                        </Spinner.Suspense>
+                                                    </PermissionRoute>
+                                                ))}
+                                                <Route path={'*'} component={NotFound} />
+                                            </Switch>
+                                        </TransitionRouter>
+                                    </ErrorBoundary>
+                                )}
+                            </>
                         ) : (
                             <ErrorBoundary>
-                                <TransitionRouter>
-                                    <Switch location={location}>
-                                        {routes.server.map(({ path, permission, component: Component }) => (
-                                            <PermissionRoute key={path} permission={permission} path={to(path)} exact>
-                                                <Spinner.Suspense>
-                                                    <Component />
-                                                </Spinner.Suspense>
-                                            </PermissionRoute>
-                                        ))}
-                                        <Route path={'*'} component={NotFound} />
-                                    </Switch>
-                                </TransitionRouter>
+                                <Switch location={location}>
+                                    {routes.server.filter((r: any) => r.path === '/console-popout').map(({ path, permission, component: Component }: any) => (
+                                        <PermissionRoute key={path} permission={permission} path={to(path)} exact>
+                                            <Spinner.Suspense>
+                                                <Component />
+                                            </Spinner.Suspense>
+                                        </PermissionRoute>
+                                    ))}
+                                    <Route path={'*'} component={NotFound} />
+                                </Switch>
                             </ErrorBoundary>
                         )}
                     </>

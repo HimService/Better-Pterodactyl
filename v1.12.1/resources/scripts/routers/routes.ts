@@ -75,6 +75,13 @@ export default {
             exact: true,
         },
         {
+            path: '/console-popout',
+            permission: null,
+            name: undefined,
+            component: lazy(() => import('@/components/server/console/ConsolePopoutContainer')),
+            exact: true,
+        },
+        {
             path: '/files',
             permission: 'file.*',
             name: 'Files',
