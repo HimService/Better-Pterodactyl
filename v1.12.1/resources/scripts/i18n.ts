@@ -15,6 +15,7 @@ i18n.use(initReactI18next).init({
     defaultNS: 'translation',
     resources: {
         zh_TW: { translation: zh_TW, frontend: zh_TW },
+        'zh-TW': { translation: zh_TW, frontend: zh_TW },
         zh: { translation: zh_TW, frontend: zh_TW },
         en: { translation: en, frontend: en },
         ja: { translation: ja, frontend: ja },
