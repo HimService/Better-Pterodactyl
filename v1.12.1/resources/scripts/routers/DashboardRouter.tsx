@@ -15,6 +15,7 @@ import routes from '@/routers/routes';
 import { useTranslation } from 'react-i18next';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
+import PluginSlot from '@/components/elements/plugins/PluginSlot';
 
 export default function DashboardRouter() {
     const { t } = useTranslation();
@@ -28,6 +29,9 @@ export default function DashboardRouter() {
             <div className="flex flex-col flex-1 w-full overflow-hidden">
                 <NavigationBar />
                 <AnnouncementBanner />
+                <div className="px-4 md:px-10 mt-4">
+                    <PluginSlot id="dashboard_header" />
+                </div>
                 {location.pathname.startsWith('/account') && (
                     <SubNavigation>
                         <div>

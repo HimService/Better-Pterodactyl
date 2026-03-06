@@ -258,6 +258,24 @@ Route::get('/api/public/status', function () {
     }
 })->withoutMiddleware(['auth', RequireTwoFactorAuthentication::class]);
 
+Route::get('/api/client/plugins', function () {
+    if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+    }
+    $plugins = \BetterPterodactyl\Plugins\DB::getPlugins();
+    $active = array_filter($plugins, function($p) { return (bool)$p['enabled']; });
+    
+    $grouped = [];
+    foreach ($active as $p) {
+        $slot = $p['slot'];
+        if (!isset($grouped[$slot])) $grouped[$slot] = [];
+        $p['config'] = json_decode($p['config'], true);
+        $grouped[$slot][] = $p;
+    }
+    
+    return response()->json($grouped);
+});
+
 Route::get('/api/public/announcements', function () {
     $path = base_path('resources/settings/announcements.json');
     if (!file_exists($path)) {

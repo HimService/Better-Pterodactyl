@@ -107,6 +107,16 @@
                                 <i class="fa fa-plug"></i> <span>@lang('admin/index.sidebar.discord_login')</span>
                             </a>
                         </li>
+                        <li class="{{ Route::is('admin.plugins') ? 'active' : '' }}">
+                            <a href="{{ route('admin.plugins') }}">
+                                <i class="fa fa-puzzle-piece"></i> <span>@lang('admin/index.sidebar.plugins')</span>
+                            </a>
+                        </li>
+                        <li class="{{ Route::is('admin.update') ? 'active' : '' }}">
+                            <a href="{{ route('admin.update') }}">
+                                <i class="fa fa-refresh"></i> <span>@lang('admin/index.sidebar.updates')</span>
+                            </a>
+                        </li>
                         <li class="header">@lang('admin/index.sidebar.management')</li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.databases') ?: 'active' }}">
                             <a href="{{ route('admin.databases') }}">
@@ -198,7 +208,7 @@
             {!! Theme::js('js/admin/functions.js?t={cache-version}') !!}
             <script src="/js/autocomplete.js" type="application/javascript"></script>
             
-            @if(Route::currentRouteName() === 'admin.index' || Route::currentRouteName() === 'admin.announcements' || Route::currentRouteName() === 'admin.status' || Route::currentRouteName() === 'admin.economy' || Route::currentRouteName() === 'admin.discord')
+            @if(Route::currentRouteName() === 'admin.index' || Route::currentRouteName() === 'admin.announcements' || Route::currentRouteName() === 'admin.status' || Route::currentRouteName() === 'admin.economy' || Route::currentRouteName() === 'admin.discord' || Route::currentRouteName() === 'admin.plugins' || Route::currentRouteName() === 'admin.update')
                 <script>
                     @if(!is_null(Auth::user()))
                         window.PterodactylUser = {!! json_encode(Auth::user()->toVueObject()) !!};

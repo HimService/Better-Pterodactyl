@@ -10,6 +10,8 @@ Route::get('/announcements', [Admin\BaseController::class, 'index'])->name('admi
 Route::get('/status', [Admin\BaseController::class, 'index'])->name('admin.status');
 Route::get('/economy', [Admin\BaseController::class, 'index'])->name('admin.economy');
 Route::get('/discord', [Admin\BaseController::class, 'index'])->name('admin.discord');
+Route::get('/plugins', [Admin\BaseController::class, 'index'])->name('admin.plugins');
+Route::get('/update', [Admin\BaseController::class, 'index'])->name('admin.update');
 Route::get('/discord/settings', function () {
     if (!class_exists('BetterPterodactyl\Discord\DB')) {
         require_once base_path('resources/settings/discord/helpers.php');
@@ -326,6 +328,192 @@ Route::get('/announcements/test-error', function () {
         return "Write Test Successful! Written to {$path}";
     } catch (\Exception $e) {
         return "Exception: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine();
+    }
+});
+
+Route::get('/plugins/list', function () {
+    if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+    }
+    return response()->json(\BetterPterodactyl\Plugins\DB::getPlugins());
+});
+
+Route::post('/plugins/install', function (\Illuminate\Http\Request $request) {
+    if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+    }
+    // Support both raw JSON in body or a 'json' field
+    $payload = $request->json()->all();
+    
+    // If it's a wrapper, unwrap it
+    if (isset($payload['plugin'])) {
+        $payload = $payload['plugin'];
+    }
+
+    $data = [
+        'name' => $payload['name'] ?? 'Unknown Plugin',
+        'slot' => $payload['slot'] ?? 'dashboard_header',
+        'type' => $payload['type'] ?? 'iframe',
+        'description' => $payload['description'] ?? '',
+        'config' => $payload['config'] ?? $payload, // Fallback to entire payload if no config key
+        'enabled' => (bool) ($payload['enabled'] ?? true),
+    ];
+    
+    \BetterPterodactyl\Plugins\DB::createPlugin($data);
+    return response()->json(['success' => true]);
+});
+
+Route::post('/plugins/toggle', function (\Illuminate\Http\Request $request) {
+    if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+    }
+    $id = $request->input('id');
+    $enabled = $request->input('enabled');
+    \BetterPterodactyl\Plugins\DB::togglePlugin($id, $enabled);
+    return response()->json(['success' => true]);
+});
+
+Route::post('/plugins/delete', function (\Illuminate\Http\Request $request) {
+    if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+    }
+    $id = $request->input('id');
+    \BetterPterodactyl\Plugins\DB::deletePlugin($id);
+    return response()->json(['success' => true]);
+});
+
+Route::get('/update/check', function () {
+    $localVersionPath = base_path('resources/settings/version.json');
+    $localId = 0;
+    $localVersion = 'Unknown';
+    
+    if (file_exists($localVersionPath)) {
+        try {
+            $json = json_decode(file_get_contents($localVersionPath), true);
+            $localId = (int) ($json['id'] ?? 0);
+            $localVersion = $json['version'] ?? 'Unknown';
+        } catch (\Exception $e) {}
+    }
+
+    $remoteId = $localId;
+    $remoteVersion = $localVersion;
+
+    try {
+        // Add cache buster
+        $url = 'https://raw.githubusercontent.com/HimService/Better-Pterodactyl/develop/v1.12.1/resources/settings/version.json?t=' . time();
+        $response = \Illuminate\Support\Facades\Http::get($url);
+        if ($response->successful()) {
+            $data = $response->json();
+            $remoteId = (int) ($data['id'] ?? 0);
+            $remoteVersion = $data['version'] ?? 'Unknown';
+        }
+    } catch (\Exception $e) {}
+
+    return response()->json([
+        'local' => $localVersion,
+        'remote' => $remoteVersion,
+        'updatable' => $remoteId > $localId,
+        'debug' => [
+            'local_id' => $localId,
+            'remote_id' => $remoteId
+        ]
+    ]);
+});
+
+Route::post('/update/execute', function () {
+    set_time_limit(900);
+    try {
+        $zipUrl = 'https://github.com/HimService/Better-Pterodactyl/archive/refs/heads/develop.zip';
+        $tempZip = storage_path('app/update.zip');
+        $backupPath = storage_path('app/settings_backup');
+        $extractPath = storage_path('app/update_extract');
+        
+        // Paths for Atomic Swap
+        $resOld = base_path('resources_old');
+        $routesOld = base_path('routes_old');
+        $resNew = base_path('resources_new');
+        $routesNew = base_path('routes_new');
+
+        // 1. Download
+        $response = \Illuminate\Support\Facades\Http::get($zipUrl);
+        if (!$response->successful()) {
+            return response()->json(['error' => 'Failed to download update from GitHub.'], 500);
+        }
+        file_put_contents($tempZip, $response->body());
+
+        // 2. Extract
+        $zip = new \ZipArchive();
+        if ($zip->open($tempZip) === TRUE) {
+            if (is_dir($extractPath)) {
+                \Illuminate\Support\Facades\File::deleteDirectory($extractPath);
+            }
+            mkdir($extractPath, 0755, true);
+            $zip->extractTo($extractPath);
+            $zip->close();
+
+            $sourcePath = $extractPath . '/Better-Pterodactyl-develop/v1.12.1';
+            
+            if (is_dir($sourcePath . '/resources') && is_dir($sourcePath . '/routes')) {
+                // 3. Backup Settings
+                if (is_dir(base_path('resources/settings'))) {
+                    if (is_dir($backupPath)) {
+                        \Illuminate\Support\Facades\File::deleteDirectory($backupPath);
+                    }
+                    \Illuminate\Support\Facades\File::copyDirectory(base_path('resources/settings'), $backupPath);
+                }
+
+                // 4. Pre-Cleanup (Remove any previous failed update leftovers)
+                if (is_dir($resOld)) \Illuminate\Support\Facades\File::deleteDirectory($resOld);
+                if (is_dir($routesOld)) \Illuminate\Support\Facades\File::deleteDirectory($routesOld);
+                if (is_dir($resNew)) \Illuminate\Support\Facades\File::deleteDirectory($resNew);
+                if (is_dir($routesNew)) \Illuminate\Support\Facades\File::deleteDirectory($routesNew);
+
+                // 5. Atomic Preparation: Copy extracted to _new
+                \Illuminate\Support\Facades\File::copyDirectory($sourcePath . '/resources', $resNew);
+                \Illuminate\Support\Facades\File::copyDirectory($sourcePath . '/routes', $routesNew);
+
+                // 6. SWAP: Millisecond downtime
+                rename(base_path('resources'), $resOld);
+                rename(base_path('routes'), $routesOld);
+                rename($resNew, base_path('resources'));
+                rename($routesNew, base_path('routes'));
+                
+                // 7. Restore backup (except version.json)
+                if (is_dir($backupPath)) {
+                    $files = \Illuminate\Support\Facades\File::allFiles($backupPath);
+                    foreach ($files as $file) {
+                        if ($file->getFilename() === 'version.json') continue;
+                        
+                        $relativePath = str_replace($backupPath, '', $file->getRealPath());
+                        $targetPath = base_path('resources/settings' . $relativePath);
+                        
+                        \Illuminate\Support\Facades\File::ensureDirectoryExists(dirname($targetPath));
+                        \Illuminate\Support\Facades\File::copy($file->getRealPath(), $targetPath);
+                    }
+                }
+
+                // 8. Final Cleanup & Permissions
+                \Illuminate\Support\Facades\File::deleteDirectory($extractPath);
+                \Illuminate\Support\Facades\File::deleteDirectory($backupPath);
+                \Illuminate\Support\Facades\File::deleteDirectory($resOld);
+                \Illuminate\Support\Facades\File::deleteDirectory($routesOld);
+                unlink($tempZip);
+
+                // Permissions
+                shell_exec('chown -R www-data:www-data ' . base_path('resources/settings'));
+                
+                // 9. Build
+                shell_exec('cd ' . base_path() . ' && yarn build:production > /dev/null 2>&1 &');
+
+                return response()->json(['success' => true]);
+            } else {
+                 return response()->json(['error' => 'Could not find version folder or assets in the downloaded package.'], 500);
+            }
+        } else {
+            return response()->json(['error' => 'Failed to open ZIP file.'], 500);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
 });
 

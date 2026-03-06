@@ -72,6 +72,8 @@ return [
     'sidebar' => [
         'better_pterodactyl' => 'Better Pterodactyl',
         'discord_login' => 'Discord 登入',
+        'plugins' => '插件管理',
+        'updates' => '版本更新',
         'basic_administration' => '基礎管理',
         'management' => '管理',
         'service_management' => '服務管理',

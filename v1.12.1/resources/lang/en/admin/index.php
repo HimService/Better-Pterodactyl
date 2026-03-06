@@ -72,6 +72,7 @@ return [
     'sidebar' => [
         'better_pterodactyl' => 'Better Pterodactyl',
         'discord_login' => 'Discord Login',
+        'plugins' => 'Plugin System',
         'basic_administration' => 'Basic Administration',
         'management' => 'Management',
         'service_management' => 'Service Management',
