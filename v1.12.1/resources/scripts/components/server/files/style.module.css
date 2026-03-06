@@ -29,7 +29,8 @@
     }
 
     &>.details {
-        @apply flex flex-1 items-center text-gray-200 no-underline px-4 py-3 overflow-hidden truncate;
+        @apply flex flex-1 items-center no-underline px-4 py-3 overflow-hidden truncate;
+        color: rgb(var(--text-secondary));
 
         &:not(a) {
             @apply cursor-default;

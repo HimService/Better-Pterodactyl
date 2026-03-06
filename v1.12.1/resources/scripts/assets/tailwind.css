@@ -14,19 +14,18 @@
         --color-brand-300: 196 181 253;
         --color-brand-400: 167 139 250;
         --color-brand-500: 139 92 246;
-        /* Base Indigo */
         --color-brand-600: 124 58 237;
         --color-brand-700: 109 40 217;
         --color-brand-800: 91 33 182;
         --color-brand-900: 76 29 149;
 
         /* Light Theme Values (Soft SaaS Style) */
-        --bg-app: 249 250 251;
-        /* gray-50 */
+        --bg-app: 243 244 246;
+        /* gray-100 */
         --bg-card: 255 255 255;
         /* white */
-        --bg-card-hover: 243 244 246;
-        /* gray-100 */
+        --bg-card-hover: 249 250 251;
+        /* gray-50 */
         --border-color: 229 231 235;
         /* gray-200 */
 
@@ -38,12 +37,11 @@
         /* gray-400 */
 
         --input-bg: 255 255 255;
+        /* white */
         --input-border: 209 213 219;
         /* gray-300 */
 
         --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-        --radius-card: 1.5rem;
-        /* 24px */
     }
 
     .dark {

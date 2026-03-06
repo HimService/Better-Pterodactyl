@@ -22,25 +22,22 @@
 .terminal {
     @apply flex flex-col w-full h-full;
 
+    & .overflows_container {
+        @apply w-full;
+    }
+
     &>.container {
-        @apply p-2 sm:p-4 min-h-[16rem] flex-1 font-mono text-sm overflow-hidden;
+        @apply p-1 sm:p-2 min-h-[16rem] flex-1 font-mono text-sm;
         background-color: rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(8px);
         border: none;
 
-        & #terminal {
+        & :global(#terminal-container) {
             @apply h-full;
+            width: 100%;
 
-            &::-webkit-scrollbar {
-                @apply w-1.5;
-            }
-
-            &::-webkit-scrollbar-track {
-                @apply bg-transparent;
-            }
-
-            &::-webkit-scrollbar-thumb {
-                @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+            & .xterm-viewport {
+                scrollbar-width: thin;
             }
         }
     }

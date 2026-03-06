@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
+import { Link, RouteComponentProps, useLocation } from 'react-router-dom';
 import login from '@/api/auth/login';
 import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import { useStoreState } from 'easy-peasy';
@@ -13,6 +13,13 @@ import useFlash from '@/plugins/useFlash';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import config from '@/config';
+import axios from 'axios';
+
+const DiscordIcon = ({ size = '1em' }: { size?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 127.14 96.36" fill="currentColor">
+        <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.06,72.06,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.71,32.65-1.82,56.6.48,80.21a105.73,105.73,0,0,0,32.22,16.15,77.7,77.7,0,0,0,7.34-11.89,68.21,68.21,0,0,1-11.85-5.65c.98-.71,1.92-1.45,2.83-2.22a74.87,74.87,0,0,0,64.12,0c.91.77,1.85,1.51,2.83,2.22a68.21,68.21,0,0,1-11.85,5.65,77.7,77.7,0,0,0,7.34,11.89,105.71,105.71,0,0,0,32.22-16.15C129.09,56.6,124.55,32.65,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5.08-12.69,11.41-12.69,11.54,5.76,11.41,12.69C53.86,60,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.23,60,73.23,53s5.08-12.69,11.41-12.69,11.54,5.76,11.41,12.69C96.05,60,91,65.69,84.69,65.69Z" />
+    </svg>
+);
 
 interface Values {
     username: string;
@@ -21,14 +28,33 @@ interface Values {
 
 const LoginContainer = ({ history }: RouteComponentProps) => {
     const { t } = useTranslation();
+    const location = useLocation();
     const ref = useRef<Reaptcha>(null);
     const [token, setToken] = useState('');
 
-    const { clearFlashes, clearAndAddHttpError } = useFlash();
+    const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
     const { enabled: recaptchaEnabled, siteKey } = useStoreState((state) => state.settings.data?.recaptcha || { enabled: false, siteKey: '' });
+    const [discordEnabled, setDiscordEnabled] = useState(false);
 
     useEffect(() => {
         clearFlashes();
+
+        // Handle Discord errors from query parameters
+        const params = new URLSearchParams(location.search);
+        const error = params.get('error');
+        if (error) {
+            if (error === 'registration_disabled') {
+                addFlash({ type: 'error', message: t('discord.error.registration_disabled'), key: 'auth.login' });
+            } else {
+                addFlash({ type: 'error', message: t('discord.error.generic'), key: 'auth.login' });
+            }
+            // Clear the error from URL
+            history.replace('/auth/login');
+        }
+
+        axios.get('/api/discord/config')
+            .then(({ data }) => setDiscordEnabled(data.enabled))
+            .catch(() => setDiscordEnabled(false));
     }, []);
 
     const onSubmit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
@@ -101,6 +127,30 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                                 {t('auth.login.login_button', 'Login')}
                             </Button>
                         </div>
+                        {discordEnabled && (
+                            <>
+                                <div css={tw`mt-6 flex items-center`}>
+                                    <div css={tw`flex-grow border-t border-neutral-700`}></div>
+                                    <span css={tw`px-4 text-xs text-neutral-500 uppercase tracking-widest text-center`}>{t('discord.or', { defaultValue: '或者' })}</span>
+                                    <div css={tw`flex-grow border-t border-neutral-700`}></div>
+                                </div>
+                                <div css={tw`mt-6`}>
+                                    <Button
+                                        type={'button'}
+                                        size={'xlarge'}
+                                        css={tw`bg-[#5865F2]! hover:bg-[#4752C4]! border-none shadow-lg hover:shadow-[#5865F2] transition-all duration-300 transform hover:-translate-y-0.5 normal-case! h-14!`}
+                                        onClick={() => window.location.href = '/api/discord/login'}
+                                    >
+                                        <div css={tw`flex items-center justify-center gap-3 w-full`}>
+                                            <DiscordIcon size={'24px'} />
+                                            <span css={tw`font-semibold tracking-wide text-base`}>
+                                                {t('discord.login_with_discord')}
+                                            </span>
+                                        </div>
+                                    </Button>
+                                </div>
+                            </>
+                        )}
                         {recaptchaEnabled && (
                             <Reaptcha
                                 ref={ref}
