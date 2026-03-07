@@ -1171,6 +1171,12 @@
     "save_changes": "儲存變更",
     "cancel": "取消",
     "no_variables": "此插件沒有可設定的變數。",
-    "save_success": "設定已儲存"
+    "save_success": "設定已儲存",
+    "developer_console": "開發者主控台",
+    "clear_logs": "清除日誌",
+    "no_logs": "目前沒有任何日誌數據。",
+    "export": "匯出設定",
+    "template_gallery": "模板庫",
+    "close": "關閉"
   }
 }

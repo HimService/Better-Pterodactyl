@@ -1166,6 +1166,12 @@
         "save_changes": "Save Changes",
         "cancel": "Cancel",
         "no_variables": "This plugin has no configurable variables.",
-        "save_success": "Settings Saved"
+        "save_success": "Settings Saved",
+        "developer_console": "Developer Console",
+        "clear_logs": "Clear Logs",
+        "no_logs": "No log data available.",
+        "export": "Export Config",
+        "template_gallery": "Template Gallery",
+        "close": "Close"
     }
 }
