@@ -69,10 +69,13 @@ return [
     'status_settings' => '狀態頁面設定',
     'economy_settings' => '經濟系統設定',
     'announcements_help' => '管理全站顯示的系統公告橫幅。',
+    'trash_settings' => '回收系統設定',
+    'trash_help' => '管理全域檔案回收與自動清理機制。',
     'sidebar' => [
         'better_pterodactyl' => 'Better Pterodactyl',
         'discord_login' => 'Discord 登入',
         'plugins' => '插件管理',
+        'trash_system' => '回收系統',
         'updates' => '版本更新',
         'basic_administration' => '基礎管理',
         'management' => '管理',

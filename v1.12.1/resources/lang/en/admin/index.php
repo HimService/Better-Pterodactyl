@@ -69,10 +69,13 @@ return [
     'status_settings' => 'Status Page Settings',
     'economy_settings' => 'Economy System Settings',
     'announcements_help' => 'Manage global panel announcements.',
+    'trash_settings' => 'Recycle System Settings',
+    'trash_help' => 'Manage global file restoration and auto-cleanup policies.',
     'sidebar' => [
         'better_pterodactyl' => 'Better Pterodactyl',
         'discord_login' => 'Discord Login',
         'plugins' => 'Plugin System',
+        'trash_system' => 'Recycle System',
         'basic_administration' => 'Basic Administration',
         'management' => 'Management',
         'service_management' => 'Service Management',

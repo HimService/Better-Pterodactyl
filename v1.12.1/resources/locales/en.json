@@ -135,6 +135,15 @@
         }
     },
     "server": {
+        "trash": {
+            "header": "Trash Can",
+            "quota_warning": "Files in the trash still count towards your server's disk quota.",
+            "files_count": "{{count}} items in trash",
+            "empty_button": "Empty Trash",
+            "empty_trash_message": "The trash is currently empty.",
+            "confirm_empty": "Are you sure you want to empty the trash? This action cannot be undone.",
+            "empty_success": "Trash emptied successfully."
+        },
         "files": {
             "header": "File Manager",
             "new_file": "New File",
@@ -1049,6 +1058,21 @@
                 "weekly_multiplier": "Weekly Multiplier (default 0.25)",
                 "monthly_multiplier": "Monthly Multiplier (default 1.0)"
             }
+        },
+        "trash": {
+            "header": "Recycle System",
+            "header_desc": "Configure file soft-deletion and automated cleanup policies.",
+            "overviewTitle": "Core Configuration",
+            "overviewDesc": "Enable/disable the trash system and set retention rules.",
+            "enable": "Enable Recycle System",
+            "enable_help": "Recommended. Files will be moved to hidden storage instead of immediate deletion.",
+            "retention": "Global Retention Period (Days)",
+            "retention_help": "Specifies how long files stay in the trash before being permanently purged by the system cron.",
+            "saving": "Saving Config...",
+            "save": "Update Settings",
+            "save_success": "Recycle System settings saved!",
+            "notice": "System Notice",
+            "notice_body": "Files in the recycle system still consume disk space under the user's allocated quota. Soft-deleted files are stored in .bp_trash at the server root."
         }
     },
     "economy": {
