@@ -12,19 +12,26 @@
 {
   "name": "插件名稱",
   "description": "功能描述",
-  "slot": "插槽位置 (sidebar | dashboard_header)",
-  "type": "類型 (iframe | custom_html)",
+  "slot": "sidebar",
+  "type": "custom_html",
   "config": {
+    "permissions": ["api:get", "storage"],
     "url": "如果是 iframe，輸入網址",
     "html": "如果是 custom_html，輸入 HTML 代碼",
-    "height": "高度 (例如 150px，僅用於 header)",
+    "height": "高度 (例如 150px)",
     "variables": {
-      "text_color": { "value": "#ffffff", "label": "文字顏色" },
-      "announcement": { "value": "歡迎來到面板！", "label": "公告內容" }
+      "text_color": { "value": "#ffffff", "label": "文字顏色" }
     }
   }
 }
 ```
+
+> [!IMPORTANT]
+> **權限系統 (Permissions)**: 為了安全性，插件必須在 `config.permissions` 中宣告需要的權限。未宣告的功能將無法調用。
+> - `api:get`: 允許調用 `BP.api.get`
+> - `api:post`: 允許調用 `BP.api.post`
+> - `storage`: 允許調用 `BP.storage` 及其子功能
+> - `*`: 允許所有權限 (不建議)
 
 ---
 
@@ -53,10 +60,15 @@
 
 ### B. Custom HTML 模式 (推薦)
 直接注入 HTML/CSS 到面板中。這讓你的小工具看起來像面板「原生的」。
-- **提示**: 你可以在 `<style>` 標籤中使用面板內建的 CSS 變數：
-  - `--brand-main`: 面板主題色（通常是紫色/藍色）。
-  - `--text-primary`: 主要文字顏色。
-  - `--bg-app`: 應用背景色。
+- **Shadow DOM 隔離**: 系統使用 Shadow DOM 包裹內容。
+  - **CSS 起點重置**: 系統對 `:host` 使用 `all: initial`，這意味著面板的所有全局樣式（包括字體大小、顏色、邊距）都被攔截。你的插件是一個「乾淨的盒子」。
+  - **樣式提取技術**: 為了防止 `DOMPurify` 誤刪複雜的 CSS 規則，系統會自動從 HTML 中提取所有 `<style>` 標籤並直接注入到 Shadow DOM 核心層。
+  - **根節點**: 在 JS 中，你可以透過 `root` 參數存取插件的 Shadow Root。
+- **HTML 清洗**: 系統內建 `DOMPurify` 自動過濾 XSS 代碼，但腳本 (`<script>`) 與樣式 (`<style>`) 塊會被獨立安全處理。
+- **提示**: 你可以在樣式中使用面板內建的常用變數（但需注意 `all: initial` 下，變數需要手動套用）：
+  - `--brand-main`: 面板主題色（紫色/藍色）。
+  - 文字顏色: 預設為 `#f8fafc`。
+  - 字體: 預設為 `Inter`, `system-ui`。
 
 ---
 
@@ -193,8 +205,81 @@ console.log(window.BP_VARIABLES.text_color);
 
 ---
 
-## 9. 最佳實踐建議
+## 10. 核心 SDK (Plugin SDK - `window.BP`)
 
-1. **命名空間**: 為了避免 JS 衝突，請務必將代碼包裹在 `(function(){ ... })()` 中，或使用不重複的函數名稱。
-2. **顏色引用**: 優先使用 `var(--brand-main)` 確保插件顏色會跟隨面板主題色（Theme）自動切換。
-3. **安全性**: 不要載入不受信任的原始碼，因為插件具備與當前登入用戶相同的權限。
+為了確保插件開發的標准化與安全性，系統向每個插件注入了 `BP` SDK。
+
+### A. 作用域隔離 (Scoped Injection)
+系統採用 **作用域隔離技術**。當腳本執行時，會自動傳入 `BP`, `BP_VARIABLES` 與 `root` 對象。
+- **BP**: 插件專屬的 SDK。
+- **BP_VARIABLES**: 插件變數。
+- **root**: 插件的 Shadow Root（可用於 `root.querySelector` 查找插件內的元素）。
+
+```javascript
+/* 推薦的腳本格式 */
+(function(BP, BP_VARIABLES, root) {
+    // 使用 root 而非 document 以確保準確性
+    const btn = root.querySelector('#my-btn');
+    BP.notify('success', '插件已就緒');
+})(BP, BP_VARIABLES, root);
+```
+
+### B. UI 通知功能 (Notifications)
+調用面板內建的 SweetAlert2 樣式，提供統一的使用者體驗。
+```javascript
+// 語法: BP.notify(type, message)
+// type: 'success' | 'error' | 'warning' | 'info'
+BP.notify('success', '設定已儲存');
+```
+
+### C. 認證化 API 工具 (Authenticated API)
+SDK 自動處理 **CSRF Token** 與 **認證 Header**，您可以直接進行跨域請求。
+```javascript
+// 所有 API 請求均返回 Promise
+BP.api.get('/api/client/account').then(user => {
+    console.log('當前用戶:', user.attributes.username);
+});
+
+BP.api.post('/api/client/servers/xxxx/power', { action: 'start' });
+```
+
+### D. 持久化存儲 (Storage API)
+數據儲存在伺服器端的 SQLite 資料庫中，具備極高的穩定性。
+- **生命週期**：數據與插件繫結。若插件被卸載，對應數據將**永久刪除**。
+
+```javascript
+// 寫入數據 (僅支援字串)
+await BP.storage.set('user_preference', 'dark_mode');
+
+// 讀取數據
+const pref = await BP.storage.get('user_preference');
+
+// 刪除數據
+await BP.storage.delete('user_preference');
+```
+
+---
+
+## 11. 技術架構與數據存儲
+
+### A. 數據庫架構 (Database Schema)
+Better Pterodactyl 使用 SQLite 作為插件系統的後端存儲，文件路徑位於：
+`resources/settings/plugins/plugins.sqlite`
+
+主要包含兩張數據表：
+1.  **`plugins`**: 儲存插件定義、HTML 源碼與變數配置。
+2.  **`plugin_storage`**: 儲存透過 `BP.storage` 寫入的 Key-Value 鍵值對。
+
+### B. 安全與隔離機制
+- **Shadow DOM (v22 修復)**：每個 `custom_html` 插件都運行在獨立的 Shadow DOM 中。我們使用了 `all: initial` 徹底切斷了面板風格的污染。
+- **樣式/腳本預處理**：由於 `DOMPurify` 有時會意外破壞 CSS 選擇器或 JS 邏輯，系統在「洗滌」之前會先行「提取」所有的 `<style>` 與 `<script>`。這保證了複雜的 CSS 框架（如微型 Tailwind 或自定義動畫）能完美運行。
+- **權限控制**：SDK 功能受到 `permissions` 宣告的限制。若未授權，調用 `BP.api` 或 `BP.storage` 將在控制台報錯並被攔截。
+
+---
+
+## 12. 最佳實踐與開發建議
+
+1.  **異常處理**：在呼叫 `BP.api` 或 `BP.storage` 時，務必使用 `try-catch` 或 `.catch()` 以確保插件在網路波動時不會崩潰。
+2.  **效能優化**：避免在插件腳本中使用高頻率的操作（如 `setInterval` 進行頻繁 API 請求），以免增加伺服器負擔。
+3.  **主題適配**：優先使用 CSS 變數（如 `var(--brand-main)`），這能確保您的插件在用戶切換暗色/亮色模式時依然保持美觀。
+4.  **腳本載入**：若需要載入外部 JS 庫（如 Chart.js），請在 `config` 的 `scripts` 陣列中定義，系統會保證載入順序。

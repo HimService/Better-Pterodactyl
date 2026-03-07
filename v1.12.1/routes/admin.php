@@ -392,6 +392,42 @@ Route::post('/plugins/delete', function (\Illuminate\Http\Request $request) {
     return response()->json(['success' => true]);
 });
 
+Route::get('/plugins/storage', function (\Illuminate\Http\Request $request) {
+    if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+    }
+    $pluginId = $request->query('id');
+    if (!$pluginId) return response()->json(['error' => 'Missing plugin ID'], 400);
+    return response()->json(\BetterPterodactyl\Plugins\DB::getStorage($pluginId));
+});
+
+Route::post('/plugins/storage', function (\Illuminate\Http\Request $request) {
+    if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+    }
+    $pluginId = $request->input('id');
+    $key = $request->input('key');
+    $value = $request->input('value');
+    
+    if (!$pluginId || !$key) return response()->json(['error' => 'Missing required fields'], 400);
+    
+    \BetterPterodactyl\Plugins\DB::setStorage($pluginId, $key, $value);
+    return response()->json(['success' => true]);
+});
+
+Route::post('/plugins/storage/delete', function (\Illuminate\Http\Request $request) {
+    if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+    }
+    $pluginId = $request->input('id');
+    $key = $request->input('key');
+    
+    if (!$pluginId || !$key) return response()->json(['error' => 'Missing required fields'], 400);
+    
+    \BetterPterodactyl\Plugins\DB::deleteStorage($pluginId, $key);
+    return response()->json(['success' => true]);
+});
+
 Route::get('/update/check', function () {
     $localVersionPath = base_path('resources/settings/version.json');
     $localId = 0;

@@ -8,7 +8,15 @@ import styled from 'styled-components';
 import { NotFound } from '@/components/elements/ScreenBlock';
 
 const PageContainer = styled.div`
-    padding: 1rem 0;
+    min-height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+
+    & > div {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 `;
 
 interface Plugin {
@@ -49,7 +57,7 @@ const PluginPageContainer = () => {
 
     return (
         <PageContainer>
-            <div className="px-4 md:px-10">
+            <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}>
                 <PluginHTML
                     html={targetPlugin.config.html}
                     variables={targetPlugin.config.variables}

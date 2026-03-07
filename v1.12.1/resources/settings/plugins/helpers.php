@@ -45,6 +45,16 @@ class DB {
                     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )");
 
+                self::$instance->exec("CREATE TABLE IF NOT EXISTS plugin_storage (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    plugin_id INTEGER NOT NULL,
+                    key TEXT NOT NULL,
+                    value TEXT,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (plugin_id) REFERENCES plugins (id) ON DELETE CASCADE
+                )");
+                self::$instance->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_plugin_storage_key ON plugin_storage (plugin_id, key)");
+
             } catch (\PDOException $e) {
                 throw new \Exception("SQLite Connection Error: " . $e->getMessage());
             }
@@ -102,8 +112,32 @@ class DB {
 
     public static function deletePlugin($id) {
         $db = self::getConnection();
+        // Clear storage first (manual cascade for SQLite if pragma not enabled)
+        $stmt = $db->prepare("DELETE FROM plugin_storage WHERE plugin_id = ?");
+        $stmt->execute([$id]);
+        
         $stmt = $db->prepare("DELETE FROM plugins WHERE id = ?");
         $stmt->execute([$id]);
+    }
+
+    public static function getStorage($pluginId) {
+        $db = self::getConnection();
+        $stmt = $db->prepare("SELECT key, value FROM plugin_storage WHERE plugin_id = ?");
+        $stmt->execute([$pluginId]);
+        return $stmt->fetchAll();
+    }
+
+    public static function setStorage($pluginId, $key, $value) {
+        $db = self::getConnection();
+        $stmt = $db->prepare("INSERT INTO plugin_storage (plugin_id, key, value) VALUES (?, ?, ?) 
+            ON CONFLICT(plugin_id, key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP");
+        $stmt->execute([$pluginId, $key, $value]);
+    }
+
+    public static function deleteStorage($pluginId, $key) {
+        $db = self::getConnection();
+        $stmt = $db->prepare("DELETE FROM plugin_storage WHERE plugin_id = ? AND key = ?");
+        $stmt->execute([$pluginId, $key]);
     }
 
     public static function togglePlugin($id, $enabled) {
