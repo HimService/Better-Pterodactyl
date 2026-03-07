@@ -48,12 +48,14 @@ class DB {
                 self::$instance->exec("CREATE TABLE IF NOT EXISTS plugin_storage (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     plugin_id INTEGER NOT NULL,
+                    user_id INTEGER DEFAULT 0,
                     key TEXT NOT NULL,
                     value TEXT,
                     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (plugin_id) REFERENCES plugins (id) ON DELETE CASCADE
                 )");
-                self::$instance->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_plugin_storage_key ON plugin_storage (plugin_id, key)");
+                self::$instance->exec("DROP INDEX IF EXISTS idx_plugin_storage_key");
+                self::$instance->exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_plugin_storage_key_user ON plugin_storage (plugin_id, user_id, key)");
 
             } catch (\PDOException $e) {
                 throw new \Exception("SQLite Connection Error: " . $e->getMessage());
@@ -120,24 +122,24 @@ class DB {
         $stmt->execute([$id]);
     }
 
-    public static function getStorage($pluginId) {
+    public static function getStorage($pluginId, $userId = 0) {
         $db = self::getConnection();
-        $stmt = $db->prepare("SELECT key, value FROM plugin_storage WHERE plugin_id = ?");
-        $stmt->execute([$pluginId]);
+        $stmt = $db->prepare("SELECT key, value FROM plugin_storage WHERE plugin_id = ? AND user_id = ?");
+        $stmt->execute([$pluginId, $userId]);
         return $stmt->fetchAll();
     }
 
-    public static function setStorage($pluginId, $key, $value) {
+    public static function setStorage($pluginId, $key, $value, $userId = 0) {
         $db = self::getConnection();
-        $stmt = $db->prepare("INSERT INTO plugin_storage (plugin_id, key, value) VALUES (?, ?, ?) 
-            ON CONFLICT(plugin_id, key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP");
-        $stmt->execute([$pluginId, $key, $value]);
+        $stmt = $db->prepare("INSERT INTO plugin_storage (plugin_id, user_id, key, value) VALUES (?, ?, ?, ?) 
+            ON CONFLICT(plugin_id, user_id, key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP");
+        $stmt->execute([$pluginId, $userId, $key, $value]);
     }
 
-    public static function deleteStorage($pluginId, $key) {
+    public static function deleteStorage($pluginId, $key, $userId = 0) {
         $db = self::getConnection();
-        $stmt = $db->prepare("DELETE FROM plugin_storage WHERE plugin_id = ? AND key = ?");
-        $stmt->execute([$pluginId, $key]);
+        $stmt = $db->prepare("DELETE FROM plugin_storage WHERE plugin_id = ? AND user_id = ? AND key = ?");
+        $stmt->execute([$pluginId, $userId, $key]);
     }
 
     public static function togglePlugin($id, $enabled) {

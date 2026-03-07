@@ -201,6 +201,45 @@ const Badge = styled.span`
     border: 1px solid rgba(139, 92, 246, 0.3);
 `;
 
+const LogViewer = styled.div`
+    background: rgba(17, 24, 39, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.85rem;
+    max-height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 3px; }
+`;
+
+const LogEntryLine = styled.div<{ $level: string }>`
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background: ${props =>
+        props.$level === 'error' ? 'rgba(239, 68, 68, 0.1)' :
+            props.$level === 'warn' ? 'rgba(245, 158, 11, 0.1)' : 'transparent'
+    };
+    color: ${props =>
+        props.$level === 'error' ? '#f87171' :
+            props.$level === 'warn' ? '#fbbf24' : '#9ca3af'
+    };
+`;
+
+interface LogEntry {
+    pluginId: string;
+    timestamp: string;
+    level: 'info' | 'warn' | 'error';
+    message: string;
+}
+
 interface Plugin {
     id: number;
     name: string;
@@ -221,6 +260,7 @@ const PluginManager = () => {
     const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
     const [configVariables, setConfigVariables] = useState<Record<string, any>>({});
     const [showGallery, setShowGallery] = useState(false);
+    const [logs, setLogs] = useState<LogEntry[]>((window as any).__BP_LOGS || []);
 
     const refreshPlugins = useCallback(async () => {
         setLoading(true);
@@ -233,6 +273,14 @@ const PluginManager = () => {
         } finally {
             setLoading(false);
         }
+    }, []);
+
+    useEffect(() => {
+        const handleLog = (e: any) => {
+            setLogs(prev => [...prev, e.detail].slice(-100)); // Keep last 100
+        };
+        window.addEventListener('bp-log', handleLog);
+        return () => window.removeEventListener('bp-log', handleLog);
     }, []);
 
     useEffect(() => {
@@ -446,6 +494,35 @@ const PluginManager = () => {
                 </div>
             </GlassCard>
 
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', paddingLeft: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <FontAwesomeIcon icon={faMagic} style={{ color: '#8b5cf6' }} />
+                    <h3 style={{ color: 'white', fontSize: '1.5rem', fontWeight: 800 }}>{t('plugins.developer_console')}</h3>
+                </div>
+                <PremiumButton
+                    onClick={() => { setLogs([]); (window as any).__BP_LOGS = []; }}
+                    style={{ padding: '0.5rem 1rem', fontSize: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444' }}
+                >
+                    <FontAwesomeIcon icon={faTrash} />
+                    {t('plugins.clear_logs')}
+                </PremiumButton>
+            </div>
+
+            <LogViewer style={{ marginBottom: '3rem' }}>
+                {logs.length === 0 ? (
+                    <div style={{ color: '#4b5563', textAlign: 'center', padding: '2rem' }}>{t('plugins.no_logs')}</div>
+                ) : (
+                    logs.map((log, i) => (
+                        <LogEntryLine key={i} $level={log.level}>
+                            <span style={{ color: '#6366f1', minWidth: '150px' }}>[{new Date(log.timestamp).toLocaleTimeString()}]</span>
+                            <Badge style={{ minWidth: '80px', textAlign: 'center' }}>ID: {log.pluginId}</Badge>
+                            <span style={{ fontWeight: 700, minWidth: '50px', textTransform: 'uppercase' }}>{log.level}:</span>
+                            <span style={{ flex: 1 }}>{log.message}</span>
+                        </LogEntryLine>
+                    ))
+                )}
+            </LogViewer>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem', paddingLeft: '0.5rem' }}>
                 <FontAwesomeIcon icon={faCogs} style={{ color: '#8b5cf6' }} />
                 <h3 style={{ color: 'white', fontSize: '1.5rem', fontWeight: 800 }}>{t('plugins.active_library')}</h3>
@@ -496,6 +573,20 @@ const PluginManager = () => {
                                     />
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <PremiumButton
+                                        onClick={() => {
+                                            const blob = new Blob([plugin.config], { type: 'application/json' });
+                                            const url = URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = `${plugin.name.replace(/\s+/g, '_')}.json`;
+                                            a.click();
+                                        }}
+                                        style={{ padding: '0.6rem', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', color: '#3b82f6' }}
+                                        title={t('plugins.export')}
+                                    >
+                                        <FontAwesomeIcon icon={faCloudUploadAlt} />
+                                    </PremiumButton>
                                     <PremiumButton onClick={() => openSettings(plugin)} style={{ padding: '0.6rem', background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.2)', color: '#8b5cf6' }}>
                                         <FontAwesomeIcon icon={faCog} />
                                     </PremiumButton>
@@ -584,7 +675,7 @@ const PluginManager = () => {
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
                         {TEMPLATES.map((tpl) => (
-                            <div 
+                            <div
                                 key={tpl.name}
                                 onClick={() => {
                                     setJsonInput(JSON.stringify(tpl.json, null, 2));
@@ -617,7 +708,7 @@ const PluginManager = () => {
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                         <PremiumButton 
+                        <PremiumButton
                             onClick={() => setShowGallery(false)}
                             style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#9ca3af' }}
                         >

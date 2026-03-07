@@ -350,10 +350,18 @@ Route::post('/plugins/install', function (\Illuminate\Http\Request $request) {
         $payload = $payload['plugin'];
     }
 
+    // Basic Manifest Validation
+    $required = ['name', 'slot', 'type'];
+    foreach ($required as $field) {
+        if (empty($payload[$field])) {
+            return response()->json(['error' => "Missing required field: {$field}"], 400);
+        }
+    }
+
     $data = [
-        'name' => $payload['name'] ?? 'Unknown Plugin',
-        'slot' => $payload['slot'] ?? 'dashboard_header',
-        'type' => $payload['type'] ?? 'iframe',
+        'name' => $payload['name'],
+        'slot' => $payload['slot'],
+        'type' => $payload['type'],
         'description' => $payload['description'] ?? '',
         'config' => $payload['config'] ?? $payload, // Fallback to entire payload if no config key
         'enabled' => (bool) ($payload['enabled'] ?? true),

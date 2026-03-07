@@ -19,18 +19,11 @@ const PageContainer = styled.div`
     }
 `;
 
-interface Plugin {
-    id: number;
-    name: string;
-    type: string;
-    config: any;
-}
+import { usePlugins, Plugin } from '@/plugins/usePlugins';
 
 const PluginPageContainer = () => {
     const { slug } = useParams<{ slug: string }>();
-    const { data, error } = useSWR<Record<string, Plugin[]>>('/api/client/plugins', (url) =>
-        http.get(url).then((res) => res.data)
-    );
+    const { data, error } = usePlugins();
 
     const [targetPlugin, setTargetPlugin] = useState<Plugin | null>(null);
     const [searching, setSearching] = useState(true);
@@ -39,8 +32,8 @@ const PluginPageContainer = () => {
         if (data) {
             let found = false;
             // Iterate through all slots to find a plugin with matching route config
-            Object.values(data).forEach(slotPlugins => {
-                slotPlugins.forEach(plugin => {
+            Object.values(data).forEach((slotPlugins: Plugin[]) => {
+                slotPlugins.forEach((plugin: Plugin) => {
                     if (plugin.config && plugin.config.route === slug) {
                         setTargetPlugin(plugin);
                         found = true;
@@ -62,6 +55,7 @@ const PluginPageContainer = () => {
                     html={targetPlugin.config.html}
                     variables={targetPlugin.config.variables}
                     pluginId={targetPlugin.id}
+                    permissions={targetPlugin.config.permissions || []}
                 />
             </div>
         </PageContainer>

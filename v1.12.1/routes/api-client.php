@@ -26,6 +26,49 @@ use Illuminate\Http\Request;
 Route::get('/', [Client\ClientController::class, 'index'])->name('api:client.index');
 Route::get('/permissions', [Client\ClientController::class, 'permissions']);
 
+// Plugin storage routes for clients
+Route::group(['prefix' => '/plugins'], function () {
+    Route::get('/storage', function (\Illuminate\Http\Request $request) {
+        if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+            require_once base_path('resources/settings/plugins/helpers.php');
+        }
+        $pluginId = $request->query('id');
+        if (!$pluginId) return response()->json(['error' => 'Missing plugin ID'], 400);
+        
+        // Scope by user_id
+        return response()->json(\BetterPterodactyl\Plugins\DB::getStorage($pluginId, $request->user()->id));
+    });
+
+    Route::post('/storage', function (\Illuminate\Http\Request $request) {
+        if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+            require_once base_path('resources/settings/plugins/helpers.php');
+        }
+        $pluginId = $request->input('id');
+        $key = $request->input('key');
+        $value = $request->input('value');
+        
+        if (!$pluginId || !$key) return response()->json(['error' => 'Missing required fields'], 400);
+        
+        // Scope by user_id
+        \BetterPterodactyl\Plugins\DB::setStorage($pluginId, $key, $value, $request->user()->id);
+        return response()->json(['success' => true]);
+    });
+
+    Route::post('/storage/delete', function (\Illuminate\Http\Request $request) {
+        if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+            require_once base_path('resources/settings/plugins/helpers.php');
+        }
+        $pluginId = $request->input('id');
+        $key = $request->input('key');
+        
+        if (!$pluginId || !$key) return response()->json(['error' => 'Missing required fields'], 400);
+        
+        // Scope by user_id
+        \BetterPterodactyl\Plugins\DB::deleteStorage($pluginId, $key, $request->user()->id);
+        return response()->json(['success' => true]);
+    });
+});
+
 /*
 |--------------------------------------------------------------------------
 | Zero-Config Automated Billing Cron

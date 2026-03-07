@@ -142,7 +142,17 @@ export const PluginHTML = ({ html, variables = {}, pluginId, permissions = [] }:
                 })
                 : remainingHtml;
 
-            // 3. Set content in Shadow DOM with robust reset
+            // 3. Set content in Shadow DOM with robust reset & style inheritance
+            const themeVars = [
+                '--brand-main', '--brand-main-rgb',
+                '--brand-secondary', '--brand-secondary-rgb',
+                '--text-main', '--text-secondary',
+                '--bg-main', '--bg-secondary',
+            ];
+            const inheritedStyles = themeVars
+                .map(v => `${v}: ${getComputedStyle(document.documentElement).getPropertyValue(v)};`)
+                .join(' ');
+
             shadowRef.current.innerHTML = `
                 <style>
                     :host { 
@@ -153,9 +163,11 @@ export const PluginHTML = ({ html, variables = {}, pluginId, permissions = [] }:
                         height: 100%; 
                         min-height: 0;
                         position: relative;
+                        /* Inherited Theme Variables */
+                        ${inheritedStyles}
                         /* Baseline environment */
-                        color: #f8fafc;
-                        font-family: 'Inter', system-ui, sans-serif;
+                        color: var(--text-main, #f8fafc);
+                        font-family: var(--font-family-main, 'Inter', system-ui, sans-serif);
                         font-size: 16px;
                         line-height: 1.5;
                         -webkit-font-smoothing: antialiased;
@@ -199,7 +211,31 @@ export const PluginHTML = ({ html, variables = {}, pluginId, permissions = [] }:
                     });
             };
 
+            const eventListeners: { event: string, handler: any }[] = [];
+
             const bp = {
+                // Event System (SDK v1.1)
+                on: (event: string, callback: (data: any) => void) => {
+                    const handler = (e: any) => callback(e.detail);
+                    window.addEventListener(`bp-event:${event}`, handler);
+                    eventListeners.push({ event, handler });
+                },
+                emit: (event: string, data: any) => {
+                    window.dispatchEvent(new CustomEvent(`bp-event:${event}`, { detail: data }));
+                },
+                log: (level: 'info' | 'warn' | 'error', ...args: any[]) => {
+                    const logEntry = {
+                        pluginId,
+                        timestamp: new Date().toISOString(),
+                        level,
+                        message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ')
+                    };
+                    (window as any).__BP_LOGS = (window as any).__BP_LOGS || [];
+                    (window as any).__BP_LOGS.push(logEntry);
+                    console[level](`[Plugin ${pluginId}]`, ...args);
+                    // Emit event so other plugins or admin panel can listen
+                    window.dispatchEvent(new CustomEvent('bp-log', { detail: logEntry }));
+                },
                 notify: (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
                     (window as any).Swal.fire({
                         icon: type,
@@ -210,6 +246,24 @@ export const PluginHTML = ({ html, variables = {}, pluginId, permissions = [] }:
                         timer: 3000,
                         timerProgressBar: true,
                     });
+                },
+                ui: {
+                    modal: (options: any) => (window as any).Swal.fire({
+                        background: 'rgba(23, 23, 23, 0.95)',
+                        color: '#fff',
+                        confirmButtonColor: '#8b5cf6',
+                        ...options
+                    }),
+                    confirm: (title: string, text: string) => (window as any).Swal.fire({
+                        title,
+                        text,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#8b5cf6',
+                        cancelButtonColor: '#4b5563',
+                        background: 'rgba(23, 23, 23, 0.95)',
+                        color: '#fff',
+                    })
                 },
                 api: {
                     get: (url: string) => {
@@ -230,21 +284,21 @@ export const PluginHTML = ({ html, variables = {}, pluginId, permissions = [] }:
                 storage: {
                     get: (key: string) => {
                         if (!hasPermission('storage')) return Promise.reject('Permission denied');
-                        return fetchWithJSON(`/admin/plugins/storage?id=${pluginId}`).then(data => {
+                        return fetchWithJSON(`/api/client/plugins/storage?id=${pluginId}`).then(data => {
                             const item = Array.isArray(data) ? data.find((i: any) => i.key === key) : null;
                             return item ? item.value : null;
                         });
                     },
                     set: (key: string, value: string) => {
                         if (!hasPermission('storage')) return Promise.reject('Permission denied');
-                        return fetchWithJSON('/admin/plugins/storage', {
+                        return fetchWithJSON('/api/client/plugins/storage', {
                             method: 'POST',
                             body: JSON.stringify({ id: pluginId, key, value })
                         });
                     },
                     delete: (key: string) => {
                         if (!hasPermission('storage')) return Promise.reject('Permission denied');
-                        return fetchWithJSON('/admin/plugins/storage/delete', {
+                        return fetchWithJSON('/api/client/plugins/storage/delete', {
                             method: 'POST',
                             body: JSON.stringify({ id: pluginId, key })
                         });
@@ -252,7 +306,27 @@ export const PluginHTML = ({ html, variables = {}, pluginId, permissions = [] }:
                 }
             };
 
-            // 5. Inject variables
+            // 5. Iframe Bridge (SDK v1.1)
+            const handleIframeMessage = async (event: MessageEvent) => {
+                if (!event.data || event.data.source !== 'bp-sdk' || event.data.pluginId !== pluginId) return;
+                const { action, payload, requestId } = event.data;
+                let result: any;
+                let error: string | null = null;
+                try {
+                    if (action === 'notify') bp.notify(payload.type, payload.message);
+                    else if (action === 'log') bp.log(payload.level, payload.message);
+                    else if (action === 'storage:get') result = await bp.storage.get(payload.key);
+                    else if (action === 'storage:set') await bp.storage.set(payload.key, payload.value);
+                    else if (action === 'storage:delete') await bp.storage.delete(payload.key);
+                    else if (action === 'ui:modal') bp.ui.modal(payload);
+                } catch (e: any) { error = e.message; }
+                if (requestId && event.source) {
+                    (event.source as Window).postMessage({ source: 'bp-sdk-response', requestId, result, error }, event.origin as any);
+                }
+            };
+            window.addEventListener('message', handleIframeMessage);
+
+            // 6. Inject variables
             const bpVariables: Record<string, any> = {};
             Object.entries(variables).forEach(([key, data]: [string, any]) => {
                 bpVariables[key] = data.value;
@@ -286,7 +360,18 @@ export const PluginHTML = ({ html, variables = {}, pluginId, permissions = [] }:
                     (window as any).onPluginLoaded(bpVariables);
                 }
             });
-            return () => cancelAnimationFrame(handle);
+
+            return () => {
+                cancelAnimationFrame(handle);
+                // Cleanup Event Listeners (SDK v1.1)
+                window.removeEventListener('message', handleIframeMessage);
+                eventListeners.forEach(({ event, handler }) => {
+                    window.removeEventListener(`bp-event:${event}`, handler);
+                });
+                if (typeof (window as any).onPluginUnmount === 'function') {
+                    (window as any).onPluginUnmount();
+                }
+            };
         };
 
         const handle = requestAnimationFrame(() => executeScripts());
@@ -302,21 +387,14 @@ export const PluginHTML = ({ html, variables = {}, pluginId, permissions = [] }:
     );
 };
 
-interface Plugin {
-    id: number;
-    name: string;
-    type: string;
-    config: any;
-}
+import { usePlugins, Plugin } from '@/plugins/usePlugins';
 
 interface Props {
     id: string;
 }
 
 const PluginSlot = ({ id }: Props) => {
-    const { data, error } = useSWR<Record<string, Plugin[]>>('/api/client/plugins', (url) =>
-        http.get(url).then((res) => res.data)
-    );
+    const { data, error } = usePlugins();
 
     if (error || !data || !data[id]) {
         return null;
