@@ -10,8 +10,10 @@ import {
     faLevelUpAlt,
     faPencilAlt,
     faTrashAlt,
+    faReply,
     IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
+import restoreFiles from '@/api/server/files/restoreFiles';
 import RenameFileModal from '@/components/server/files/RenameFileModal';
 import { ServerContext } from '@/state/server';
 import { join } from 'pathe';
@@ -21,6 +23,7 @@ import copyFile from '@/api/server/files/copyFile';
 import Can from '@/components/elements/Can';
 import getFileDownloadUrl from '@/api/server/files/getFileDownloadUrl';
 import useFlash from '@/plugins/useFlash';
+import { useStoreState } from '@/state/hooks';
 import tw from 'twin.macro';
 import { FileObject } from '@/api/server/files/loadDirectory';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
@@ -61,6 +64,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
     const [showSpinner, setShowSpinner] = useState(false);
     const [modal, setModal] = useState<ModalType | null>(null);
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const trashEnabled = useStoreState((state) => state.user.data?.trashEnabled || false);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { mutate } = useFileManagerSwr();
@@ -91,6 +95,16 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
         clearFlashes('files');
 
         copyFile(uuid, join(directory, file.name))
+            .then(() => mutate())
+            .catch((error) => clearAndAddHttpError({ key: 'files', error }))
+            .then(() => setShowSpinner(false));
+    };
+
+    const doRestore = () => {
+        setShowSpinner(true);
+        clearFlashes('files');
+
+        restoreFiles(uuid, [file.name])
             .then(() => mutate())
             .catch((error) => clearAndAddHttpError({ key: 'files', error }))
             .then(() => setShowSpinner(false));
@@ -138,8 +152,18 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                 confirm={t('global.delete', 'Delete')}
                 onConfirmed={doDeletion}
             >
-                {t('server.files.delete_confirm_prefix', 'You will not be able to recover the contents of')}&nbsp;
-                <span className={'font-semibold text-neutral-900 dark:text-gray-50'}>{file.name}</span> {t('server.files.delete_confirm_suffix', 'once deleted.')}.
+                {trashEnabled ? (
+                    <>
+                        {t('server.files.delete_confirm_prefix', 'You will not be able to recover the contents of')}&nbsp;
+                        <span className={'font-semibold text-neutral-900 dark:text-gray-50'}>{file.name}</span>{' '}
+                        {t('server.files.delete_confirm_suffix', 'once deleted.')}.
+                    </>
+                ) : (
+                    <>
+                        {t('server.files.delete_permanent', 'This will permanently delete')}&nbsp;
+                        <span className={'font-semibold text-neutral-900 dark:text-gray-50'}>{file.name}</span>.
+                    </>
+                )}
             </Dialog.Confirm>
             <DropdownMenu
                 ref={onClickRef}
@@ -168,29 +192,64 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                     </div>
                 )}
             >
-                <Can action={'file.update'}>
-                    <Row onClick={() => setModal('rename')} icon={faPencilAlt} title={t('server.files.rename', 'Rename')} />
-                    <Row onClick={() => setModal('move')} icon={faLevelUpAlt} title={t('server.files.move', 'Move')} />
-                    <Row onClick={() => setModal('chmod')} icon={faFileCode} title={t('server.files.permissions', 'Permissions')} />
-                </Can>
-                {file.isFile && (
-                    <Can action={'file.create'}>
-                        <Row onClick={doCopy} icon={faCopy} title={t('server.files.copy', 'Copy')} />
-                    </Can>
-                )}
-                {file.isArchiveType() ? (
-                    <Can action={'file.create'}>
-                        <Row onClick={doUnarchive} icon={faBoxOpen} title={t('server.files.unarchive', 'Unarchive')} />
+                {directory === '.bp_trash' || directory === '/.bp_trash' ? (
+                    <Can action={'file.update'}>
+                        <Row onClick={doRestore} icon={faReply} title={t('server.files.restore', 'Restore')} />
                     </Can>
                 ) : (
-                    <Can action={'file.archive'}>
-                        <Row onClick={doArchive} icon={faFileArchive} title={t('server.files.archive', 'Archive')} />
-                    </Can>
+                    <>
+                        <Can action={'file.update'}>
+                            <Row
+                                onClick={() => setModal('rename')}
+                                icon={faPencilAlt}
+                                title={t('server.files.rename', 'Rename')}
+                            />
+                            <Row
+                                onClick={() => setModal('move')}
+                                icon={faLevelUpAlt}
+                                title={t('server.files.move', 'Move')}
+                            />
+                            <Row
+                                onClick={() => setModal('chmod')}
+                                icon={faFileCode}
+                                title={t('server.files.permissions', 'Permissions')}
+                            />
+                        </Can>
+                        {file.isFile && (
+                            <Can action={'file.create'}>
+                                <Row onClick={doCopy} icon={faCopy} title={t('server.files.copy', 'Copy')} />
+                            </Can>
+                        )}
+                        {file.isArchiveType() ? (
+                            <Can action={'file.create'}>
+                                <Row
+                                    onClick={doUnarchive}
+                                    icon={faBoxOpen}
+                                    title={t('server.files.unarchive', 'Unarchive')}
+                                />
+                            </Can>
+                        ) : (
+                            <Can action={'file.archive'}>
+                                <Row onClick={doArchive} icon={faFileArchive} title={t('server.files.archive', 'Archive')} />
+                            </Can>
+                        )}
+                        {file.isFile && (
+                            <Row
+                                onClick={doDownload}
+                                icon={faFileDownload}
+                                title={t('server.files.download', 'Download')}
+                            />
+                        )}
+                        <Can action={'file.delete'}>
+                            <Row
+                                onClick={() => setShowConfirmation(true)}
+                                icon={faTrashAlt}
+                                title={t('global.delete', 'Delete')}
+                                $danger
+                            />
+                        </Can>
+                    </>
                 )}
-                {file.isFile && <Row onClick={doDownload} icon={faFileDownload} title={t('server.files.download', 'Download')} />}
-                <Can action={'file.delete'}>
-                    <Row onClick={() => setShowConfirmation(true)} icon={faTrashAlt} title={t('global.delete', 'Delete')} $danger />
-                </Can>
             </DropdownMenu>
         </>
     );

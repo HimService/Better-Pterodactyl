@@ -17,26 +17,31 @@ import FileManagerStatus from '@/components/server/files/FileManagerStatus';
 import MassActionsBar from '@/components/server/files/MassActionsBar';
 import UploadButton from '@/components/server/files/UploadButton';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
-import { useStoreActions } from '@/state/hooks';
+import { useStoreActions, useStoreState } from '@/state/hooks';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import { FileActionCheckbox } from '@/components/server/files/SelectFileCheckbox';
 import { hashToPath } from '@/helpers';
 import style from './style.module.css';
 import { useTranslation } from 'react-i18next';
-
-const sortFiles = (files: FileObject[]): FileObject[] => {
-    const sortedFiles: FileObject[] = files
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .sort((a, b) => (a.isFile === b.isFile ? 0 : a.isFile ? 1 : -1));
-    return sortedFiles.filter((file, index) => index === 0 || file.name !== sortedFiles[index - 1].name);
-};
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 export default () => {
     const { t } = useTranslation();
     const id = ServerContext.useStoreState((state) => state.server.data!.id);
+    const trashEnabled = useStoreState((state) => state.user.data?.trashEnabled || false);
     const { hash } = useLocation();
     const { data: files, error, mutate } = useFileManagerSwr();
     const directory = ServerContext.useStoreState((state) => state.files.directory);
+
+    const sortFiles = (files: FileObject[]): FileObject[] => {
+        const sortedFiles: FileObject[] = files
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .sort((a, b) => (a.isFile === b.isFile ? 0 : a.isFile ? 1 : -1));
+        return sortedFiles
+            .filter((file, index) => index === 0 || file.name !== sortedFiles[index - 1].name)
+            .filter((file) => directory === '/.bp_trash' || directory === '.bp_trash' || file.name !== '.bp_trash');
+    };
     const clearFlashes = useStoreActions((actions) => actions.flashes.clearFlashes);
     const setDirectory = ServerContext.useStoreActions((actions) => actions.files.setDirectory);
 
@@ -83,6 +88,13 @@ export default () => {
                             <NavLink to={`/server/${id}/files/new${window.location.hash}`}>
                                 <Button>{t('server.files.new_file', 'New File')}</Button>
                             </NavLink>
+                            {trashEnabled && (
+                                <NavLink to={`/server/${id}/files/trash`} css={tw`ml-2`}>
+                                    <Button color={'secondary'} isSecondary>
+                                        <FontAwesomeIcon icon={faTrashAlt} />
+                                    </Button>
+                                </NavLink>
+                            )}
                         </div>
                     </Can>
                 </div>

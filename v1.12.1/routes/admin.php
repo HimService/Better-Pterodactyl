@@ -11,6 +11,7 @@ Route::get('/status', [Admin\BaseController::class, 'index'])->name('admin.statu
 Route::get('/economy', [Admin\BaseController::class, 'index'])->name('admin.economy');
 Route::get('/discord', [Admin\BaseController::class, 'index'])->name('admin.discord');
 Route::get('/plugins', [Admin\BaseController::class, 'index'])->name('admin.plugins');
+Route::get('/trash', [Admin\BaseController::class, 'index'])->name('admin.trash');
 Route::get('/update', [Admin\BaseController::class, 'index'])->name('admin.update');
 Route::get('/discord/settings', function () {
     if (!class_exists('BetterPterodactyl\Discord\DB')) {
@@ -24,6 +25,20 @@ Route::post('/discord/settings', function (\Illuminate\Http\Request $request) {
     }
     $payload = $request->json()->all();
     \BetterPterodactyl\Discord\DB::updateSettings($payload);
+    return response()->json(['success' => true]);
+});
+Route::get('/trash/settings', function () {
+    if (!class_exists('BetterPterodactyl\Trash\DB')) {
+        require_once base_path('resources/settings/trash/helpers.php');
+    }
+    return response()->json(\BetterPterodactyl\Trash\DB::getSettings());
+});
+Route::post('/trash/settings', function (\Illuminate\Http\Request $request) {
+    if (!class_exists('BetterPterodactyl\Trash\DB')) {
+        require_once base_path('resources/settings/trash/helpers.php');
+    }
+    $payload = $request->json()->all();
+    \BetterPterodactyl\Trash\DB::updateSettings($payload);
     return response()->json(['success' => true]);
 });
 Route::get('/status/nodes', function () {
@@ -351,7 +366,7 @@ Route::post('/plugins/install', function (\Illuminate\Http\Request $request) {
     }
 
     // Basic Manifest Validation
-    $required = ['name', 'slot', 'type'];
+    $required = ['name', 'type'];
     foreach ($required as $field) {
         if (empty($payload[$field])) {
             return response()->json(['error' => "Missing required field: {$field}"], 400);
@@ -360,8 +375,8 @@ Route::post('/plugins/install', function (\Illuminate\Http\Request $request) {
 
     $data = [
         'name' => $payload['name'],
-        'slot' => $payload['slot'],
-        'type' => $payload['type'],
+        'slot' => $payload['slot'] ?? 'api',
+        'type' => $payload['type'] ?? 'custom_html',
         'description' => $payload['description'] ?? '',
         'config' => $payload['config'] ?? $payload, // Fallback to entire payload if no config key
         'enabled' => (bool) ($payload['enabled'] ?? true),

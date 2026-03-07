@@ -47,6 +47,9 @@
             @elseif(Route::is('admin.economy'))
                 @lang('admin/index.economy_settings')
                 <small>@lang('admin/index.subtitle')</small>
+            @elseif(Route::is('admin.trash'))
+                @lang('admin/index.trash_settings')
+                <small>@lang('admin/index.trash_help')</small>
             @else
                 @lang('admin/index.title')
                 <small>@lang('admin/index.subtitle')</small>

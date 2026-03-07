@@ -12,6 +12,7 @@ import RenameFileModal from '@/components/server/files/RenameFileModal';
 import Portal from '@/components/elements/Portal';
 import { Dialog } from '@/components/elements/dialog';
 import { useTranslation } from 'react-i18next';
+import restoreFiles from '@/api/server/files/restoreFiles';
 
 const MassActionsBar = () => {
     const { t } = useTranslation();
@@ -40,6 +41,20 @@ const MassActionsBar = () => {
         compressFiles(uuid, directory, selectedFiles)
             .then(() => mutate())
             .then(() => setSelectedFiles([]))
+            .catch((error) => clearAndAddHttpError({ key: 'files', error }))
+            .then(() => setLoading(false));
+    };
+
+    const onClickRestore = () => {
+        setLoading(true);
+        clearFlashes('files');
+        setLoadingMessage(t('server.files.restoring', 'Restoring files...'));
+
+        restoreFiles(uuid, selectedFiles)
+            .then(() => {
+                mutate();
+                setSelectedFiles([]);
+            })
             .catch((error) => clearAndAddHttpError({ key: 'files', error }))
             .then(() => setLoading(false));
     };
@@ -97,11 +112,17 @@ const MassActionsBar = () => {
                     <div className={'pointer-events-none fixed bottom-0 mb-6 flex justify-center w-full z-50'}>
                         <Fade timeout={75} in={selectedFiles.length > 0} unmountOnExit>
                             <div css={tw`flex items-center space-x-4 pointer-events-auto rounded p-4 bg-black/50`}>
-                                <Button onClick={() => setShowMove(true)}>{t('server.files.move', 'Move')}</Button>
-                                <Button onClick={onClickCompress}>{t('server.files.archive', 'Archive')}</Button>
-                                <Button.Danger variant={Button.Variants.Secondary} onClick={() => setShowConfirm(true)}>
-                                    {t('global.delete', 'Delete')}
-                                </Button.Danger>
+                                {directory === '.bp_trash' || directory === '/.bp_trash' ? (
+                                    <Button onClick={onClickRestore}>{t('server.files.restore', 'Restore')}</Button>
+                                ) : (
+                                    <>
+                                        <Button onClick={() => setShowMove(true)}>{t('server.files.move', 'Move')}</Button>
+                                        <Button onClick={onClickCompress}>{t('server.files.archive', 'Archive')}</Button>
+                                        <Button.Danger variant={Button.Variants.Secondary} onClick={() => setShowConfirm(true)}>
+                                            {t('global.delete', 'Delete')}
+                                        </Button.Danger>
+                                    </>
+                                )}
                             </div>
                         </Fade>
                     </div>

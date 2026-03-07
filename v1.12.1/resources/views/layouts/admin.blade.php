@@ -116,6 +116,11 @@
                                 <i class="fa fa-puzzle-piece"></i> <span>@lang('admin/index.sidebar.plugins')</span>
                             </a>
                         </li>
+                        <li class="{{ Route::is('admin.trash') ? 'active' : '' }}">
+                            <a href="{{ route('admin.trash') }}">
+                                <i class="fa fa-trash"></i> <span>@lang('admin/index.sidebar.trash_system')</span>
+                            </a>
+                        </li>
                         <li class="{{ Route::is('admin.update') ? 'active' : '' }}">
                             <a href="{{ route('admin.update') }}">
                                 <i class="fa fa-refresh"></i> <span>@lang('admin/index.sidebar.updates')</span>
@@ -212,7 +217,7 @@
             {!! Theme::js('js/admin/functions.js?t={cache-version}') !!}
             <script src="/js/autocomplete.js" type="application/javascript"></script>
             
-            @if(Route::currentRouteName() === 'admin.index' || Route::currentRouteName() === 'admin.announcements' || Route::currentRouteName() === 'admin.status' || Route::currentRouteName() === 'admin.economy' || Route::currentRouteName() === 'admin.discord' || Route::currentRouteName() === 'admin.plugins' || Route::currentRouteName() === 'admin.update')
+            @if(Route::currentRouteName() === 'admin.index' || Route::currentRouteName() === 'admin.announcements' || Route::currentRouteName() === 'admin.status' || Route::currentRouteName() === 'admin.economy' || Route::currentRouteName() === 'admin.discord' || Route::currentRouteName() === 'admin.plugins' || Route::currentRouteName() === 'admin.trash' || Route::currentRouteName() === 'admin.update')
                 <script>
                     @if(!is_null(Auth::user()))
                         window.PterodactylUser = {!! json_encode(Auth::user()->toVueObject()) !!};

@@ -17,6 +17,7 @@ import StatusManager from '@/components/admin/StatusManager';
 import EconomyManager from '@/components/admin/EconomyManager';
 import DiscordManager from '@/components/admin/DiscordManager';
 import PluginManager from '@/components/admin/PluginManager';
+import TrashManager from '@/components/admin/TrashManager';
 import UpdateManager from '@/components/admin/UpdateManager';
 import AnnouncementBanner from '@/components/elements/AnnouncementBanner';
 
@@ -37,6 +38,7 @@ if (adminRadarRoot) {
     const isEconomy = window.location.pathname.includes('/admin/economy');
     const isDiscord = window.location.pathname.includes('/admin/discord');
     const isPlugins = window.location.pathname.includes('/admin/plugins');
+    const isTrash = window.location.pathname.includes('/admin/trash');
     const isUpdate = window.location.pathname.includes('/admin/update');
 
     // @ts-ignore
@@ -45,7 +47,7 @@ if (adminRadarRoot) {
             <ThemeProvider>
                 <GlobalStylesheet />
                 <AnnouncementBanner />
-                {isAnnouncements ? <AnnouncementManager /> : (isStatus ? <StatusManager /> : (isEconomy ? <EconomyManager /> : (isDiscord ? <DiscordManager /> : (isPlugins ? <PluginManager /> : (isUpdate ? <UpdateManager /> : <AdminRadarWrapper />)))))}
+                {isAnnouncements ? <AnnouncementManager /> : (isStatus ? <StatusManager /> : (isEconomy ? <EconomyManager /> : (isDiscord ? <DiscordManager /> : (isPlugins ? <PluginManager /> : (isTrash ? <TrashManager /> : (isUpdate ? <UpdateManager /> : <AdminRadarWrapper />))))))}
             </ThemeProvider>
         </StoreProvider>,
         adminRadarRoot

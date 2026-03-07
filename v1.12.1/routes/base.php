@@ -309,3 +309,35 @@ Route::middleware(['web', 'throttle:60,1', \Illuminate\Routing\Middleware\Substi
 
 Route::get('/{react}', [Base\IndexController::class, 'index'])
     ->where('react', '^(?!(\/)?(api|auth|admin|daemon)).+');
+
+// Clean Plugin Extension Routes (Publicly Accessible)
+// These are placed in base.php to bypass the global api-client auth middleware
+Route::any('/api/client/extensions/{path}', function (\Illuminate\Http\Request $request, $path) {
+    if (!class_exists('BetterPterodactyl\Plugins\HookService')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+        require_once base_path('resources/settings/plugins/HookService.php');
+    }
+    $userId = $request->user() ? $request->user()->id : null;
+    return \BetterPterodactyl\Plugins\HookService::matchAndDispatch($path, $userId, $request->all());
+})->where('path', '.*')->withoutMiddleware([
+    'auth', 
+    'auth:api', 
+    \Illuminate\Auth\Middleware\Authenticate::class,
+    \Pterodactyl\Http\Middleware\RequireTwoFactorAuthentication::class,
+    \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+]);
+
+Route::any('/api/client/servers/{server}/extensions/{path}', function (\Illuminate\Http\Request $request, $server, $path) {
+    if (!class_exists('BetterPterodactyl\Plugins\HookService')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+        require_once base_path('resources/settings/plugins/HookService.php');
+    }
+    $userId = $request->user() ? $request->user()->id : null;
+    return \BetterPterodactyl\Plugins\HookService::matchAndDispatch($path, $userId, $request->all(), $server);
+})->where('path', '.*')->withoutMiddleware([
+    'auth', 
+    'auth:api', 
+    \Illuminate\Auth\Middleware\Authenticate::class,
+    \Pterodactyl\Http\Middleware\RequireTwoFactorAuthentication::class,
+    \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+]);
