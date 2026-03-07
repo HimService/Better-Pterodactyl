@@ -8,12 +8,20 @@ use Pterodactyl\Http\Middleware\Activity\AccountSubject;
 use Pterodactyl\Http\Middleware\RequireTwoFactorAuthentication;
 use Pterodactyl\Http\Middleware\Api\Client\Server\ResourceBelongsToServer;
 use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
+use Pterodactyl\Models\Server;
+use Pterodactyl\Repositories\Wings\DaemonFileRepository;
 
 if (!class_exists('BetterPterodactyl\Economy\DB')) {
     require_once base_path('resources/settings/economy/helpers.php');
 }
+if (!class_exists('BetterPterodactyl\Trash\DB')) {
+    require_once base_path('resources/settings/trash/helpers.php');
+}
 use BetterPterodactyl\Economy\DB;
+use BetterPterodactyl\Trash\DB as TrashDB;
 use Illuminate\Http\Request;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ListFilesRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Files\DeleteFileRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,7 +75,17 @@ Route::group(['prefix' => '/plugins'], function () {
         \BetterPterodactyl\Plugins\DB::deleteStorage($pluginId, $key, $request->user()->id);
         return response()->json(['success' => true]);
     });
+
+    // Backend Hooks
+    Route::post('/{id}/hook/{action}', function (\Illuminate\Http\Request $request, $id, $action) {
+        if (!class_exists('BetterPterodactyl\Plugins\HookService')) {
+            require_once base_path('resources/settings/plugins/helpers.php');
+            require_once base_path('resources/settings/plugins/HookService.php');
+        }
+        return \BetterPterodactyl\Plugins\HookService::dispatch($id, $action, $request->user()->id, $request->all());
+    });
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -100,6 +118,36 @@ if (!app()->runningInConsole()) {
                             \BetterPterodactyl\Economy\BillingService::handlePendingDeletion($row['server_id']);
                         }
                         \Log::info('Zero-Config Billing: Successfully processed automated billing cycle.');
+
+                        // 4. Process Trash Cleanup
+                        $trashSettings = TrashDB::getSettings();
+                        if ($trashSettings['enabled'] ?? false) {
+                            $retention = (int) ($trashSettings['retention_days'] ?? 30);
+                            $allServers = \Pterodactyl\Models\Server::all();
+                            foreach ($allServers as $server) {
+                                try {
+                                    $trashPath = '.bp_trash';
+                                    // We use the same FileController logic or call Wings directly if possible.
+                                    // For simplicity in this patched environment, we'll try to use Wings via sub-requests or dispatch a job.
+                                    // However, since we are in a terminating callback, we should be careful.
+                                    // A safer way is to just let the individual server access trigger the cleanup or use a dedicated service.
+                                    // But let's try to do a basic cleanup via Wings if we can resolve the repository.
+                                    $repository = app(DaemonFileRepository::class);
+                                    $repository->setServer($server);
+                                    
+                                    $repository->getDirectory($trashPath);
+                                    $files = $repository->getDirectoryContents($trashPath);
+                                    foreach ($files as $file) {
+                                        $mtime = $file->mtime ?? 0;
+                                        if ($mtime > 0 && (time() - $mtime) > ($retention * 86400)) {
+                                            $repository->deleteFiles($trashPath, [$file->name]);
+                                        }
+                                    }
+                                } catch (\Throwable $e) {
+                                    // Ignore errors for specific servers
+                                }
+                            }
+                        }
                     } catch (\Exception $e) {
                         \Log::error('Zero-Config Billing Error: ' . $e->getMessage());
                     }
@@ -140,6 +188,7 @@ Route::group(['prefix' => '/economy'], function () {
                 ],
                 'usage' => $usage,
                 'settings' => $settings,
+                'trash_enabled' => \BetterPterodactyl\Trash\DB::getSettings()['enabled'] ?? true,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -624,6 +673,15 @@ Route::group([
 
         return \BetterPterodactyl\Economy\BillingService::processCharge($serverModel->id);
     });
+
+    // Server-scoped Plugin Hooks
+    Route::post('/plugins/{id}/hook/{action}', function (\Illuminate\Http\Request $request, $server_ident, $id, $action) {
+        if (!class_exists('BetterPterodactyl\Plugins\HookService')) {
+            require_once base_path('resources/settings/plugins/helpers.php');
+            require_once base_path('resources/settings/plugins/HookService.php');
+        }
+        return \BetterPterodactyl\Plugins\HookService::dispatch($id, $action, $request->user()->id, $request->all(), $server_ident);
+    });
 });
 
 Route::group([
@@ -654,8 +712,156 @@ Route::group([
         Route::delete('/{database}', [Client\Servers\DatabaseController::class, 'delete']);
     });
 
+    Route::group(['prefix' => '/trash'], function () {
+
+        Route::post('/restore', function (Request $request, Server $server) {
+            try {
+                $server->loadMissing('node');
+                $repository = app(DaemonFileRepository::class);
+                $repository->setServer($server);
+                
+                $files = $request->input('files', []);
+                $renameFiles = [];
+                
+                foreach ($files as $file) {
+                    // file name in trash: [random]_[time]_[original]
+                    $parts = explode('_', $file, 3);
+                    $targetName = (count($parts) < 3) ? $file : $parts[2];
+                    
+                    $renameFiles[] = [
+                        'from' => '.bp_trash/' . ltrim($file, '/'),
+                        'to' => $targetName
+                    ];
+                }
+                
+                if (!empty($renameFiles)) {
+                    $repository->renameFiles('/', $renameFiles);
+                }
+                return response()->noContent();
+            } catch (\Throwable $e) {
+                \Log::error('BetterPterodactyl Trash Restore Error: ' . $e->getMessage());
+                return response()->json(['error' => $e->getMessage()], 500);
+            }
+        });
+
+        Route::post('/clear', function (Request $request, Server $server) {
+            try {
+                $server->loadMissing('node');
+                $repository = app(DaemonFileRepository::class);
+                $repository->setServer($server);
+                
+                $files = $repository->getDirectoryContents('.bp_trash');
+                $fileNames = array_map(fn($f) => $f->name, $files);
+                
+                if (!empty($fileNames)) {
+                    $repository->deleteFiles('.bp_trash', $fileNames);
+                }
+                
+                return response()->noContent();
+            } catch (\Throwable $e) {
+                \Log::error('BetterPterodactyl Trash Clear Error: ' . $e->getMessage());
+                return response()->json(['error' => $e->getMessage()], 500);
+            }
+        });
+    });
+
     Route::group(['prefix' => '/files'], function () {
-        Route::get('/list', [Client\Servers\FileController::class, 'directory']);
+        Route::get('/list', function (Request $request, Server $server, Client\Servers\FileController $controller) {
+            $fallback = function() use ($request, $server, $controller) {
+                try {
+                    $rc = new \ReflectionClass($controller);
+                    $method = $rc->getMethod('directory');
+                    $params = $method->getParameters();
+                    if (isset($params[0]) && $type = $params[0]->getType()) {
+                        $typeName = $type->getName();
+                        if (class_exists($typeName) && $typeName !== 'Illuminate\Http\Request') {
+                            \Log::info('BetterPterodactyl Trash: Attempting spoofer', ['type' => $typeName]);
+                            $spoofed = app($typeName);
+                            $spoofed->setMethod($request->getMethod());
+                            $spoofed->query->replace($request->query->all());
+                            $spoofed->request->replace($request->request->all());
+                            $spoofed->files->replace($request->files->all());
+                            $spoofed->cookies->replace($request->cookies->all());
+                            $spoofed->headers->replace($request->headers->all());
+                            $spoofed->setUserResolver($request->getUserResolver());
+                            $spoofed->setRouteResolver($request->getRouteResolver());
+                            
+                            try {
+                                return $controller->directory($spoofed, $server);
+                            } catch (\Throwable $e) {
+                                \Log::error('BetterPterodactyl Trash: Controller call failed: ' . $e->getMessage());
+                                throw $e;
+                            }
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    \Log::error('BetterPterodactyl Trash: List fallback spoof failed: ' . $e->getMessage());
+                    throw $e;
+                }
+                
+                return $controller->directory($request, $server);
+            };
+
+            try {
+                $server->loadMissing('node');
+                $response = $fallback();
+                
+                // Unified filtering: Only hide .bp_trash if we are NOT explicitly looking at it
+                $requestedDir = $request->query('directory', '');
+                if (trim($requestedDir, '/') === '.bp_trash') {
+                    return $response;
+                }
+
+                $filterTrash = function ($items) {
+                    if (!is_array($items)) return $items;
+                    return array_values(array_filter($items, function ($item) {
+                        $name = '';
+                        if (is_array($item)) {
+                            $name = $item['name'] ?? ($item['attributes']['name'] ?? '');
+                        } elseif (is_object($item)) {
+                            $name = $item->name ?? ($item->attributes->name ?? '');
+                        }
+                        return strtolower((string)$name) !== '.bp_trash';
+                    }));
+                };
+
+                if (is_object($response)) {
+                    if (method_exists($response, 'getData')) {
+                        $data = $response->getData(true);
+                        if (isset($data['data']) && is_array($data['data'])) {
+                            $data['data'] = $filterTrash($data['data']);
+                        }
+                        return response()->json($data);
+                    }
+                    if (method_exists($response, 'toArray')) {
+                        $data = $response->toArray();
+                        if (isset($data['data']) && is_array($data['data'])) {
+                            $data['data'] = $filterTrash($data['data']);
+                        } else {
+                            $data = $filterTrash($data);
+                        }
+                        return response()->json($data);
+                    }
+                }
+                
+                if (is_array($response)) {
+                    if (isset($response['data']) && is_array($response['data'])) {
+                        $response['data'] = $filterTrash($response['data']);
+                    } else {
+                        $response = $filterTrash($response);
+                    }
+                    return response()->json($response);
+                }
+
+                return $response;
+            } catch (\Throwable $e) {
+                if ($requestedDir === '.bp_trash') {
+                    return response()->json(['data' => []]);
+                }
+                throw $e;
+            }
+        });
+
         Route::get('/contents', [Client\Servers\FileController::class, 'contents']);
         Route::get('/download', [Client\Servers\FileController::class, 'download']);
         Route::put('/rename', [Client\Servers\FileController::class, 'rename']);
@@ -663,7 +869,108 @@ Route::group([
         Route::post('/write', [Client\Servers\FileController::class, 'write']);
         Route::post('/compress', [Client\Servers\FileController::class, 'compress']);
         Route::post('/decompress', [Client\Servers\FileController::class, 'decompress']);
-        Route::post('/delete', [Client\Servers\FileController::class, 'delete']);
+        
+        Route::post('/delete', function (Request $request, Server $server, Client\Servers\FileController $controller) {
+            $fallback = function() use ($request, $server, $controller) {
+                try {
+                    $rc = new \ReflectionClass($controller);
+                    $method = $rc->getMethod('delete');
+                    $params = $method->getParameters();
+                    if (isset($params[0]) && $type = $params[0]->getType()) {
+                        $typeName = $type->getName();
+                        if (class_exists($typeName) && $typeName !== 'Illuminate\Http\Request') {
+                            $spoofed = app($typeName);
+                            $spoofed->setMethod($request->getMethod());
+                            $spoofed->query->replace($request->query->all());
+                            $spoofed->request->replace($request->request->all());
+                            $spoofed->files->replace($request->files->all());
+                            $spoofed->cookies->replace($request->cookies->all());
+                            $spoofed->headers->replace($request->headers->all());
+                            $spoofed->setUserResolver($request->getUserResolver());
+                            $spoofed->setRouteResolver($request->getRouteResolver());
+                            
+                            try {
+                                return $controller->delete($spoofed, $server);
+                            } catch (\Throwable $e) {
+                                \Log::error('BetterPterodactyl Trash: Delete controller call failed: ' . $e->getMessage());
+                                throw $e;
+                            }
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    \Log::error('BetterPterodactyl Trash: Delete fallback spoof failed: ' . $e->getMessage());
+                    throw $e;
+                }
+                
+                return $controller->delete($request, $server);
+            };
+
+            try {
+                $server->loadMissing('node');
+                $repository = app(DaemonFileRepository::class);
+                $repository->setServer($server);
+            } catch (\Exception $e) {
+                \Log::error('BetterPterodactyl Trash: Failed to resolve repository: ' . $e->getMessage());
+                return $fallback();
+            }
+
+            $trashSettings = TrashDB::getSettings();
+            $retention = (int) ($trashSettings['retention_days'] ?? 30);
+            $isEnabled = $trashSettings['enabled'] ?? true;
+
+            // Log the attempt for debugging
+            \Log::debug('BetterPterodactyl Trash: Deletion request', [
+                'enabled' => $isEnabled,
+                'retention' => $retention,
+                'user' => $request->user()->id ?? 'unknown'
+            ]);
+
+            if (!$isEnabled || $retention <= 0) {
+                return $fallback();
+            }
+
+            $root = ltrim($request->input('root', '/'), '/');
+            $files = $request->input('files', []);
+
+            if (str_starts_with($root, '.bp_trash')) {
+                return $fallback();
+            }
+
+            try {
+                try {
+                    $repository->getDirectory('.bp_trash');
+                } catch (\Throwable $e) {
+                    try {
+                        $repository->createDirectory('', '.bp_trash');
+                    } catch (\Throwable $e2) {
+                        $repository->createDirectory('/', '.bp_trash');
+                    }
+                }
+            } catch (\Throwable $e) {
+                \Log::error('BetterPterodactyl Trash: All directory creation attempts failed: ' . $e->getMessage());
+            }
+
+            $renameFiles = [];
+            foreach ($files as $file) {
+                $cleanFile = ltrim($file, '/');
+                $fromPath = trim($root . '/' . $cleanFile, '/');
+                $trashName = bin2hex(random_bytes(4)) . '_' . time() . '_' . str_replace('/', '_', $cleanFile);
+                
+                $renameFiles[] = [
+                    'from' => $fromPath,
+                    'to' => '.bp_trash/' . $trashName
+                ];
+            }
+
+            try {
+                $repository->renameFiles('/', $renameFiles);
+                return response()->noContent();
+            } catch (\Throwable $e) {
+                \Log::error('BetterPterodactyl Trash: Failed to move files to trash: ' . $e->getMessage());
+                return response()->json(['error' => 'Failed to move files to trash: ' . $e->getMessage()], 500);
+            }
+        });
+
         Route::post('/create-folder', [Client\Servers\FileController::class, 'create']);
         Route::post('/chmod', [Client\Servers\FileController::class, 'chmod']);
         Route::middleware([ResourceLimit::FilePull->middleware()])
