@@ -16,6 +16,7 @@ import Avatar from '@/components/Avatar';
 import { useTranslation } from 'react-i18next';
 import { Dialog } from '@/components/elements/dialog';
 import { Button } from '@/components/elements/button';
+import PluginSlot from '@/components/elements/plugins/PluginSlot';
 
 const NavigationContainer = styled.div`
     ${tw`w-full overflow-x-auto sticky top-0 z-50 transition-colors duration-300 backdrop-blur-md`};
@@ -160,6 +161,7 @@ export default () => {
                             <FontAwesomeIcon icon={faSignOutAlt} />
                         </button>
                     </Tooltip>
+                    <PluginSlot id="navbar_end" />
                 </RightNavigation>
             </div>
             <Dialog

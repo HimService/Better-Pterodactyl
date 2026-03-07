@@ -373,6 +373,16 @@ Route::post('/plugins/toggle', function (\Illuminate\Http\Request $request) {
     return response()->json(['success' => true]);
 });
 
+Route::post('/plugins/config', function (\Illuminate\Http\Request $request) {
+    if (!class_exists('BetterPterodactyl\Plugins\DB')) {
+        require_once base_path('resources/settings/plugins/helpers.php');
+    }
+    $id = $request->input('id');
+    $config = $request->input('config');
+    \BetterPterodactyl\Plugins\DB::updatePlugin($id, ['config' => $config]);
+    return response()->json(['success' => true]);
+});
+
 Route::post('/plugins/delete', function (\Illuminate\Http\Request $request) {
     if (!class_exists('BetterPterodactyl\Plugins\DB')) {
         require_once base_path('resources/settings/plugins/helpers.php');

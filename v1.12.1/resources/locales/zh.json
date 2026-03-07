@@ -1166,6 +1166,11 @@
     "delete_title": "確定要永久刪除？",
     "delete_text": "這個操作無法還原，插件的配置將會被抹除。",
     "delete_confirm": "是的，刪除它",
-    "delete_cancel": "先不要"
+    "delete_cancel": "先不要",
+    "settings": "設定",
+    "save_changes": "儲存變更",
+    "cancel": "取消",
+    "no_variables": "此插件沒有可設定的變數。",
+    "save_success": "設定已儲存"
   }
 }

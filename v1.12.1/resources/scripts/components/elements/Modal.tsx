@@ -166,9 +166,19 @@ const Modal: React.FC<ModalProps> = ({
 };
 
 const PortaledModal: React.FC<ModalProps> = ({ children, ...props }) => {
-    const element = useRef(document.getElementById('modal-portal'));
+    const [element, setElement] = useState<HTMLElement | null>(document.getElementById('modal-portal'));
 
-    return createPortal(<Modal {...props}>{children}</Modal>, element.current!);
+    useEffect(() => {
+        if (!element) {
+            setElement(document.getElementById('modal-portal'));
+        }
+    }, [element]);
+
+    if (!element) {
+        return null;
+    }
+
+    return createPortal(<Modal {...props}>{children}</Modal>, element);
 };
 
 export default PortaledModal;

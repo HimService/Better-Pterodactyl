@@ -33,6 +33,10 @@ body, .wrapper, .content-wrapper, .right-side {
 
 .main-header {
     border-bottom: none !important;
+    position: fixed !important;
+    width: 100% !important;
+    top: 0;
+    left: 0;
 }
 
 .box {
@@ -77,16 +81,18 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 /* Handle collapsed sidebar logo */
 @media (min-width: 768px) {
     body.sidebar-collapse .main-header .logo {
-        width: 50px !important;
+        width: 230px !important; /* Keep logo wide enough for full name */
+        padding-left: 15px !important;
+        padding-right: 15px !important;
     }
     body.sidebar-collapse .main-header .navbar {
-        margin-left: 50px !important;
+        margin-left: 230px !important; /* Move navbar to the right */
     }
     body.sidebar-collapse .main-header .logo > .logo-lg {
-        display: none !important;
+        display: block !important; /* Always show full name */
     }
     body.sidebar-collapse .main-header .logo > .logo-mini {
-        display: block !important;
+        display: none !important; /* Hide redundant mini logo */
     }
 }
 
@@ -144,6 +150,38 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     font-size: 14.5px;
     letter-spacing: 0.85px;
     padding: 18px 25px 10px 15px !important;
+}
+
+/* Sidebar Collapse Specifics */
+@media (min-width: 768px) {
+    body.sidebar-collapse .main-sidebar {
+        width: 50px !important;
+    }
+    body.sidebar-collapse .content-wrapper,
+    body.sidebar-collapse .main-footer {
+        margin-left: 50px !important;
+    }
+    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > span,
+    body.sidebar-collapse .main-sidebar .sidebar-menu > li.header {
+        display: none !important;
+    }
+    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a {
+        padding: 15px !important;
+        text-align: center;
+    }
+    body.sidebar-collapse .main-sidebar .sidebar-menu > li > a > i {
+        margin-right: 0 !important;
+        font-size: 20px !important;
+    }
+
+    /* Hide sidebar scrollbar in collapsed state */
+    body.sidebar-collapse .main-sidebar::-webkit-scrollbar {
+        display: none !important;
+    }
+    body.sidebar-collapse .main-sidebar {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+    }
 }
 
 /* Sidebar Modifications */

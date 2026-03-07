@@ -94,6 +94,7 @@ const Sidebar = () => {
                         </AdminNavItemStyle>
                     </Tooltip>
                 )}
+                <PluginSlot id="sidebar_bottom" />
             </SidebarNavBottom>
         </SidebarContainer>
     );

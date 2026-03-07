@@ -7,6 +7,7 @@ import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
 import Field from '@/components/elements/Field';
 import tw from 'twin.macro';
+import PluginSlot from '@/components/elements/plugins/PluginSlot';
 import Button from '@/components/elements/Button';
 import Reaptcha from 'reaptcha';
 import useFlash from '@/plugins/useFlash';
@@ -118,6 +119,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                         className={config.login_visuals.glow_borders ? 'relative group' : 'relative'}
                         css={tw`w-full flex`}
                     >
+                        <PluginSlot id="login_top" />
                         <Field type={'text'} label={t('auth.login.username', 'Username or Email')} name={'username'} disabled={isSubmitting} />
                         <div css={tw`mt-6`}>
                             <Field type={'password'} label={t('auth.login.password', 'Password')} name={'password'} disabled={isSubmitting} />
@@ -174,6 +176,7 @@ const LoginContainer = ({ history }: RouteComponentProps) => {
                                 {t('auth.login.forgot_password', 'Forgot password?')}
                             </Link>
                         </div>
+                        <PluginSlot id="login_bottom" />
                     </LoginFormContainer>
                 </motion.div>
             )}

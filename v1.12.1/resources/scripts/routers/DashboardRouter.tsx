@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import PluginSlot from '@/components/elements/plugins/PluginSlot';
+import PluginPageContainer from '@/components/elements/plugins/PluginPageContainer';
 
 export default function DashboardRouter() {
     const { t } = useTranslation();
@@ -66,12 +67,18 @@ export default function DashboardRouter() {
                                     <Component />
                                 </Route>
                             ))}
+                            <Route path={'/plugins/:slug'} exact>
+                                <PluginPageContainer />
+                            </Route>
                             <Route path={'*'}>
                                 <NotFound />
                             </Route>
                         </Switch>
                     </React.Suspense>
                 </TransitionRouter>
+                <div className="px-4 md:px-10 mt-4">
+                    <PluginSlot id="dashboard_footer" />
+                </div>
             </div>
         </div>
     );

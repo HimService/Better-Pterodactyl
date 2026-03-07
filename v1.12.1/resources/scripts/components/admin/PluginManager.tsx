@@ -9,9 +9,64 @@ import {
     faCogs,
     faMagic,
     faCheckCircle,
+    faCog,
+    faSave,
 } from '@fortawesome/free-solid-svg-icons';
 import Switch from '@/components/elements/Switch';
 import { useTranslation } from 'react-i18next';
+import Modal from '@/components/elements/Modal';
+import { faCloud, faChartBar, faComments, faFileCode } from '@fortawesome/free-solid-svg-icons';
+
+const TEMPLATES = [
+    {
+        name: 'Weather Widget (天氣小工具)',
+        description: '在儀表板頂部顯示即時天氣 (採用 iframe)',
+        icon: faCloud,
+        json: {
+            name: '即時天氣',
+            description: '顯示目前城市的即時天氣狀況',
+            slot: 'dashboard_header',
+            type: 'iframe',
+            config: {
+                url: 'https://wttr.in/?format=3',
+                height: '60px'
+            }
+        }
+    },
+    {
+        name: 'Status Overview (系統狀態卡)',
+        description: '高質感的系統公告與狀態卡 (採用 Custom HTML)',
+        icon: faChartBar,
+        json: {
+            name: '系統公告',
+            slot: 'dashboard_header',
+            type: 'custom_html',
+            config: {
+                html: '<div style=\"background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); padding: 20px; border-radius: 16px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 15px;\"><div style=\"font-size: 24px;\">🚀</div><div><div style=\"font-size: 14px; color: #a78bfa; font-weight: bold;\">{{tag}}</div><div style=\"font-size: 16px; color: white;\">{{message}}</div></div></div>',
+                variables: {
+                    tag: { value: '系統公告', label: '標籤文字' },
+                    message: { value: '歡迎使用 Better Pterodactyl 面板！', label: '內容訊息' }
+                }
+            }
+        }
+    },
+    {
+        name: 'Discord Card (Discord 伺服器卡)',
+        description: '在側邊欄最底端顯示 Discord 連結',
+        icon: faComments,
+        json: {
+            name: 'Discord 連結',
+            slot: 'sidebar_bottom',
+            type: 'custom_html',
+            config: {
+                html: '<a href=\"{{url}}\" target=\"_blank\" style=\"cursor:pointer; width:48px; height:48px; display:flex; align-items:center; justify-content:center; background:#5865F2; border-radius:12px; color:white; transition:transform 0.2s;\"><svg width=\"24\" height=\"24\" fill=\"currentColor\" viewBox=\"0 0 24 24\"><path d=\"M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.419-2.157 2.419z\"/></svg></a>',
+                variables: {
+                    url: { value: 'https://discord.gg/yourserver', label: 'Discord 邀請鏈接' }
+                }
+            }
+        }
+    }
+];
 
 const fadeIn = keyframes`
     from { opacity: 0; transform: translateY(10px); }
@@ -163,6 +218,9 @@ const PluginManager = () => {
     const [loading, setLoading] = useState(true);
     const [installing, setInstalling] = useState(false);
     const [dragActive, setDragActive] = useState(false);
+    const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
+    const [configVariables, setConfigVariables] = useState<Record<string, any>>({});
+    const [showGallery, setShowGallery] = useState(false);
 
     const refreshPlugins = useCallback(async () => {
         setLoading(true);
@@ -268,6 +326,38 @@ const PluginManager = () => {
                 console.error(err);
             }
         });
+    };
+
+    const handleUpdateConfig = async () => {
+        if (!selectedPlugin) return;
+        try {
+            const response = await fetch('/admin/plugins/config', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': (document.querySelector('meta[name="_token"]') as any)?.content || ''
+                },
+                body: JSON.stringify({ id: selectedPlugin.id, config: { ...JSON.parse(selectedPlugin.config), variables: configVariables } }),
+            });
+
+            if (response.ok) {
+                (window as any).swal({ title: t('plugins.save_success'), type: 'success', timer: 1500 });
+                setSelectedPlugin(null);
+                refreshPlugins();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const openSettings = (plugin: Plugin) => {
+        setSelectedPlugin(plugin);
+        try {
+            const config = JSON.parse(plugin.config);
+            setConfigVariables(config.variables || {});
+        } catch (e) {
+            setConfigVariables({});
+        }
     };
 
     const handleDrag = (e: React.DragEvent) => {
@@ -405,14 +495,137 @@ const PluginManager = () => {
                                         onChange={() => handleToggle(plugin)}
                                     />
                                 </div>
-                                <PremiumButton $variant="danger" onClick={() => handleDelete(plugin.id)} style={{ padding: '0.6rem' }}>
-                                    <FontAwesomeIcon icon={faTrash} />
-                                </PremiumButton>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <PremiumButton onClick={() => openSettings(plugin)} style={{ padding: '0.6rem', background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.2)', color: '#8b5cf6' }}>
+                                        <FontAwesomeIcon icon={faCog} />
+                                    </PremiumButton>
+                                    <PremiumButton $variant="danger" onClick={() => handleDelete(plugin.id)} style={{ padding: '0.6rem' }}>
+                                        <FontAwesomeIcon icon={faTrash} />
+                                    </PremiumButton>
+                                </div>
                             </div>
                         </PluginRow>
                     ))}
                 </div>
             )}
+
+            <Modal
+                visible={!!selectedPlugin}
+                onDismissed={() => setSelectedPlugin(null)}
+                closeOnBackground={true}
+            >
+                <div style={{ padding: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                        <FontAwesomeIcon icon={faCog} style={{ color: '#8b5cf6' }} size="lg" />
+                        <h2 style={{ color: 'white', fontSize: '1.5rem', fontWeight: 700 }}>
+                            {selectedPlugin?.name} {t('plugins.settings')}
+                        </h2>
+                    </div>
+
+                    <div style={{ display: 'grid', gap: '1.5rem', marginBottom: '2rem' }}>
+                        {Object.entries(configVariables).length === 0 ? (
+                            <p style={{ color: '#6b7280', textAlign: 'center' }}>{t('plugins.no_variables')}</p>
+                        ) : (
+                            Object.entries(configVariables).map(([key, data]: [string, any]) => (
+                                <div key={key}>
+                                    <label style={{ display: 'block', color: '#9ca3af', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                        {data.label || key}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.value}
+                                        onChange={(e) => setConfigVariables({
+                                            ...configVariables,
+                                            [key]: { ...data, value: e.target.value }
+                                        })}
+                                        style={{
+                                            width: '100%',
+                                            background: 'rgba(31, 41, 55, 0.5)',
+                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                            borderRadius: '0.75rem',
+                                            padding: '0.75rem 1rem',
+                                            color: 'white',
+                                            outline: 'none',
+                                            transition: 'border-color 0.2s'
+                                        }}
+                                    />
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                        <PremiumButton
+                            onClick={() => setSelectedPlugin(null)}
+                            style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#9ca3af' }}
+                        >
+                            {t('plugins.cancel')}
+                        </PremiumButton>
+                        <PremiumButton onClick={handleUpdateConfig}>
+                            <FontAwesomeIcon icon={faSave} />
+                            {t('plugins.save_changes')}
+                        </PremiumButton>
+                    </div>
+                </div>
+            </Modal>
+
+            <Modal
+                visible={showGallery}
+                onDismissed={() => setShowGallery(false)}
+                closeOnBackground={true}
+            >
+                <div style={{ padding: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                        <FontAwesomeIcon icon={faMagic} style={{ color: '#8b5cf6' }} size="lg" />
+                        <h2 style={{ color: 'white', fontSize: '1.5rem', fontWeight: 700 }}>
+                            {t('plugins.template_gallery')}
+                        </h2>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+                        {TEMPLATES.map((tpl) => (
+                            <div 
+                                key={tpl.name}
+                                onClick={() => {
+                                    setJsonInput(JSON.stringify(tpl.json, null, 2));
+                                    setShowGallery(false);
+                                }}
+                                style={{
+                                    background: 'rgba(31, 41, 55, 0.5)',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    borderRadius: '1rem',
+                                    padding: '1.5rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                }}
+                                onMouseOver={(e) => {
+                                    e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.5)';
+                                    e.currentTarget.style.background = 'rgba(31, 41, 55, 0.8)';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                                    e.currentTarget.style.background = 'rgba(31, 41, 55, 0.5)';
+                                }}
+                            >
+                                <div style={{ width: '3rem', height: '3rem', background: 'rgba(139, 92, 246, 0.1)', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', color: '#8b5cf6' }}>
+                                    <FontAwesomeIcon icon={tpl.icon} size="lg" />
+                                </div>
+                                <h4 style={{ color: 'white', fontWeight: 700, marginBottom: '0.5rem' }}>{tpl.name}</h4>
+                                <p style={{ color: '#9ca3af', fontSize: '0.8rem' }}>{tpl.description}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                         <PremiumButton 
+                            onClick={() => setShowGallery(false)}
+                            style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#9ca3af' }}
+                        >
+                            {t('plugins.close')}
+                        </PremiumButton>
+                    </div>
+                </div>
+            </Modal>
         </Container>
     );
 };

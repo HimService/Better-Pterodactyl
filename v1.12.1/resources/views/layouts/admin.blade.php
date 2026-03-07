@@ -37,10 +37,14 @@
         @include('layouts.admin_theme')
     </head>
     <body class="hold-transition skin-blue fixed sidebar-mini">
+        <div id="modal-portal"></div>
         <div class="wrapper">
             <header class="main-header">
                 <a href="{{ route('index') }}" class="logo">
-                    <span>{{ config('app.name', 'Pterodactyl') }}</span>
+                    <!-- mini logo for sidebar mini 50x50 pixels -->
+                    <span class="logo-mini">{{ config('app.name', 'Pterodactyl') }}</span>
+                    <!-- logo for regular state and mobile devices -->
+                    <span class="logo-lg">{{ config('app.name', 'Pterodactyl') }}</span>
                 </a>
                 <nav class="navbar navbar-static-top">
                     <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">

@@ -1161,6 +1161,11 @@
         "delete_title": "Delete Permanently?",
         "delete_text": "This action cannot be undone, and the plugin configuration will be wiped.",
         "delete_confirm": "Yes, delete it",
-        "delete_cancel": "Not now"
+        "delete_cancel": "Not now",
+        "settings": "Settings",
+        "save_changes": "Save Changes",
+        "cancel": "Cancel",
+        "no_variables": "This plugin has no configurable variables.",
+        "save_success": "Settings Saved"
     }
 }
