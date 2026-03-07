@@ -12,6 +12,7 @@ export interface UserData {
     points: number;
     economyEnabled: boolean;
     billingEnabled: boolean;
+    trashEnabled: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -48,6 +49,7 @@ const user: UserStore = {
                 points: data.points,
                 economyEnabled: data.settings?.enabled || false,
                 billingEnabled: data.settings?.billing?.enabled || false,
+                trashEnabled: data.trash_enabled || false,
             });
         } catch (error) {
             console.error('Failed to refresh user points:', error);

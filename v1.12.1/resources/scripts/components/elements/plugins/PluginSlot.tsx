@@ -280,6 +280,25 @@ export const PluginHTML = ({ html, variables = {}, pluginId, permissions = [] }:
                         }
                         return fetchWithJSON(url, { method: 'POST', body: JSON.stringify(data) });
                     },
+                    hook: (action: string, data: any = {}) => {
+                        if (!hasPermission('api:post') && !hasPermission('api:get')) {
+                            console.warn(`[Plugin ${pluginId}] Permission denied: hook access requires api:get or api:post`);
+                            return Promise.reject('Permission denied');
+                        }
+
+                        // Detect server context from URL
+                        const serverMatch = window.location.pathname.match(/\/server\/([a-zA-Z0-9]+)/);
+                        const serverUuid = serverMatch ? serverMatch[1] : null;
+
+                        const url = serverUuid
+                            ? `/api/client/servers/${serverUuid}/plugins/${pluginId}/hook/${action}`
+                            : `/api/client/plugins/${pluginId}/hook/${action}`;
+
+                        return fetchWithJSON(url, {
+                            method: 'POST',
+                            body: JSON.stringify(data)
+                        });
+                    },
                 },
                 storage: {
                     get: (key: string) => {

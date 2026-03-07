@@ -20,6 +20,7 @@ import ServerActivityLogContainer from '@/components/server/ServerActivityLogCon
 // These specific lazy loaded routes are to avoid loading in heavy screens
 // for the server dashboard when they're only needed for specific instances.
 const FileEditContainer = lazy(() => import('@/components/server/files/FileEditContainer'));
+const TrashContainer = lazy(() => import('@/components/server/files/TrashContainer'));
 const ScheduleEditContainer = lazy(() => import('@/components/server/schedules/ScheduleEditContainer'));
 
 interface RouteDefinition {
@@ -92,6 +93,12 @@ export default {
             permission: 'file.*',
             name: undefined,
             component: FileEditContainer,
+        },
+        {
+            path: '/files/trash',
+            permission: 'file.*',
+            name: undefined,
+            component: TrashContainer,
         },
         {
             path: '/databases',

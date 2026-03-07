@@ -494,6 +494,8 @@ const PluginManager = () => {
                 </div>
             </GlassCard>
 
+
+
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', paddingLeft: '0.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <FontAwesomeIcon icon={faMagic} style={{ color: '#8b5cf6' }} />
