@@ -6,6 +6,8 @@ export interface SiteSettings {
     recaptcha: {
         enabled: boolean;
         siteKey: string;
+        verification_type: 'recaptcha' | 'turnstile';
+        turnstile_site_key: string;
     };
 }
 

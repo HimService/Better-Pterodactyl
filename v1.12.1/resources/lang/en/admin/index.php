@@ -64,6 +64,7 @@ return [
         'users' => 'Users',
         'mounts' => 'Mounts',
         'nests' => 'Nests',
+        'logs' => 'System Logs',
     ],
     'announcements' => 'Announcements',
     'status_settings' => 'Status Page Settings',
@@ -79,6 +80,7 @@ return [
         'basic_administration' => 'Basic Administration',
         'management' => 'Management',
         'service_management' => 'Service Management',
+        'logs' => 'System Logs',
     ],
     'navbar' => [
         'exit_admin_control' => 'Exit Admin Control',

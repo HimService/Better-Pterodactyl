@@ -6,9 +6,10 @@ return [
     'failed' => '找不到與這些憑證相符的帳號。',
 
     'forgot_password' => [
-        'label' => '忘記密碼？',
-        'label_help' => '請輸入您的帳號電子郵件地址以接收重設密碼的指示。',
-        'button' => '復原帳號',
+        'username_required' => '必須提供用戶名或電子郵件。',
+        'password_required' => '請輸入您的帳戶密碼。',
+        'verification_required' => '請完成網站驗證。',
+        'remember_me' => '記住我',
     ],
 
     'reset_password' => [

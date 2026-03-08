@@ -4,6 +4,10 @@ return [
     'sign_in' => 'ログイン',
     'go_to_login' => 'ログインへ移動',
     'failed' => 'これらの資格情報に一致する記録は見つかりませんでした。',
+    'username_required' => 'ユーザー名またはメールアドレスを入力してください。',
+    'password_required' => 'パスワードを入力してください。',
+    'verification_required' => '検証を完了してください。',
+    'remember_me' => 'ログイン状態を維持する',
 
     'forgot_password' => [
         'label' => 'パスワードを忘れましたか？',

@@ -8,6 +8,7 @@ return [
     'forgot_password' => [
         'label' => 'Forgot password?',
         'label_help' => 'Enter your account email address to receive instructions on resetting your password.',
+        'verification_required' => 'Please complete the website verification.',
         'button' => 'Recover Account',
     ],
 
