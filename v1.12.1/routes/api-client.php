@@ -17,8 +17,13 @@ if (!class_exists('BetterPterodactyl\Economy\DB')) {
 if (!class_exists('BetterPterodactyl\Trash\DB')) {
     require_once base_path('resources/settings/trash/helpers.php');
 }
+if (!class_exists('BetterPterodactyl\Tickets\DB')) {
+    require_once base_path('resources/settings/tickets/helpers.php');
+}
 use BetterPterodactyl\Economy\DB;
 use BetterPterodactyl\Trash\DB as TrashDB;
+use BetterPterodactyl\Tickets\DB as TicketDB;
+use BetterPterodactyl\Tickets\TicketService;
 use Illuminate\Http\Request;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ListFilesRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\DeleteFileRequest;
@@ -189,6 +194,7 @@ Route::group(['prefix' => '/economy'], function () {
                 'usage' => $usage,
                 'settings' => $settings,
                 'trash_enabled' => \BetterPterodactyl\Trash\DB::getSettings()['enabled'] ?? true,
+                'tickets_enabled' => \BetterPterodactyl\Tickets\DB::getSettings()['enabled'] ?? false,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -559,6 +565,108 @@ Route::group(['prefix' => '/economy'], function () {
             return response()->json(['error' => '部署伺服器時發生錯誤: ' . $e->getMessage()], 500);
         }
     });
+});
+
+Route::group(['prefix' => '/tickets'], function () {
+    Route::get('/', function (Request $request) {
+        $settings = TicketDB::getSettings();
+        if (!($settings['enabled'] ?? false)) {
+            return response()->json(['error' => 'Ticket system is disabled.'], 403);
+        }
+        return response()->json(TicketDB::getTickets($request->user()->id));
+    });
+
+    Route::get('/new', function (Request $request) {
+        $settings = TicketDB::getSettings();
+        if (!($settings['enabled'] ?? false)) {
+            return response()->json(['error' => 'Ticket system is disabled.'], 403);
+        }
+        return response()->json([
+            'categories' => ['General Support', 'Technical Issue', 'Billing', 'Report'],
+            'priorities' => ['low', 'normal', 'high'],
+        ]);
+    });
+
+    Route::post('/', function (Request $request) {
+        $settings = TicketDB::getSettings();
+        if (!($settings['enabled'] ?? false)) {
+            return response()->json(['error' => 'Ticket system is disabled.'], 403);
+        }
+
+        $openTicketCount = TicketDB::getUserOpenTicketsCount($request->user()->id);
+        if ($openTicketCount >= $settings['max_per_user']) {
+            return response()->json(['error' => __('admin/tickets.errors.limit_reached')], 403);
+        }
+
+        $validated = $request->validate([
+            'subject' => 'required|string|max:255',
+            'priority' => 'required|string|in:low,normal,high',
+            'category' => 'required|string',
+            'content' => 'required|string',
+            'server_id' => 'nullable|integer',
+        ]);
+
+        $ticketId = TicketDB::createTicket(
+            $request->user()->id,
+            $validated['subject'],
+            $validated['priority'],
+            $validated['category'],
+            $validated['server_id'] ?? null
+        );
+
+        TicketDB::addComment($ticketId, $request->user()->id, $validated['content']);
+
+        // Send Discord Notification
+        TicketService::sendDiscordNotification($ticketId, $validated['subject'], $request->user());
+
+        return response()->json(['success' => true, 'id' => $ticketId]);
+    });
+
+    Route::get('/{id}', function (Request $request, $id) {
+        $ticket = TicketDB::getTicket($id);
+        if (!$ticket || ($ticket['user_id'] != $request->user()->id && !$request->user()->rootAdmin)) {
+            return response()->json(['error' => 'Ticket not found.'], 404);
+        }
+
+        return response()->json([
+            'ticket' => $ticket,
+            'comments' => TicketDB::getComments($id)
+        ]);
+    })->where('id', '[0-9]+');
+
+    Route::post('/{id}/comment', function (Request $request, $id) {
+        $ticket = TicketDB::getTicket($id);
+        if (!$ticket || ($ticket['user_id'] != $request->user()->id && !$request->user()->rootAdmin)) {
+            return response()->json(['error' => 'Ticket not found.'], 404);
+        }
+
+        if ($ticket['status'] === 'closed') {
+            return response()->json(['error' => 'Cannot comment on a closed ticket.'], 403);
+        }
+
+        $validated = $request->validate([
+            'comment' => 'required|string',
+        ]);
+
+        TicketDB::addComment($id, $request->user()->id, $validated['comment'], $request->user()->rootAdmin);
+
+        return response()->json(['success' => true]);
+    })->where('id', '[0-9]+');
+
+    Route::post('/{id}/status', function (Request $request, $id) {
+        $ticket = TicketDB::getTicket($id);
+        if (!$ticket || ($ticket['user_id'] != $request->user()->id && !$request->user()->rootAdmin)) {
+            return response()->json(['error' => 'Ticket not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:open,resolved,closed',
+        ]);
+
+        TicketDB::updateStatus($id, $validated['status']);
+
+        return response()->json(['success' => true]);
+    })->where('id', '[0-9]+');
 });
 
 Route::prefix('/account')->middleware(AccountSubject::class)->group(function () {

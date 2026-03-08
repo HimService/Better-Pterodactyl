@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faServer, faUserCog, faCogs, faStore } from '@fortawesome/free-solid-svg-icons';
+import { faServer, faUserCog, faCogs, faStore, faTicketAlt } from '@fortawesome/free-solid-svg-icons';
 import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import Tooltip from '@/components/elements/tooltip/Tooltip';
@@ -82,6 +82,14 @@ const Sidebar = () => {
                         <FontAwesomeIcon icon={faUserCog} size={'lg'} />
                     </NavItemStyle>
                 </Tooltip>
+
+                {useStoreState((state: ApplicationStore) => state.user.data?.ticketsEnabled) && (
+                    <Tooltip placement="right" content={t('navigation.support_tickets', 'Support Tickets')}>
+                        <NavItemStyle to={'/tickets'}>
+                            <FontAwesomeIcon icon={faTicketAlt} size={'lg'} />
+                        </NavItemStyle>
+                    </Tooltip>
+                )}
 
                 <PluginSlot id="sidebar" />
             </SidebarNavTop>

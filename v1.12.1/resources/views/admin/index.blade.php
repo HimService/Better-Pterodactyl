@@ -50,6 +50,9 @@
             @elseif(Route::is('admin.trash'))
                 @lang('admin/index.trash_settings')
                 <small>@lang('admin/index.trash_help')</small>
+            @elseif(Route::is('admin.logs'))
+                @lang('admin/index.sidebar.logs')
+                <small>@lang('admin/index.subtitle')</small>
             @else
                 @lang('admin/index.title')
                 <small>@lang('admin/index.subtitle')</small>
@@ -524,6 +527,10 @@
 </script>
 
 <div id="admin-radar-root"></div>
+
+@if(Route::is('admin.logs'))
+    @include('admin.logs')
+@endif
 
 @if(Route::is('admin.index'))
 <div class="row" style="margin-bottom: 24px;">

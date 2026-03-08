@@ -30,10 +30,30 @@
                     window.SiteConfiguration = {!! json_encode($siteConfiguration) !!};
                 </script>
             @endif
+            @php
+                if (!class_exists('BetterPterodactyl\Verification\DB')) {
+                    require_once base_path('resources/settings/verification/helpers.php');
+                }
+                $verificationSettings = \BetterPterodactyl\Verification\DB::getSettings();
+            @endphp
+            <script>
+                window.SiteConfiguration = window.SiteConfiguration || {};
+                window.SiteConfiguration.recaptcha = {
+                    enabled: {{ $verificationSettings['enabled'] ? 'true' : 'false' }},
+                    siteKey: '{{ $verificationSettings['recaptcha_site_key'] }}',
+                    verification_type: '{{ $verificationSettings['verification_type'] }}',
+                    turnstile_site_key: '{{ $verificationSettings['turnstile_site_key'] }}' || '1x00000000000000000000AA',
+                };
+            </script>
             <script>
                 window.SiteLocale = '{{ app()->getLocale() }}';
             </script>
-        @show
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                window.swal = window.Swal;
+            </script>
+@show
 
         @yield('assets')
 
