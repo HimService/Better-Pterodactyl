@@ -64,6 +64,7 @@ return [
         'users' => '使用者',
         'mounts' => '掛載',
         'nests' => '巢 (Nests)',
+        'logs' => '系統日誌',
     ],
     'announcements' => '公告系統',
     'status_settings' => '狀態頁面設定',
@@ -80,6 +81,7 @@ return [
         'basic_administration' => '基礎管理',
         'management' => '管理',
         'service_management' => '服務管理',
+        'logs' => '系統日誌',
     ],
     'navbar' => [
         'exit_admin_control' => '退出管理控制',

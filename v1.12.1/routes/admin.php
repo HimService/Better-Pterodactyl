@@ -12,12 +12,19 @@ Route::get('/economy', [Admin\BaseController::class, 'index'])->name('admin.econ
 Route::get('/discord', [Admin\BaseController::class, 'index'])->name('admin.discord');
 Route::get('/plugins', [Admin\BaseController::class, 'index'])->name('admin.plugins');
 Route::get('/trash', [Admin\BaseController::class, 'index'])->name('admin.trash');
+Route::get('/logs', [Admin\BaseController::class, 'index'])->name('admin.logs');
 Route::get('/update', [Admin\BaseController::class, 'index'])->name('admin.update');
 Route::get('/discord/settings', function () {
     if (!class_exists('BetterPterodactyl\Discord\DB')) {
         require_once base_path('resources/settings/discord/helpers.php');
     }
     return response()->json(\BetterPterodactyl\Discord\DB::getSettings());
+});
+Route::get('/settings/verification', function () {
+    if (!class_exists('BetterPterodactyl\Verification\DB')) {
+        require_once base_path('resources/settings/verification/helpers.php');
+    }
+    return response()->json(\BetterPterodactyl\Verification\DB::getSettings());
 });
 Route::post('/discord/settings', function (\Illuminate\Http\Request $request) {
     if (!class_exists('BetterPterodactyl\Discord\DB')) {
@@ -678,6 +685,32 @@ Route::group(['prefix' => 'databases'], function () {
     Route::delete('/view/{host:id}', [Admin\DatabaseController::class, 'delete']);
 });
 
+Route::group(['prefix' => 'tickets'], function () {
+    Route::get('/settings', function () {
+        if (!class_exists('BetterPterodactyl\Tickets\DB')) {
+            require_once base_path('resources/settings/tickets/helpers.php');
+        }
+        return response()->json(\BetterPterodactyl\Tickets\DB::getSettings());
+    });
+
+    Route::post('/settings', function (\Illuminate\Http\Request $request) {
+        if (!class_exists('BetterPterodactyl\Tickets\DB')) {
+            require_once base_path('resources/settings/tickets/helpers.php');
+        }
+        $payload = $request->json()->all();
+        \BetterPterodactyl\Tickets\DB::updateSettings($payload);
+        return response()->json(['success' => true]);
+    });
+
+    Route::get('/list', function (\Illuminate\Http\Request $request) {
+        if (!class_exists('BetterPterodactyl\Tickets\DB')) {
+            require_once base_path('resources/settings/tickets/helpers.php');
+        }
+        $status = $request->query('status');
+        return response()->json(\BetterPterodactyl\Tickets\DB::getTickets(null, $status));
+    });
+});
+
 /*
 |--------------------------------------------------------------------------
 | Settings Controller Routes
@@ -695,7 +728,107 @@ Route::group(['prefix' => 'settings'], function () {
 
     Route::patch('/', [Admin\Settings\IndexController::class, 'update']);
     Route::patch('/mail', [Admin\Settings\MailController::class, 'update']);
-    Route::patch('/advanced', [Admin\Settings\AdvancedController::class, 'update']);
+    Route::patch('/advanced', function (\Pterodactyl\Http\Requests\Admin\Settings\AdvancedSettingsFormRequest $request) {
+        if (!class_exists('BetterPterodactyl\Verification\DB')) {
+            require_once base_path('resources/settings/verification/helpers.php');
+        }
+        $data = [
+            'enabled' => $request->input('verification_enabled') === 'true',
+            'verification_type' => $request->input('verification_type'),
+            'recaptcha_site_key' => $request->input('verification_recaptcha_site_key'),
+            'recaptcha_secret_key' => $request->input('verification_recaptcha_secret_key'),
+            'turnstile_site_key' => $request->input('verification_turnstile_site_key'),
+            'turnstile_secret_key' => $request->input('verification_turnstile_secret_key'),
+        ];
+        \Illuminate\Support\Facades\Log::info('Saving Verification Settings:', $data);
+        \BetterPterodactyl\Verification\DB::updateSettings($data);
+
+        // Sync with core Pterodactyl settings to ensure warning logic and defaults are updated
+        $request->merge([
+            'recaptcha:website_key' => $data['recaptcha_site_key'],
+            'recaptcha:secret_key' => $data['recaptcha_secret_key'],
+            'recaptcha:enabled' => 'false', // We handle this via our own logic
+        ]);
+
+        return redirect()->route('admin.settings.advanced');
+    });
+
+    Route::get('/tickets', function () {
+        if (!class_exists('BetterPterodactyl\Tickets\DB')) {
+            require_once base_path('resources/settings/tickets/helpers.php');
+        }
+        $tickets = \BetterPterodactyl\Tickets\DB::getTickets();
+        $settings = \BetterPterodactyl\Tickets\DB::getSettings();
+        
+        // Map user IDs to names (simple version)
+        foreach ($tickets as &$ticket) {
+            $user = \Pterodactyl\Models\User::find($ticket['user_id']);
+            $ticket['user_name'] = $user ? $user->username : 'Unknown';
+            $ticket['user_email'] = $user ? $user->email : 'Unknown';
+        }
+
+        return view('admin.tickets.index', [
+            'tickets' => $tickets,
+            'settings' => $settings,
+        ]);
+    })->name('admin.tickets');
+
+    Route::patch('/tickets/settings', function (\Illuminate\Http\Request $request) {
+        if (!class_exists('BetterPterodactyl\Tickets\DB')) {
+            require_once base_path('resources/settings/tickets/helpers.php');
+        }
+        \BetterPterodactyl\Tickets\DB::updateSettings([
+            'enabled' => $request->input('enabled') === 'true',
+            'max_per_user' => (int) $request->input('max_per_user'),
+            'discord_webhook' => $request->input('discord_webhook'),
+        ]);
+
+        return redirect()->route('admin.tickets')
+            ->with('alert', __('admin/tickets.notifications.settings_updated'));
+    })->name('admin.tickets.settings');
+
+    Route::get('/tickets/{id}', function ($id) {
+        if (!class_exists('BetterPterodactyl\Tickets\DB')) {
+            require_once base_path('resources/settings/tickets/helpers.php');
+        }
+        $ticket = \BetterPterodactyl\Tickets\DB::getTicket($id);
+        if (!$ticket) abort(404);
+
+        $comments = \BetterPterodactyl\Tickets\DB::getComments($id);
+        $user = \Pterodactyl\Models\User::find($ticket['user_id']);
+        $ticket['user_name'] = $user ? $user->username : 'Unknown';
+        
+        foreach ($comments as &$comment) {
+            $cUser = \Pterodactyl\Models\User::find($comment['user_id']);
+            $comment['user_name'] = $cUser ? $cUser->username : 'Unknown';
+        }
+
+        return view('admin.tickets.view', [
+            'ticket' => $ticket,
+            'comments' => $comments,
+        ]);
+    })->name('admin.tickets.view');
+
+    Route::post('/tickets/{id}/comment', function (\Illuminate\Http\Request $request, $id) {
+        if (!class_exists('BetterPterodactyl\Tickets\DB')) {
+            require_once base_path('resources/settings/tickets/helpers.php');
+        }
+        $comment = $request->input('comment');
+        
+        if (!empty($comment)) {
+            \BetterPterodactyl\Tickets\DB::addComment($id, \Auth::id(), $comment, true);
+        }
+
+        if ($request->has('status')) {
+            \BetterPterodactyl\Tickets\DB::updateStatus($id, $request->input('status'));
+        }
+
+        if (empty($comment) && !$request->has('status')) {
+            return redirect()->back();
+        }
+
+        return redirect()->route('admin.tickets.view', $id);
+    })->name('admin.tickets.comment');
 });
 
 /*

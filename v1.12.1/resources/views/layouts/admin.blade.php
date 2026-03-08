@@ -126,6 +126,16 @@
                                 <i class="fa fa-refresh"></i> <span>@lang('admin/index.sidebar.updates')</span>
                             </a>
                         </li>
+                        <li class="{{ Route::is('admin.logs') ? 'active' : '' }}">
+                            <a href="{{ route('admin.logs') }}">
+                                <i class="fa fa-terminal"></i> <span>@lang('admin/index.sidebar.logs')</span>
+                            </a>
+                        </li>
+                        <li class="{{ starts_with(Route::currentRouteName(), 'admin.tickets') ? 'active' : '' }}">
+                            <a href="{{ route('admin.tickets') }}">
+                                <i class="fa fa-ticket"></i> <span>@lang('admin/tickets.title')</span>
+                            </a>
+                        </li>
                         <li class="header">@lang('admin/index.sidebar.management')</li>
                         <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.databases') ?: 'active' }}">
                             <a href="{{ route('admin.databases') }}">

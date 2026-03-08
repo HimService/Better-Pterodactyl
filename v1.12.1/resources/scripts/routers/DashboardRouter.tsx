@@ -17,6 +17,9 @@ import { useStoreState } from 'easy-peasy';
 import { ApplicationStore } from '@/state';
 import PluginSlot from '@/components/elements/plugins/PluginSlot';
 import PluginPageContainer from '@/components/elements/plugins/PluginPageContainer';
+import TicketContainer from '@/components/tickets/TicketContainer';
+import TicketFormContainer from '@/components/tickets/TicketFormContainer';
+import TicketChatContainer from '@/components/tickets/TicketChatContainer';
 
 export default function DashboardRouter() {
     const { t } = useTranslation();
@@ -70,6 +73,19 @@ export default function DashboardRouter() {
                             <Route path={'/plugins/:slug'} exact>
                                 <PluginPageContainer />
                             </Route>
+                            {useStoreState((state: ApplicationStore) => state.user.data?.ticketsEnabled) && (
+                                <>
+                                    <Route path={'/tickets/new'} exact>
+                                        <TicketFormContainer />
+                                    </Route>
+                                    <Route path={'/tickets/:id(\\d+)'} exact>
+                                        <TicketChatContainer />
+                                    </Route>
+                                    <Route path={'/tickets'} exact>
+                                        <TicketContainer />
+                                    </Route>
+                                </>
+                            )}
                             <Route path={'*'}>
                                 <NotFound />
                             </Route>
