@@ -1204,5 +1204,49 @@
     "export": "匯出設定",
     "template_gallery": "模板庫",
     "close": "關閉"
+  },
+  "tickets": {
+    "header": "支援票務",
+    "description": "管理您的支援請求與技術諮詢。",
+    "create": "建立新票務",
+    "create_header": "建立支援票務",
+    "create_description": "請提供詳細資訊以便我們為您提供更好的協助。",
+    "subject": "標題",
+    "priority": "優先級",
+    "category": "分類",
+    "message": "訊息內容",
+    "submit": "送出票務",
+    "no_tickets": "您目前沒有任何票務。",
+    "ticket": "票務",
+    "type_message": "輸入您的訊息...",
+    "status": "狀態",
+    "loading": "載入中...",
+    "not_found": "找不到票務。",
+    "support_team": "客服團隊",
+    "you": "您",
+    "errors": {
+      "load_failed": "載入票務失敗。",
+      "create_failed": "建立票務失敗。",
+      "send_failed": "發送訊息失敗。",
+      "ticket_details": "票務詳情",
+      "support_tickets": "Support Tickets",
+      "validation": {
+        "subject_required": "必須提供標題。",
+        "subject_min": "標題至少需要 {{min}} 個字元。",
+        "subject_max": "標題不得超過 {{max}} 個字元。",
+        "content_required": "必須輸入訊息內容。",
+        "content_min": "訊息內容至少需要 {{min}} 個字元。"
+      }
+    },
+    "priorities": {
+      "low": "低",
+      "normal": "中",
+      "high": "高"
+    },
+    "statuses": {
+      "open": "開啟",
+      "resolved": "已解決",
+      "closed": "已關閉"
+    }
   }
 }

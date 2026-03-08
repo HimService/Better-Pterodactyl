@@ -1197,5 +1197,48 @@
         "export": "Export Config",
         "template_gallery": "Template Gallery",
         "close": "Close"
+    },
+    "tickets": {
+        "header": "Support Tickets",
+        "description": "Manage your support requests and technical inquiries.",
+        "create": "Create New Ticket",
+        "create_header": "Create Support Ticket",
+        "create_description": "Please provide detailed information so we can assist you better.",
+        "subject": "Subject",
+        "priority": "Priority",
+        "category": "Category",
+        "message": "Message",
+        "submit": "Submit Ticket",
+        "no_tickets": "You have no tickets at the moment.",
+        "ticket": "Ticket",
+        "type_message": "Type your message...",
+        "status": "Status",
+        "loading": "Loading...",
+        "not_found": "Ticket not found.",
+        "support_team": "Support Team",
+        "you": "You",
+        "ticket_details": "Ticket Details",
+        "validation": {
+            "subject_required": "A subject must be provided.",
+            "subject_min": "The subject must be at least {{min}} characters.",
+            "subject_max": "The subject may not be longer than {{max}} characters.",
+            "content_required": "A message content must be provided.",
+            "content_min": "The message content must be at least {{min}} characters."
+        },
+        "errors": {
+            "load_failed": "Failed to load tickets.",
+            "create_failed": "Failed to create ticket.",
+            "send_failed": "Failed to send message."
+        },
+        "priorities": {
+            "low": "Low",
+            "normal": "Normal",
+            "high": "High"
+        },
+        "statuses": {
+            "open": "Open",
+            "resolved": "Resolved",
+            "closed": "Closed"
+        }
     }
 }
