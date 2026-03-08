@@ -64,6 +64,13 @@ class DB {
         return self::$instance;
     }
 
+    public static function getPlugin($id) {
+        $db = self::getConnection();
+        $stmt = $db->prepare("SELECT * FROM plugins WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+
     public static function getPlugins() {
         $db = self::getConnection();
         $stmt = $db->query("SELECT * FROM plugins ORDER BY created_at DESC");
