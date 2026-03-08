@@ -24,14 +24,94 @@ Route::get('/password/reset/{token}', [Auth\LoginController::class, 'index'])->n
 // @see \Pterodactyl\Providers\RouteServiceProvider
 Route::middleware(['throttle:authentication'])->group(function () {
     // Login endpoints.
-    Route::post('/login', [Auth\LoginController::class, 'login'])->middleware('recaptcha');
+    Route::post('/login', function (\Illuminate\Http\Request $request) {
+        if (!class_exists('BetterPterodactyl\Verification\DB')) {
+            require_once base_path('resources/settings/verification/helpers.php');
+        }
+        $settings = \BetterPterodactyl\Verification\DB::getSettings();
+        
+        if ($settings['enabled']) {
+            if ($settings['verification_type'] === 'turnstile') {
+                $response = $request->input('cf-turnstile-response');
+                $secret = $settings['turnstile_secret_key'];
+                
+                $verify = \Illuminate\Support\Facades\Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+                    'secret' => $secret,
+                    'response' => $response,
+                    'remoteip' => $request->ip(),
+                ]);
+                
+                if (!$verify->json('success')) {
+                    return response()->json([
+                        'errors' => [['code' => 'VerificationException', 'detail' => 'Cloudflare Turnstile verification failed.']]
+                    ], 400);
+                }
+            } else {
+                $response = $request->input('g-recaptcha-response');
+                $secret = $settings['recaptcha_secret_key'];
+                
+                $verify = \Illuminate\Support\Facades\Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                    'secret' => $secret,
+                    'response' => $response,
+                    'remoteip' => $request->ip(),
+                ]);
+                
+                if (!$verify->json('success')) {
+                    return response()->json([
+                        'errors' => [['code' => 'VerificationException', 'detail' => 'reCAPTCHA verification failed.']]
+                    ], 400);
+                }
+            }
+        }
+        
+        return app()->make(Auth\LoginController::class)->login($request);
+    })->withoutMiddleware('recaptcha');
+
     Route::post('/login/checkpoint', Auth\LoginCheckpointController::class)->name('auth.login-checkpoint');
 
-    // Forgot password route. A post to this endpoint will trigger an
-    // email to be sent containing a reset token.
-    Route::post('/password', [Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])
-        ->name('auth.post.forgot-password')
-        ->middleware('recaptcha');
+    // Forgot password route.
+    Route::post('/password', function (\Illuminate\Http\Request $request) {
+        if (!class_exists('BetterPterodactyl\Verification\DB')) {
+            require_once base_path('resources/settings/verification/helpers.php');
+        }
+        $settings = \BetterPterodactyl\Verification\DB::getSettings();
+        
+        if ($settings['enabled']) {
+            if ($settings['verification_type'] === 'turnstile') {
+                $response = $request->input('cf-turnstile-response');
+                $secret = $settings['turnstile_secret_key'];
+                
+                $verify = \Illuminate\Support\Facades\Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+                    'secret' => $secret,
+                    'response' => $response,
+                    'remoteip' => $request->ip(),
+                ]);
+                
+                if (!$verify->json('success')) {
+                    return response()->json([
+                        'errors' => [['code' => 'VerificationException', 'detail' => 'Cloudflare Turnstile verification failed.']]
+                    ], 400);
+                }
+            } else {
+                $response = $request->input('g-recaptcha-response');
+                $secret = $settings['recaptcha_secret_key'];
+                
+                $verify = \Illuminate\Support\Facades\Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                    'secret' => $secret,
+                    'response' => $response,
+                    'remoteip' => $request->ip(),
+                ]);
+                
+                if (!$verify->json('success')) {
+                    return response()->json([
+                        'errors' => [['code' => 'VerificationException', 'detail' => 'reCAPTCHA verification failed.']]
+                    ], 400);
+                }
+            }
+        }
+        
+        return app()->make(Auth\ForgotPasswordController::class)->sendResetLinkEmail($request);
+    })->withoutMiddleware('recaptcha')->name('auth.post.forgot-password');
 });
 
 // Password reset routes. This endpoint is hit after going through
