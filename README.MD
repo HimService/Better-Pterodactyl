@@ -27,6 +27,10 @@ Better Pterodactyl 是一個專注於 Pterodactyl 面板前端介面優化與後
     - 獨立且精美的狀態頁面，即時顯示各節點（Nodes）的運作狀態。
     - 詳細的硬體監控：CPU 核心、記憶體、硬碟使用率及網路頻寬（RX/TX）。
     - 整合 Discord Webhook，當節點斷線或恢復時自動發送通知。
+- **控制台自定義快捷鍵 (Custom Console Shortcuts)**:
+    - **伺服器專用設定**: 每個伺服器可擁有獨立的指令按鈕列，滿足不同遊戲/應用的操作需求。
+    - **完全自定義**: 支持新增自定義指令，並允許移除系統預設按鈕（如 STATUS, VERSION, HELP）。
+    - **雲端同步**: 基於 SQLite 持久化，設定隨帳號同步而不受瀏覽器快取限制。
 - **管理與限制**: 
     - **特定節點部署 (Allowed Nodes)**: 管理員可限制特定伺服器僅能在指定的節點上運行。
     - **進階插件系統 (Advanced Plugin System)**: 
@@ -49,7 +53,7 @@ Better Pterodactyl 是一個專注於 Pterodactyl 面板前端介面優化與後
 
 ### 1. 環境要求
 - Pterodactyl 面板版本: `v1.12.1`
-- PHP 擴充功能: `pdo_sqlite` (用於經濟系統與 Discord 整合)
+- PHP 擴充功能: `pdo_sqlite` (用於經濟系統、Discord 整合、控制台快捷鍵等)
     - Ubuntu/Debian: `apt install php-sqlite3`
     - CentOS/RHEL: `yum install php-sqlite3`
 - 已安裝 `yarn` 或 `npm`
