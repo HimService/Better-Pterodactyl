@@ -61,22 +61,33 @@
     }
 
     & .shortcut_container {
-        @apply flex items-center gap-2 p-2 px-4 overflow-x-auto whitespace-nowrap;
+        @apply flex items-center gap-2 p-2 px-4 overflow-x-auto whitespace-nowrap w-full;
         background-color: rgba(0, 0, 0, 0.2);
         border-top: 1px solid rgba(255, 255, 255, 0.03);
-        scrollbar-width: none;
-        /* Firefox */
-        -ms-overflow-style: none;
-        /* IE and Edge */
 
+        /* Custom Scrollbar Styles */
         &::-webkit-scrollbar {
-            display: none;
-            /* Chrome, Safari and Opera */
+            height: 3px;
+            background: transparent;
         }
 
+        &::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: background 0.2s ease;
+        }
+
+        &:hover::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Firefox Support */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+
         & button {
-            @apply px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-200;
-            @apply bg-white/5 text-neutral-400 border border-white/5;
+            @apply px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex-shrink-0;
+            @apply bg-white/5 text-neutral-400 border border-white/5 max-w-[140px] overflow-hidden truncate whitespace-nowrap;
 
             &:hover {
                 @apply bg-white/10 text-neutral-200 border-white/10 scale-105;
@@ -84,6 +95,10 @@
 
             &:active {
                 @apply scale-95;
+            }
+
+            & > span {
+                @apply truncate;
             }
         }
     }

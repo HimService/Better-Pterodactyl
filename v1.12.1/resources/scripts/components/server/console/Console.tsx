@@ -267,16 +267,18 @@ export default () => {
                                         deleteShortcut(s.id);
                                     }
                                 }}
-                                title={t('server.console.shortcuts.edit')}
+                                title={s.label}
+                                className={'flex items-center group'}
                             >
-                                <FontAwesomeIcon icon={faTerminal} className={'mr-1.5 opacity-70'} />
-                                {s.label}
+                                <FontAwesomeIcon icon={faTerminal} className={'mr-1.5 flex-shrink-0 opacity-70'} />
+                                <span className={'truncate inline-block'}>{s.label}</span>
                                 <span
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         deleteShortcut(s.id);
                                     }}
-                                    className={'ml-2 opacity-0 hover:opacity-100 transition-opacity text-red-500'}
+                                    className={'ml-2 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-red-500'}
+                                    title={t('server.console.shortcuts.delete')}
                                 >
                                     <FontAwesomeIcon icon={faTrashAlt} />
                                 </span>
