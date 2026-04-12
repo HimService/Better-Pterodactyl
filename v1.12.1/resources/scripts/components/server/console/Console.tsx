@@ -16,8 +16,10 @@ import { usePersistedState } from '@/plugins/usePersistedState';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTerminal, faCode, faQuestionCircle, faAngleDoubleRight, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { faTerminal, faCode, faQuestionCircle, faAngleDoubleRight, faExternalLinkAlt, faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+import http from '@/api/http';
+import ShortcutModal from '@/components/server/console/ShortcutModal';
 
 import 'xterm/css/xterm.css';
 import styles from './style.module.css';
@@ -68,9 +70,12 @@ export default () => {
     const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
     const [canSendCommands] = usePermissions(['control.console']);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.id);
+    const serverUuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const isTransferring = ServerContext.useStoreState((state) => state.server.data?.isTransferring || false);
     const [history, setHistory] = usePersistedState<string[]>(`${serverId}:command_history`, []);
     const [historyIndex, setHistoryIndex] = useState(-1);
+    const [shortcuts, setShortcuts] = useState<any[]>([]);
+    const [isShortcutModalVisible, setIsShortcutModalVisible] = useState(false);
     // SearchBarAddon has hardcoded z-index: 999 :(
     const zIndex = `
     .xterm-search-bar__addon {
@@ -124,6 +129,32 @@ export default () => {
             instance && instance.send('send command', command);
             e.currentTarget.value = '';
         }
+    };
+
+    useEffect(() => {
+        if (serverUuid) {
+            http.get(`/api/client/servers/${serverUuid}/shortcuts`)
+                .then(({ data }) => setShortcuts(data))
+                .catch(error => console.error('Failed to fetch shortcuts:', error));
+        }
+    }, [serverUuid]);
+
+    const saveShortcuts = (newShortcuts: any[]) => {
+        if (!serverUuid) return;
+        setShortcuts(newShortcuts);
+        http.post(`/api/client/servers/${serverUuid}/shortcuts`, { shortcuts: newShortcuts })
+            .catch(error => console.error('Failed to save shortcuts:', error));
+    };
+
+    const addShortcut = (label: string, command: string) => {
+        const newShortcuts = [...shortcuts, { id: Math.random().toString(36).substring(2, 9), label, command }];
+        saveShortcuts(newShortcuts);
+        setIsShortcutModalVisible(false);
+    };
+
+    const deleteShortcut = (id: string) => {
+        const newShortcuts = shortcuts.filter(s => s.id !== id);
+        saveShortcuts(newShortcuts);
     };
 
     useEffect(() => {
@@ -226,23 +257,45 @@ export default () => {
             {canSendCommands && (
                 <div className={'relative'}>
                     <div className={styles.shortcut_container}>
-                        <button onClick={() => instance?.send('send command', 'status')}>
-                            <FontAwesomeIcon icon={faTerminal} className={'mr-1.5 opacity-70'} />
-                            Status
-                        </button>
-                        <button onClick={() => instance?.send('send command', 'version')}>
-                            <FontAwesomeIcon icon={faCode} className={'mr-1.5 opacity-70'} />
-                            Version
-                        </button>
-                        <button onClick={() => instance?.send('send command', 'help')}>
-                            <FontAwesomeIcon icon={faQuestionCircle} className={'mr-1.5 opacity-70'} />
-                            Help
+                        {shortcuts.map((s) => (
+                            <button
+                                key={s.id}
+                                onClick={() => instance?.send('send command', s.command)}
+                                onContextMenu={(e) => {
+                                    e.preventDefault();
+                                    if (confirm(`${t('server.console.shortcuts.delete')} "${s.label}"?`)) {
+                                        deleteShortcut(s.id);
+                                    }
+                                }}
+                                title={t('server.console.shortcuts.edit')}
+                            >
+                                <FontAwesomeIcon icon={faTerminal} className={'mr-1.5 opacity-70'} />
+                                {s.label}
+                                <span
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteShortcut(s.id);
+                                    }}
+                                    className={'ml-2 opacity-0 hover:opacity-100 transition-opacity text-red-500'}
+                                >
+                                    <FontAwesomeIcon icon={faTrashAlt} />
+                                </span>
+                            </button>
+                        ))}
+                        <button onClick={() => setIsShortcutModalVisible(true)} className={'bg-indigo-600! hover:bg-indigo-500!'}>
+                            <FontAwesomeIcon icon={faPlus} className={'mr-1.5'} />
+                            {t('server.console.shortcuts.add')}
                         </button>
                         <button onClick={() => window.open(`${window.location.pathname}/console-popout`, '_blank', 'width=900,height=600')}>
                             <FontAwesomeIcon icon={faExternalLinkAlt} className={'mr-1.5 opacity-70'} />
                             Popout
                         </button>
                     </div>
+                    <ShortcutModal
+                        visible={isShortcutModalVisible}
+                        onDismissed={() => setIsShortcutModalVisible(false)}
+                        onSave={addShortcut}
+                    />
                     <div className={classNames('relative', styles.overflows_container)}>
                         <input
                             className={classNames('peer', styles.command_input, 'text-neutral-200 placeholder-neutral-500 font-medium')}

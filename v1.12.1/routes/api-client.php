@@ -812,6 +812,25 @@ Route::group([
     Route::post('/command', [Client\Servers\CommandController::class, 'index']);
     Route::post('/power', [Client\Servers\PowerController::class, 'index']);
 
+    Route::get('/shortcuts', function (Request $request, Server $server) {
+        if (!class_exists('BetterPterodactyl\Custom\Shortcuts\DB')) {
+            require_once base_path('resources/settings/custom/shortcuts/helpers.php');
+        }
+        return response()->json(\BetterPterodactyl\Custom\Shortcuts\DB::getShortcuts($request->user()->id, $server->id));
+    });
+
+    Route::post('/shortcuts', function (Request $request, Server $server) {
+        if (!class_exists('BetterPterodactyl\Custom\Shortcuts\DB')) {
+            require_once base_path('resources/settings/custom/shortcuts/helpers.php');
+        }
+        $shortcuts = $request->input('shortcuts');
+        if (!is_array($shortcuts)) {
+            return response()->json(['error' => 'Invalid data format.'], 400);
+        }
+        \BetterPterodactyl\Custom\Shortcuts\DB::updateShortcuts($request->user()->id, $server->id, $shortcuts);
+        return response()->json(['success' => true]);
+    });
+
     Route::group(['prefix' => '/databases'], function () {
         Route::get('/', [Client\Servers\DatabaseController::class, 'index']);
         Route::middleware([ResourceLimit::Database->middleware()])
