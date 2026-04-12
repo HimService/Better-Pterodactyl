@@ -324,7 +324,18 @@
             "network_in": "受信 (In)",
             "network_out": "送信 (Out)",
             "inbound": "受信",
-            "outbound": "送信"
+            "outbound": "送信",
+            "shortcuts": {
+                "add": "ショートカットを追加",
+                "edit": "ショートカットを編集",
+                "delete": "ショートカットを削除",
+                "modal_title": "カスタムショートカットの作成",
+                "label": "ラベル名",
+                "placeholder_label": "例：サーバー再起動",
+                "command": "コマンド内容",
+                "placeholder_command": "実行するコマンドを入力",
+                "save": "保存する"
+            }
         },
         "databases": {
             "validation": {

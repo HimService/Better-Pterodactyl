@@ -336,7 +336,18 @@
       "network_in": "接收 (In)",
       "network_out": "傳送 (Out)",
       "inbound": "輸入",
-      "outbound": "輸出"
+      "outbound": "輸出",
+      "shortcuts": {
+        "add": "新增捷徑",
+        "edit": "編輯捷徑",
+        "delete": "刪除捷徑",
+        "modal_title": "建立自定義指令捷徑",
+        "label": "捷徑名稱",
+        "placeholder_label": "例如：啟動伺服器",
+        "command": "對應指令",
+        "placeholder_command": "輸入點擊時要發送的指令内容",
+        "save": "儲存捷徑"
+      }
     },
     "databases": {
       "validation": {

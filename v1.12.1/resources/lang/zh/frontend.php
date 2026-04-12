@@ -32,6 +32,18 @@ return [
             'server_status' => '伺服器狀態標記為 :status...',
             'type_command' => '輸入指令...',
             'command_input_aria' => '控制台指令輸入欄位。',
+            'shortcuts' => [
+                'add' => '新增控制台快捷鍵',
+                'edit' => '編輯快捷鍵',
+                'label' => '按鈕名稱',
+                'command' => '執行指令',
+                'save' => '儲存設定',
+                'delete' => '刪除按鈕',
+                'modal_title' => '自定義控制台快捷鍵',
+                'success' => '快捷鍵設定已成功更新。',
+                'placeholder_label' => '例如：重開機',
+                'placeholder_command' => '指令內容...',
+            ],
         ]
     ],
     'dashboard' => [

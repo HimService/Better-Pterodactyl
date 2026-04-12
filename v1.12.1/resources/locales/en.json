@@ -336,7 +336,18 @@
             "network_in": "Inbound",
             "network_out": "Outbound",
             "inbound": "Inbound",
-            "outbound": "Outbound"
+            "outbound": "Outbound",
+            "shortcuts": {
+                "add": "Add Shortcut",
+                "edit": "Edit Shortcut",
+                "delete": "Delete Shortcut",
+                "modal_title": "Create Custom Shortcut",
+                "label": "Shortcut Label",
+                "placeholder_label": "Enter a name (e.g. Restart)",
+                "command": "Shortcut Command",
+                "placeholder_command": "Command to be executed",
+                "save": "Save Shortcut"
+            }
         },
         "databases": {
             "validation": {

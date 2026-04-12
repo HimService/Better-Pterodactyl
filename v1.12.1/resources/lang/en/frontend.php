@@ -32,6 +32,18 @@ return [
             'server_status' => 'Server status marked as :status...',
             'type_command' => 'Type a command...',
             'command_input_aria' => 'Console command input field.',
+            'shortcuts' => [
+                'add' => 'Add Console Shortcut',
+                'edit' => 'Edit Shortcut',
+                'label' => 'Button Label',
+                'command' => 'Command',
+                'save' => 'Save Settings',
+                'delete' => 'Delete Button',
+                'modal_title' => 'Custom Console Shortcuts',
+                'success' => 'Shortcut settings have been successfully updated.',
+                'placeholder_label' => 'e.g., Restart',
+                'placeholder_command' => 'Command content...',
+            ],
         ]
     ],
     'dashboard' => [
