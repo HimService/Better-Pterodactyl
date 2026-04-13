@@ -117,5 +117,6 @@ return [
     'save' => 'Save',
     'add' => 'Add',
     'copy' => 'Copy',
+    'why' => 'Why',
     'copyright' => '&copy; 2015 - :year Pterodactyl Software',
 ];

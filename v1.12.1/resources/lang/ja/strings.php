@@ -115,5 +115,6 @@ return [
     'disable' => '無効化',
     'save' => '保存',
     'add' => '追加',
+    'why' => 'なぜ',
     'copyright' => '&copy; 2015 - :year Pterodactyl Software',
 ];

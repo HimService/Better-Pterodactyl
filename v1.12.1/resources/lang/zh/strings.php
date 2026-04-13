@@ -117,5 +117,6 @@ return [
     'save' => '儲存',
     'add' => '新增',
     'copy' => '複製',
+    'why' => '為什麼',
     'copyright' => '&copy; 2015 - :year Pterodactyl Software',
 ];

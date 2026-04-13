@@ -15,23 +15,23 @@ const ScheduleCronRow = ({ cron, className }: Props) => {
         <div className={classNames('flex', className)}>
             <div className={'w-1/5 sm:w-auto text-center'}>
                 <p className={'font-medium'}>{cron.minute}</p>
-                <p className={'text-2xs text-neutral-500 uppercase'}>{t('schedules.cron_minute')}</p>
+                <p className={'text-2xs text-neutral-500 uppercase'}>{t('server.schedules.cron_minute')}</p>
             </div>
             <div className={'w-1/5 sm:w-auto text-center ml-4'}>
                 <p className={'font-medium'}>{cron.hour}</p>
-                <p className={'text-2xs text-neutral-500 uppercase'}>{t('schedules.cron_hour')}</p>
+                <p className={'text-2xs text-neutral-500 uppercase'}>{t('server.schedules.cron_hour')}</p>
             </div>
             <div className={'w-1/5 sm:w-auto text-center ml-4'}>
                 <p className={'font-medium'}>{cron.dayOfMonth}</p>
-                <p className={'text-2xs text-neutral-500 uppercase'}>{t('schedules.cron_dom')}</p>
+                <p className={'text-2xs text-neutral-500 uppercase'}>{t('server.schedules.cron_dom')}</p>
             </div>
             <div className={'w-1/5 sm:w-auto text-center ml-4'}>
                 <p className={'font-medium'}>{cron.month}</p>
-                <p className={'text-2xs text-neutral-500 uppercase'}>{t('schedules.cron_month')}</p>
+                <p className={'text-2xs text-neutral-500 uppercase'}>{t('server.schedules.cron_month')}</p>
             </div>
             <div className={'w-1/5 sm:w-auto text-center ml-4'}>
                 <p className={'font-medium'}>{cron.dayOfWeek}</p>
-                <p className={'text-2xs text-neutral-500 uppercase'}>{t('schedules.cron_dow')}</p>
+                <p className={'text-2xs text-neutral-500 uppercase'}>{t('server.schedules.cron_dow')}</p>
             </div>
         </div>
     );
