@@ -41,6 +41,19 @@ class DropdownMenu extends React.PureComponent<Props, State> {
             document.addEventListener('click', this.windowListener);
             document.addEventListener('contextmenu', this.contextMenuListener);
             menu.style.left = `${Math.round(this.state.posX - menu.clientWidth)}px`;
+            
+            window.requestAnimationFrame(() => {
+                if (!this.menu.current) return;
+                const m = this.menu.current;
+                const rect = m.getBoundingClientRect();
+                
+                // 如果選單超出視窗底部，則改為向上展開 (減去自身高度與點擊點的偏移量)
+                if (rect.bottom > window.innerHeight) {
+                    m.style.transform = 'translateY(calc(-100% - 45px))';
+                } else {
+                    m.style.transform = '';
+                }
+            });
         }
 
         if (!this.state.visible && prevState.visible) {
