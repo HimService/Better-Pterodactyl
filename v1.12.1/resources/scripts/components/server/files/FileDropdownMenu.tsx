@@ -193,9 +193,19 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                 )}
             >
                 {directory === '.bp_trash' || directory === '/.bp_trash' ? (
-                    <Can action={'file.update'}>
-                        <Row onClick={doRestore} icon={faReply} title={t('server.files.restore', 'Restore')} />
-                    </Can>
+                    <>
+                        <Can action={'file.update'}>
+                            <Row onClick={doRestore} icon={faReply} title={t('server.files.restore', 'Restore')} />
+                        </Can>
+                        <Can action={'file.delete'}>
+                            <Row
+                                onClick={() => setShowConfirmation(true)}
+                                icon={faTrashAlt}
+                                title={t('global.delete', 'Delete')}
+                                $danger
+                            />
+                        </Can>
+                    </>
                 ) : (
                     <>
                         <Can action={'file.update'}>

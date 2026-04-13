@@ -44,7 +44,18 @@ return [
                 'placeholder_label' => 'e.g., Restart',
                 'placeholder_command' => 'Command content...',
             ],
-        ]
+        ],
+        'trash' => [
+            'header' => 'Trash Can',
+            'files_count' => '{{count}} items in trash',
+            'empty_button' => 'Empty Trash',
+            'empty_trash_message' => 'The trash is currently empty.',
+            'confirm_empty' => 'Empty Trash?',
+            'confirm_empty_desc' => 'Are you sure you want to empty the trash? This action cannot be undone.',
+            'empty_success' => 'Trash emptied successfully.',
+            'quota_warning' => 'Files in the trash still count towards your server\'s disk quota.',
+            'delete' => 'Delete Permanently',
+        ],
     ],
     'dashboard' => [
         // to be added

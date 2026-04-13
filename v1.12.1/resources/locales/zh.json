@@ -141,7 +141,8 @@
       "files_count": "回收站中有 {{count}} 個項目",
       "empty_button": "清空回收站",
       "empty_trash_message": "回收站目前是空的。",
-      "confirm_empty": "您確定要清空回收站嗎？此操作無法撤銷。",
+      "confirm_empty": "清空回收站？",
+      "confirm_empty_desc": "您確定要清空回收站嗎？此操作無法撤銷。",
       "empty_success": "回收站已成功清空。"
     },
     "files": {
@@ -161,7 +162,9 @@
       "archive": "壓縮",
       "download": "下載",
       "archiving": "正在壓縮檔案...",
+      "restoring": "正在還原檔案...",
       "deleting": "正在刪除檔案...",
+      "restore": "還原",
       "delete_title": "刪除檔案",
       "delete_mass_confirm_prefix": "確定要刪除",
       "files_count": "個檔案",

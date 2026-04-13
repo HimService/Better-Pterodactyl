@@ -141,7 +141,8 @@
             "files_count": "{{count}} items in trash",
             "empty_button": "Empty Trash",
             "empty_trash_message": "The trash is currently empty.",
-            "confirm_empty": "Are you sure you want to empty the trash? This action cannot be undone.",
+            "confirm_empty": "Empty Trash?",
+            "confirm_empty_desc": "Are you sure you want to empty the trash? This action cannot be undone.",
             "empty_success": "Trash emptied successfully."
         },
         "files": {
@@ -161,7 +162,9 @@
             "archive": "Archive",
             "download": "Download",
             "archiving": "Archiving files...",
+            "restoring": "Restoring files...",
             "deleting": "Deleting files...",
+            "restore": "Restore",
             "delete_title": "Delete Files",
             "delete_mass_confirm_prefix": "Are you sure you want to delete",
             "files_count": "files",

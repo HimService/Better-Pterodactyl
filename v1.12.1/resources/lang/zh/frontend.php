@@ -44,7 +44,18 @@ return [
                 'placeholder_label' => '例如：重開機',
                 'placeholder_command' => '指令內容...',
             ],
-        ]
+        ],
+        'trash' => [
+            'header' => '垃圾桶 (Trash Can)',
+            'files_count' => '垃圾桶內共有 {{count}} 個項目',
+            'empty_button' => '清空垃圾桶',
+            'empty_trash_message' => '垃圾桶目前是空的。',
+            'confirm_empty' => '清空垃圾桶？',
+            'confirm_empty_desc' => '您確定要清空垃圾桶嗎？此操作無法撤銷。',
+            'empty_success' => '垃圾桶已成功清空。',
+            'quota_warning' => '垃圾桶內的檔案仍會計算在您的伺服器磁碟配額中。',
+            'delete' => '永久刪除',
+        ],
     ],
     'dashboard' => [
         // to be added

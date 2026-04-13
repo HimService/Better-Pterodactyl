@@ -113,7 +113,15 @@ const MassActionsBar = () => {
                         <Fade timeout={75} in={selectedFiles.length > 0} unmountOnExit>
                             <div css={tw`flex items-center space-x-4 pointer-events-auto rounded p-4 bg-black/50`}>
                                 {directory === '.bp_trash' || directory === '/.bp_trash' ? (
-                                    <Button onClick={onClickRestore}>{t('server.files.restore', 'Restore')}</Button>
+                                    <>
+                                        <Button onClick={onClickRestore}>{t('server.files.restore', 'Restore')}</Button>
+                                        <Button.Danger
+                                            variant={Button.Variants.Secondary}
+                                            onClick={() => setShowConfirm(true)}
+                                        >
+                                            {t('global.delete', 'Delete')}
+                                        </Button.Danger>
+                                    </>
                                 ) : (
                                     <>
                                         <Button onClick={() => setShowMove(true)}>{t('server.files.move', 'Move')}</Button>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { httpErrorToHuman } from '@/api/http';
 import { CSSTransition } from 'react-transition-group';
 import Spinner from '@/components/elements/Spinner';
@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import deleteFiles from '@/api/server/files/deleteFiles';
+import { Dialog } from '@/components/elements/dialog';
 
 const sortFiles = (files: FileObject[]): FileObject[] => {
     return files
@@ -29,6 +30,7 @@ const sortFiles = (files: FileObject[]): FileObject[] => {
 
 export default () => {
     const { t } = useTranslation();
+    const [showConfirm, setShowConfirm] = useState(false);
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
 
     // Hardcoded to .bp_trash
@@ -53,17 +55,20 @@ export default () => {
         setSelectedFiles(e.currentTarget.checked ? files?.map((file) => file.name) || [] : []);
     };
 
-    const onEmptyTrashClick = () => {
-        if (!files || files.length === 0) return;
-        if (!confirm(t('server.trash.confirm_empty', 'Are you sure you want to empty the trash? This action cannot be undone.'))) return;
-
-        const fileNames = files.map(f => f.name);
+    const onDoEmptyTrash = () => {
+        setShowConfirm(false);
+        const fileNames = files!.map(f => f.name);
         deleteFiles(uuid, '.bp_trash', fileNames)
             .then(() => {
                 mutate();
                 addFlash({ key: 'files', type: 'success', message: t('server.trash.empty_success', 'Trash emptied successfully.') });
             })
             .catch(error => clearAndAddHttpError({ key: 'files', error }));
+    };
+
+    const onEmptyTrashClick = () => {
+        if (!files || files.length === 0) return;
+        setShowConfirm(true);
     };
 
     if (error) {
@@ -119,6 +124,15 @@ export default () => {
                     )}
                 </>
             )}
+            <Dialog.Confirm
+                title={t('server.trash.confirm_empty', 'Empty Trash?')}
+                confirm={t('global.delete', 'Delete')}
+                open={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                onConfirmed={onDoEmptyTrash}
+            >
+                {t('server.trash.confirm_empty_desc', 'Are you sure you want to empty the trash? This action cannot be undone.')}
+            </Dialog.Confirm>
         </ServerContentBlock>
     );
 };
