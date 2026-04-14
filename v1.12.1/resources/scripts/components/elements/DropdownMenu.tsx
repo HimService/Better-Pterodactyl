@@ -40,7 +40,13 @@ class DropdownMenu extends React.PureComponent<Props, State> {
         if (this.state.visible && !prevState.visible && menu) {
             document.addEventListener('click', this.windowListener);
             document.addEventListener('contextmenu', this.contextMenuListener);
-            menu.style.left = `${Math.round(this.state.posX - menu.clientWidth)}px`;
+            // 透過暫時設為 0 來取得包含區塊 (containing block) 的絕對 X 座標
+            menu.style.left = '0px';
+            const containingBlockLeft = menu.getBoundingClientRect().left;
+            
+            // 計算真正的相對位移 (滑鼠點擊的視窗座標 - 包含區塊底圖的視窗座標 - 選單本身寬度)
+            const targetLeft = this.state.posX - containingBlockLeft - menu.clientWidth;
+            menu.style.left = `${Math.round(targetLeft)}px`;
             
             window.requestAnimationFrame(() => {
                 if (!this.menu.current) return;

@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components/macro';
 import tw from 'twin.macro';
 
 export default styled.div<{ $hoverable?: boolean }>`
-    ${tw`flex no-underline items-center p-5 transition-all duration-300 overflow-hidden backdrop-blur-md`};
+    ${tw`flex no-underline items-center p-5 transition-all duration-300 backdrop-blur-md`};
     background-color: rgba(var(--bg-card), 0.85);
     border: 1px solid rgba(var(--border-color), 0.5);
     border-radius: var(--radius-card, 1.5rem);
