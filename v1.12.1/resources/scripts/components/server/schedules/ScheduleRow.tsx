@@ -1,7 +1,7 @@
 import React from 'react';
 import { Schedule } from '@/api/server/schedules/getServerSchedules';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import { faBolt, faCalendarAlt, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
 import tw from 'twin.macro';
 import ScheduleCronRow from '@/components/server/schedules/ScheduleCronRow';
@@ -19,6 +19,43 @@ export default ({ schedule }: { schedule: Schedule }) => {
                 <p css={tw`text-xs text-neutral-400`}>
                     {t('server.schedules.last_run_at', 'Last run at:')} {schedule.lastRunAt ? format(schedule.lastRunAt, "MMM do 'at' h:mma") : t('server.schedules.never', 'never')}
                 </p>
+                <div css={tw`mt-2 flex items-center`}>
+                    {schedule.onlyWhenOnline ? (
+                        <div
+                            translate="no"
+                            css={[
+                                tw`flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider transition-all duration-300`,
+                                tw`border text-yellow-500`,
+                                {
+                                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                    borderColor: 'rgba(245, 158, 11, 0.3)',
+                                    backdropFilter: 'blur(8px)',
+                                    boxShadow: '0 0 10px rgba(245, 158, 11, 0.1)',
+                                },
+                            ]}
+                        >
+                            <FontAwesomeIcon icon={faGlobe} css={tw`mr-1.5 text-[9px]`} />
+                            {t('server.schedules.status_online_only', 'Online only')}
+                        </div>
+                    ) : (
+                        <div
+                            translate="no"
+                            css={[
+                                tw`flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider transition-all duration-300`,
+                                tw`border text-green-500`,
+                                {
+                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                    borderColor: 'rgba(16, 185, 129, 0.3)',
+                                    backdropFilter: 'blur(8px)',
+                                    boxShadow: '0 0 10px rgba(16, 185, 129, 0.1)',
+                                },
+                            ]}
+                        >
+                            <FontAwesomeIcon icon={faBolt} css={tw`mr-1.5 text-[9px]`} />
+                            {t('server.schedules.status_always', 'Always')}
+                        </div>
+                    )}
+                </div>
             </div>
             <div>
                 <p

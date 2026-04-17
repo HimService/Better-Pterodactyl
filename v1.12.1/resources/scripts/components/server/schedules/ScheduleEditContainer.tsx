@@ -30,16 +30,19 @@ const CronBox = ({ title, value }: { title: string; value: string }) => (
     </div>
 );
 
-const ActivePill = ({ active }: { active: boolean }) => (
-    <span
-        css={[
-            tw`rounded-full px-2 py-px text-xs ml-4 uppercase`,
-            active ? tw`bg-green-600 text-green-100` : tw`bg-red-600 text-red-100`,
-        ]}
-    >
-        {active ? '啟用' : '停用'}
-    </span>
-);
+const ActivePill = ({ active }: { active: boolean }) => {
+    const { t } = useTranslation();
+    return (
+        <span
+            css={[
+                tw`rounded-full px-2 py-px text-xs ml-4 uppercase`,
+                active ? tw`bg-green-600 text-green-100` : tw`bg-red-600 text-red-100`,
+            ]}
+        >
+            {active ? t('server.schedules.active') : t('server.schedules.inactive')}
+        </span>
+    );
+};
 
 export default () => {
     const { t } = useTranslation();
