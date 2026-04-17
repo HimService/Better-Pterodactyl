@@ -2,6 +2,7 @@ import React, { createRef } from 'react';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 import Fade from '@/components/elements/Fade';
+import Portal from '@/components/elements/Portal';
 
 interface Props {
     children: React.ReactNode;
@@ -19,6 +20,7 @@ export const DropdownButtonRow = styled.button<{ danger?: boolean }>`
 
 interface State {
     posX: number;
+    posY: number;
     visible: boolean;
 }
 
@@ -27,6 +29,7 @@ class DropdownMenu extends React.PureComponent<Props, State> {
 
     state: State = {
         posX: 0,
+        posY: 0,
         visible: false,
     };
 
@@ -40,24 +43,25 @@ class DropdownMenu extends React.PureComponent<Props, State> {
         if (this.state.visible && !prevState.visible && menu) {
             document.addEventListener('click', this.windowListener);
             document.addEventListener('contextmenu', this.contextMenuListener);
-            // 透過暫時設為 0 來取得包含區塊 (containing block) 的絕對 X 座標
-            menu.style.left = '0px';
-            const containingBlockLeft = menu.getBoundingClientRect().left;
             
-            // 計算真正的相對位移 (滑鼠點擊的視窗座標 - 包含區塊底圖的視窗座標 - 選單本身寬度)
-            const targetLeft = this.state.posX - containingBlockLeft - menu.clientWidth;
-            menu.style.left = `${Math.round(targetLeft)}px`;
+            // 由於元件在 Portal 中採用 fixed 定位，因此直接使用滑鼠在全螢幕的座標即可
+            menu.style.left = `${Math.round(this.state.posX - menu.clientWidth)}px`;
+            // 若預設向下延伸
+            menu.style.top = `${Math.round(this.state.posY)}px`;
             
             window.requestAnimationFrame(() => {
                 if (!this.menu.current) return;
                 const m = this.menu.current;
                 const rect = m.getBoundingClientRect();
                 
-                // 如果選單超出視窗底部，則改為向上展開 (減去自身高度與點擊點的偏移量)
+                // 如果底部超過螢幕邊界，則直接改從滑鼠點擊位置往上方展開
                 if (rect.bottom > window.innerHeight) {
-                    m.style.transform = 'translateY(calc(-100% - 45px))';
-                } else {
-                    m.style.transform = '';
+                    m.style.top = `${Math.round(this.state.posY - m.clientHeight)}px`;
+                }
+                
+                // 防呆：如果右鍵菜單被擠出螢幕左側
+                if (rect.left < 0) {
+                    m.style.left = `${Math.round(this.state.posX)}px`;
                 }
             });
         }
@@ -74,7 +78,7 @@ class DropdownMenu extends React.PureComponent<Props, State> {
 
     onClickHandler = (e: React.MouseEvent<any, MouseEvent>) => {
         e.preventDefault();
-        this.triggerMenu(e.clientX);
+        this.triggerMenu(e.clientX, e.clientY);
     };
 
     contextMenuListener = () => this.setState({ visible: false });
@@ -95,9 +99,10 @@ class DropdownMenu extends React.PureComponent<Props, State> {
         }
     };
 
-    triggerMenu = (posX: number) =>
+    triggerMenu = (posX: number, posY: number) =>
         this.setState((s) => ({
             posX: !s.visible ? posX : s.posX,
+            posY: !s.visible ? posY : s.posY,
             visible: !s.visible,
         }));
 
@@ -105,19 +110,21 @@ class DropdownMenu extends React.PureComponent<Props, State> {
         return (
             <div>
                 {this.props.renderToggle(this.onClickHandler)}
-                <Fade timeout={150} in={this.state.visible} unmountOnExit>
-                    <div
-                        ref={this.menu}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            this.setState({ visible: false });
-                        }}
-                        style={{ width: '12rem' }}
-                        css={tw`absolute bg-white p-2 rounded border border-neutral-700 shadow-lg text-neutral-500 z-50`}
-                    >
-                        {this.props.children}
-                    </div>
-                </Fade>
+                <Portal>
+                    <Fade timeout={150} in={this.state.visible} unmountOnExit>
+                        <div
+                            ref={this.menu}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                this.setState({ visible: false });
+                            }}
+                            style={{ width: '12rem' }}
+                            css={tw`fixed bg-white p-2 rounded border border-neutral-700 shadow-lg text-neutral-500 z-50`}
+                        >
+                            {this.props.children}
+                        </div>
+                    </Fade>
+                </Portal>
             </div>
         );
     }

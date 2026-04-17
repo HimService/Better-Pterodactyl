@@ -54,6 +54,7 @@ const terminalProps: ITerminalOptions = {
     fontFamily: th('fontFamily.mono'),
     rows: 30,
     theme: theme,
+    convertEol: true,
 };
 
 export default () => {
@@ -82,25 +83,32 @@ export default () => {
         z-index: 10;
     }`;
 
-    const handleConsoleOutput = (line: string, prelude = false) =>
-        terminal.writeln((prelude ? TERMINAL_PRELUDE : '') + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m');
+    const handleConsoleOutput = (line: string, prelude = false) => {
+        if (prelude) {
+            terminal.write('\r\n' + TERMINAL_PRELUDE + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m\r\n');
+        } else {
+            // Check if the line ends with a newline character, if not, append \r\n
+            const output = line.endsWith('\n') ? line.replace(/\n$/, '\r\n') : (line.endsWith('\r') ? line : line + '\r\n');
+            terminal.write(output);
+        }
+    };
 
     const handleTransferStatus = (status: string) => {
         switch (status) {
             // Sent by either the source or target node if a failure occurs.
             case 'failure':
-                terminal.writeln('\r' + TERMINAL_PRELUDE + t('server.console.transfer_failed', 'Transfer has failed.') + '\u001b[0m');
+                terminal.write('\r' + TERMINAL_PRELUDE + t('server.console.transfer_failed', 'Transfer has failed.') + '\u001b[0m\r\n');
                 return;
         }
     };
 
     const handleDaemonErrorOutput = (line: string) =>
-        terminal.writeln(
-            '\r' + TERMINAL_PRELUDE + '\u001b[1m\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/i, '') + '\u001b[0m'
+        terminal.write(
+            '\r\n' + TERMINAL_PRELUDE + '\u001b[1m\u001b[41m' + line.replace(/(?:\r\n|\r|\n)$/i, '') + '\u001b[0m\r\n'
         );
 
     const handlePowerChangeEvent = (state: string) =>
-        terminal.writeln('\r' + TERMINAL_PRELUDE + t('server.console.server_status', 'Server marked as {{status}}...', { status: state }) + '\u001b[0m');
+        terminal.write('\r\n' + TERMINAL_PRELUDE + t('server.console.server_status', 'Server marked as {{status}}...', { status: state }) + '\u001b[0m\r\n');
 
     const handleCommandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'ArrowUp') {

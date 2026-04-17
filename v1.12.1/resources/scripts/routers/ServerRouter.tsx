@@ -158,7 +158,7 @@ export default () => {
                                         </div>
                                     </SubNavigation>
                                 </CSSTransition>
-                                {inConflictState && (!rootAdmin || (rootAdmin && !location.pathname.endsWith(`/server/${id}`))) ? (
+                                {inConflictState && (!rootAdmin || (rootAdmin && !location.pathname.endsWith(`/server/${id}`))) && ServerContext.useStoreState(state => state.server.data?.status) !== 'installing' ? (
                                     <ConflictStateRenderer />
                                 ) : (
                                     <ErrorBoundary>
