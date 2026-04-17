@@ -270,7 +270,9 @@
       "task_unknown": "未知動作",
       "ignoring_files": "忽略的檔案和資料夾：",
       "continues_on_failure": "失敗時繼續",
-      "seconds_later": "秒後"
+      "seconds_later": "秒後",
+      "status_online_only": "僅在伺服器啟動時執行",
+      "status_always": "任何狀態皆執行"
     },
     "startup": {
       "header": "啟動設定",

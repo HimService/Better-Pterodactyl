@@ -270,7 +270,9 @@
             "task_unknown": "Unknown Action",
             "ignoring_files": "Ignoring files and folders:",
             "continues_on_failure": "Continues on Failure",
-            "seconds_later": "seconds later"
+            "seconds_later": "seconds later",
+            "status_online_only": "Online only",
+            "status_always": "Always"
         },
         "startup": {
             "header": "Startup Settings",
