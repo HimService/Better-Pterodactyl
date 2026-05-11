@@ -272,7 +272,19 @@
             "continues_on_failure": "Continues on Failure",
             "seconds_later": "seconds later",
             "status_online_only": "Online only",
-            "status_always": "Always"
+            "status_always": "Always",
+            "conditions_header": "Smart Execution Conditions",
+            "conditions_description": "Only execute this schedule if the following conditions are met.",
+            "add_condition": "Add Condition",
+            "condition_variable": "Variable",
+            "condition_operator": "Operator",
+            "condition_value": "Value",
+            "logic_and": "AND",
+            "logic_or": "OR",
+            "var_players": "Players Online",
+            "var_cpu": "CPU Usage (%)",
+            "var_memory": "Memory Usage (%)",
+            "var_uptime": "Uptime (Seconds)"
         },
         "startup": {
             "header": "Startup Settings",
@@ -521,7 +533,8 @@
         "activity_log": "Activity Log",
         "api_credentials": "API Credentials",
         "ssh_keys": "SSH Keys",
-        "activity": "Activity Log"
+        "activity": "Activity Log",
+        "support_tickets": "Support Tickets"
     },
     "dashboard": {
         "account_api": {
@@ -1258,6 +1271,29 @@
             "open": "Open",
             "resolved": "Resolved",
             "closed": "Closed"
+        }
+    },
+    "console": {
+        "installing": "The system is installing the server environment...",
+        "processing": "Processing...",
+        "active": "Active",
+        "system_process": "System Process",
+        "steps": {
+            "downloading": "Downloading data",
+            "extracting": "Extracting files",
+            "pulling": "Pulling images",
+            "pushing": "Pushing images",
+            "verifying": "Verifying integrity",
+            "installing": "Executing installation",
+            "checksum": "Checking checksums",
+            "waiting": "Waiting for response",
+            "cleanup": "Cleaning up cache"
+        },
+        "status": {
+            "download_complete": "Download complete",
+            "pull_complete": "Pull complete",
+            "install_complete": "Installation successful",
+            "image_ready": "Image ready"
         }
     }
 }

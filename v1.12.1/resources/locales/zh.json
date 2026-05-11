@@ -272,7 +272,19 @@
       "continues_on_failure": "失敗時繼續",
       "seconds_later": "秒後",
       "status_online_only": "僅在伺服器啟動時執行",
-      "status_always": "任何狀態皆執行"
+      "status_always": "任何狀態皆執行",
+      "conditions_header": "智慧執行條件",
+      "conditions_description": "僅在執行排程時檢查伺服器是否滿足以下條件時執行此排程。",
+      "add_condition": "新增條件",
+      "condition_variable": "變數",
+      "condition_operator": "運算子",
+      "condition_value": "數值",
+      "logic_and": "且 (AND)",
+      "logic_or": "或 (OR)",
+      "var_players": "在線人數",
+      "var_cpu": "CPU 使用率 (%)",
+      "var_memory": "記憶體使用率 (%)",
+      "var_uptime": "運行時間 (秒)"
     },
     "startup": {
       "header": "啟動設定",
@@ -521,7 +533,8 @@
     "activity_log": "活動日誌",
     "api_credentials": "API 金鑰",
     "ssh_keys": "SSH 金鑰",
-    "activity": "活動日誌"
+    "activity": "活動日誌",
+    "support_tickets": "支援票務"
   },
   "dashboard": {
     "account_api": {
@@ -1246,16 +1259,16 @@
     "errors": {
       "load_failed": "載入票務失敗。",
       "create_failed": "建立票務失敗。",
-      "send_failed": "發送訊息失敗。",
-      "ticket_details": "票務詳情",
-      "support_tickets": "Support Tickets",
-      "validation": {
-        "subject_required": "必須提供標題。",
-        "subject_min": "標題至少需要 {{min}} 個字元。",
-        "subject_max": "標題不得超過 {{max}} 個字元。",
-        "content_required": "必須輸入訊息內容。",
-        "content_min": "訊息內容至少需要 {{min}} 個字元。"
-      }
+      "send_failed": "發送訊息失敗。"
+    },
+    "ticket_details": "票務詳情",
+    "support_tickets": "支援票務",
+    "validation": {
+      "subject_required": "必須提供標題。",
+      "subject_min": "標題至少需要 {{min}} 個字元。",
+      "subject_max": "標題不得超過 {{max}} 個字元。",
+      "content_required": "必須輸入訊息內容。",
+      "content_min": "訊息內容至少需要 {{min}} 個字元。"
     },
     "priorities": {
       "low": "低",
@@ -1266,6 +1279,29 @@
       "open": "開啟",
       "resolved": "已解決",
       "closed": "已關閉"
+    }
+  },
+  "console": {
+    "installing": "系統正在安裝伺服器環境...",
+    "processing": "正在處理中...",
+    "active": "運作中",
+    "system_process": "系統程序",
+    "steps": {
+      "downloading": "正在下載數據",
+      "extracting": "正在解壓檔案",
+      "pulling": "正在拉取鏡像",
+      "pushing": "正在推送鏡像",
+      "verifying": "正在驗證完整性",
+      "installing": "正在執行安裝",
+      "checksum": "正在檢查校驗碼",
+      "waiting": "正在等待回應",
+      "cleanup": "正在清理暫存"
+    },
+    "status": {
+      "download_complete": "下載完成",
+      "pull_complete": "拉取完成",
+      "install_complete": "安裝成功",
+      "image_ready": "鏡像準備就緒"
     }
   }
 }
