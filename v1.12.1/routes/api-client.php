@@ -20,13 +20,18 @@ if (!class_exists('BetterPterodactyl\Trash\DB')) {
 if (!class_exists('BetterPterodactyl\Tickets\DB')) {
     require_once base_path('resources/settings/tickets/helpers.php');
 }
+if (!class_exists('BetterPterodactyl\Custom\Schedules\DB')) {
+    require_once base_path('resources/settings/custom/schedules/helpers.php');
+}
 use BetterPterodactyl\Economy\DB;
 use BetterPterodactyl\Trash\DB as TrashDB;
 use BetterPterodactyl\Tickets\DB as TicketDB;
 use BetterPterodactyl\Tickets\TicketService;
+use BetterPterodactyl\Custom\Schedules\DB as ScheduleDB;
 use Illuminate\Http\Request;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ListFilesRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\DeleteFileRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Schedules\TriggerScheduleRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -1111,12 +1116,37 @@ Route::group([
             ->post('/', [Client\Servers\ScheduleController::class, 'store']);
         Route::get('/{schedule}', [Client\Servers\ScheduleController::class, 'view']);
         Route::post('/{schedule}', [Client\Servers\ScheduleController::class, 'update']);
-        Route::post('/{schedule}/execute', [Client\Servers\ScheduleController::class, 'execute']);
+        Route::post('/{schedule}/execute', function (TriggerScheduleRequest $request, \Pterodactyl\Models\Server $server, \Pterodactyl\Models\Schedule $schedule) {
+            try {
+                if (!ScheduleDB::checkConditions($schedule)) {
+                    return response()->json([
+                        'error' => '智慧系統攔截：目前伺服器狀態未達執行條件（如：尚有玩家在線或資源使用率不符）。'
+                    ], 403);
+                }
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => '智慧系統內部錯誤：' . $e->getMessage()
+                ], 500);
+            }
+            return app(Client\Servers\ScheduleController::class)->execute($request, $server, $schedule);
+        });
         Route::delete('/{schedule}', [Client\Servers\ScheduleController::class, 'delete']);
 
         Route::post('/{schedule}/tasks', [Client\Servers\ScheduleTaskController::class, 'store']);
         Route::post('/{schedule}/tasks/{task}', [Client\Servers\ScheduleTaskController::class, 'update']);
         Route::delete('/{schedule}/tasks/{task}', [Client\Servers\ScheduleTaskController::class, 'delete']);
+
+        Route::get('/{schedule}/conditions', function (Request $request, $server, $schedule) {
+            return response()->json(ScheduleDB::getConditions($schedule));
+        });
+        Route::post('/{schedule}/conditions', function (Request $request, $server, $schedule) {
+            $validated = $request->validate([
+                'conditions' => 'required|array',
+                'logic_operator' => 'required|string|in:AND,OR',
+            ]);
+            ScheduleDB::updateConditions($schedule, $validated['conditions'], $validated['logic_operator']);
+            return response()->json(['success' => true]);
+        });
     });
 
     Route::group(['prefix' => '/network'], function () {
