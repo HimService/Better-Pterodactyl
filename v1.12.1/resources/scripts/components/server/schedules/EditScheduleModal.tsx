@@ -15,6 +15,11 @@ import asModal from '@/hoc/asModal';
 import Switch from '@/components/elements/Switch';
 import ScheduleCheatsheetCards from '@/components/server/schedules/ScheduleCheatsheetCards';
 import { useTranslation } from 'react-i18next';
+import getScheduleConditions, { ScheduleCondition } from '@/api/server/schedules/getScheduleConditions';
+import updateScheduleConditions from '@/api/server/schedules/updateScheduleConditions';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faTrash, faRobot } from '@fortawesome/free-solid-svg-icons';
+import Select from '@/components/elements/Select';
 
 interface Props {
     schedule?: Schedule;
@@ -40,11 +45,37 @@ const EditScheduleModal = ({ schedule }: Props) => {
     const appendSchedule = ServerContext.useStoreActions((actions) => actions.schedules.appendSchedule);
     const [showCheatsheet, setShowCheetsheet] = useState(false);
 
+    const [conditions, setConditions] = useState<ScheduleCondition[]>([]);
+    const [logicOperator, setLogicOperator] = useState<'AND' | 'OR'>('AND');
+
     useEffect(() => {
+        if (schedule) {
+            getScheduleConditions(uuid, schedule.id)
+                .then(data => {
+                    setConditions(data.conditions);
+                    setLogicOperator(data.logic_operator);
+                })
+                .catch(err => console.error('Failed to fetch schedule conditions:', err));
+        }
+
         return () => {
             clearFlashes('schedule:edit');
         };
-    }, []);
+    }, [schedule]);
+
+    const addCondition = () => {
+        setConditions([...conditions, { variable: 'cpu_usage', operator: '==', value: 0 }]);
+    };
+
+    const removeCondition = (index: number) => {
+        setConditions(conditions.filter((_, i) => i !== index));
+    };
+
+    const updateCondition = (index: number, key: keyof ScheduleCondition, value: any) => {
+        const newConditions = [...conditions];
+        newConditions[index] = { ...newConditions[index], [key]: value };
+        setConditions(newConditions);
+    };
 
     const submit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
         clearFlashes('schedule:edit');
@@ -61,6 +92,10 @@ const EditScheduleModal = ({ schedule }: Props) => {
             onlyWhenOnline: values.onlyWhenOnline,
             isActive: values.enabled,
         })
+            .then(async (newSchedule) => {
+                await updateScheduleConditions(uuid, newSchedule.id, conditions, logicOperator);
+                return newSchedule;
+            })
             .then((schedule) => {
                 setSubmitting(false);
                 appendSchedule(schedule);
@@ -136,6 +171,88 @@ const EditScheduleModal = ({ schedule }: Props) => {
                             description={t('server.schedules.enabled_description', 'This schedule will be executed automatically if enabled.')}
                             label={t('server.schedules.enabled_label', 'Schedule Enabled')}
                         />
+                    </div>
+
+                    <div css={tw`mt-6 p-6 rounded-xl border border-neutral-800 bg-neutral-900/50 backdrop-blur-md`}>
+                        <div css={tw`flex items-center justify-between mb-4`}>
+                            <div css={tw`flex items-center gap-3`}>
+                                <div css={tw`p-2 rounded-lg bg-purple-500 bg-opacity-10 text-purple-400`}>
+                                    <FontAwesomeIcon icon={faRobot} />
+                                </div>
+                                <div>
+                                    <h4 css={tw`text-neutral-100 font-bold`}>{t('server.schedules.conditions_header', 'Smart Conditions')}</h4>
+                                    <p css={tw`text-xs text-neutral-400`}>{t('server.schedules.conditions_description', 'Only execute if these conditions are met.')}</p>
+                                </div>
+                            </div>
+                            <Button.Text type={'button'} css={tw`text-xs px-3 py-1!`} onClick={addCondition}>
+                                <FontAwesomeIcon icon={faPlus} css={tw`mr-2`} />
+                                {t('server.schedules.add_condition', 'Add')}
+                            </Button.Text>
+                        </div>
+
+                        {conditions.length > 0 && (
+                            <div css={tw`space-y-3`}>
+                                <div css={tw`flex items-center gap-4 mb-4`}>
+                                    <span css={tw`text-xs text-neutral-400 uppercase font-bold tracking-wider`}>Logic Operator</span>
+                                    <div css={tw`flex gap-2`}>
+                                        {['AND', 'OR'].map(op => (
+                                            <button
+                                                key={op}
+                                                type="button"
+                                                onClick={() => setLogicOperator(op as any)}
+                                                css={[
+                                                    tw`px-3 py-1 rounded-md text-xs font-bold transition-all`,
+                                                    logicOperator === op ? tw`bg-purple-600 text-white shadow-lg` : tw`bg-neutral-800 text-neutral-400 hover:bg-neutral-700`
+                                                ]}
+                                            >
+                                                {t(`server.schedules.logic_${op.toLowerCase()}`)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {conditions.map((condition, index) => (
+                                    <div key={index} className="group" css={tw`flex items-center gap-3 bg-neutral-800/50 p-3 rounded-lg border border-neutral-700/50`}>
+                                        <div css={tw`flex-1 grid grid-cols-3 gap-3`}>
+                                            <Select
+                                                value={condition.variable}
+                                                onChange={e => updateCondition(index, 'variable', e.target.value)}
+                                                css={tw`bg-neutral-900! border-neutral-700! text-sm!`}
+                                            >
+                                                <option value="cpu_usage">{t('server.schedules.var_cpu')}</option>
+                                                <option value="memory_usage">{t('server.schedules.var_memory')}</option>
+                                                <option value="uptime">{t('server.schedules.var_uptime')}</option>
+                                            </Select>
+                                            <Select
+                                                value={condition.operator}
+                                                onChange={e => updateCondition(index, 'operator', e.target.value)}
+                                                css={tw`bg-neutral-900! border-neutral-700! text-sm! font-mono!`}
+                                            >
+                                                <option value="==">==</option>
+                                                <option value="!=">!=</option>
+                                                <option value=">">&gt;</option>
+                                                <option value="<">&lt;</option>
+                                                <option value=">=">&gt;=</option>
+                                                <option value="<=">&lt;=</option>
+                                            </Select>
+                                            <input
+                                                type="number"
+                                                value={condition.value}
+                                                onChange={e => updateCondition(index, 'value', Number(e.target.value))}
+                                                css={tw`w-full bg-neutral-900 border border-neutral-700 rounded-md px-3 py-1.5 text-sm text-neutral-100 outline-none focus:border-purple-500 transition-colors`}
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeCondition(index)}
+                                            css={tw`p-2 text-neutral-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100`}
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     <div css={tw`mt-6 text-right`}>
                         <Button className={'w-full sm:w-auto'} type={'submit'} disabled={isSubmitting}>
