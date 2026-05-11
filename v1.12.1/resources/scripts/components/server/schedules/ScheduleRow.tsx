@@ -1,14 +1,26 @@
 import React from 'react';
 import { Schedule } from '@/api/server/schedules/getServerSchedules';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBolt, faCalendarAlt, faGlobe } from '@fortawesome/free-solid-svg-icons';
+import { faBolt, faCalendarAlt, faGlobe, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
 import tw from 'twin.macro';
 import ScheduleCronRow from '@/components/server/schedules/ScheduleCronRow';
 import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';
+import getScheduleConditions from '@/api/server/schedules/getScheduleConditions';
+import { ServerContext } from '@/state/server';
 
 export default ({ schedule }: { schedule: Schedule }) => {
     const { t } = useTranslation();
+    const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
+    const [hasConditions, setHasConditions] = useState(false);
+
+    useEffect(() => {
+        getScheduleConditions(uuid, schedule.id)
+            .then(data => setHasConditions(data.conditions.length > 0))
+            .catch(() => setHasConditions(false));
+    }, [schedule.id]);
+
     return (
         <>
             <div className="icon hidden md:flex">
@@ -53,6 +65,24 @@ export default ({ schedule }: { schedule: Schedule }) => {
                         >
                             <FontAwesomeIcon icon={faBolt} css={tw`mr-1.5 text-[9px]`} />
                             {t('server.schedules.status_always', 'Always')}
+                        </div>
+                    )}
+                    {hasConditions && (
+                        <div
+                            translate="no"
+                            css={[
+                                tw`flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider transition-all duration-300 ml-2`,
+                                tw`border text-purple-400`,
+                                {
+                                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                                    borderColor: 'rgba(139, 92, 246, 0.3)',
+                                    backdropFilter: 'blur(8px)',
+                                    boxShadow: '0 0 10px rgba(139, 92, 246, 0.1)',
+                                },
+                            ]}
+                        >
+                            <FontAwesomeIcon icon={faRobot} css={tw`mr-1.5 text-[9px]`} />
+                            {t('server.schedules.conditions_header', 'Smart')}
                         </div>
                     )}
                 </div>
