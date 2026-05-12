@@ -1298,7 +1298,7 @@
       "cleanup": "正在清理暫存"
     },
     "status": {
-      "download_complete": "下載完成",
+      "download_complete": "完成",
       "pull_complete": "拉取完成",
       "install_complete": "安裝成功",
       "image_ready": "鏡像準備就緒"

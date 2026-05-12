@@ -988,7 +988,7 @@
             "cleanup": "キャッシュをクリーンアップ中"
         },
         "status": {
-            "download_complete": "ダウンロード完了",
+            "download_complete": "完了",
             "pull_complete": "プル完了",
             "install_complete": "インストール成功",
             "image_ready": "イメージ準備完了"

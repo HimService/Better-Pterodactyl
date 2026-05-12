@@ -1290,7 +1290,7 @@
             "cleanup": "Cleaning up cache"
         },
         "status": {
-            "download_complete": "Download complete",
+            "download_complete": "Complete",
             "pull_complete": "Pull complete",
             "install_complete": "Installation successful",
             "image_ready": "Image ready"
