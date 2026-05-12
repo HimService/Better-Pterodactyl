@@ -84,9 +84,9 @@ export default () => {
         z-index: 10;
     }`;
     const [currentProgress, setCurrentProgress] = useState<string | null>(null);
-    const [isMinimized, setIsMinimized] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(true);
     const [isHiddenByUser, setIsHiddenByUser] = useState(false);
-    const [position, setPosition] = useState({ x: 20, y: 20 }); // Position from top-right
+    const [position, setPosition] = useState({ x: 20, y: 20 });
     const [isDragging, setIsDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
@@ -121,6 +121,17 @@ export default () => {
         };
     }, [isDragging, dragOffset]);
 
+    // 狀態同步：當伺服器狀態變動時更新提示，且不自動關閉
+    useEffect(() => {
+        if (status === 'running') {
+            setCurrentProgress(t('dashboard.server_row.running', 'Running'));
+            setIsHiddenByUser(false);
+        } else if (status === 'offline') {
+            setCurrentProgress(t('dashboard.server_row.offline', 'Offline'));
+            // 注意：這裡不強制重置 isHiddenByUser，尊重用戶在運行期間的關閉選擇
+        }
+    }, [status]);
+
     const handleConsoleOutput = (line: string, prelude = false) => {
         // 清理 ANSI 代碼以進行純文字分析
         const cleanLine = line.replace(/\u001b\[[0-9;]*[a-zA-Z]/g, '').trim();
@@ -131,16 +142,35 @@ export default () => {
             'Verifying', 'Loading', 'Checksum', 'Waiting', 'Cleanup'
         ];
         
-        // 判斷是否為進度型行：必須是關鍵字開頭且長度較短（排除 Daemon 的長句提示）
-        // 或者是包含進度條特徵的行
-        const isProgressStep = progressKeywords.some(kw => 
-            (cleanLine === kw || cleanLine.startsWith(kw + ':')) && cleanLine.length < 40
+        // 判斷是否為伺服器內部日誌 (例如 Minecraft 的 [09:14:28] INFO...)
+        const isServerLog = /^\[\d{2}:\d{2}:\d{2}\]/.test(cleanLine);
+        
+        // 判斷是否為進度型行：必須是關鍵字開頭，且長度合理
+        // 智能過濾：如果伺服器已在運行中，單純的關鍵字通常是用戶輸入，而非進度
+        const isProgressStep = !isServerLog && progressKeywords.some(kw => {
+            const isExactMatch = cleanLine === kw;
+            if (isExactMatch && status === 'running') return false;
+
+            return (isExactMatch || cleanLine.startsWith(kw + ':') || cleanLine.startsWith(kw + ' ') || cleanLine.startsWith(kw + '...')) 
+                && cleanLine.length < 60;
+        });
+        
+        // 優化進度條判斷：排除包含字母數字的時間戳記 [12:34:56]，只匹配包含進度符號的方括號
+        const hasOriginalBar = !isServerLog && /\[[=#>\-\s]{5,}\]/.test(line);
+        
+        // 優化完成判定：同樣在運行中排除單純的關鍵字回顯
+        const isCompletion = !isServerLog && (
+            (cleanLine.includes('complete') && (status !== 'running' || cleanLine.length > 10)) || 
+            cleanLine.includes('Success') || 
+            cleanLine.includes('finished')
         );
-        const hasOriginalBar = line.includes('[') && line.includes(']');
-        const isCompletion = cleanLine.includes('complete') || cleanLine.includes('Success') || cleanLine.includes('finished');
+        
+        // 判斷是否為指令回顯 (Echo Filtering)：避免用戶手動輸入關鍵字誤觸 UI
+        const isEcho = line.includes('container@pterodactyl~');
 
         // 更新 Overlay 進度狀態 (用於視覺化 UI)
-        if (isProgressStep || hasOriginalBar) {
+        // 排除指令回顯、伺服器日誌與 Daemon 前綴訊息
+        if (!isEcho && !isServerLog && !prelude && (isProgressStep || (hasOriginalBar && cleanLine.length < 100))) {
             if (cleanLine.length > 3) {
                 // 將關鍵字翻譯為本地語言
                 let displayStatus = cleanLine;
@@ -158,7 +188,7 @@ export default () => {
                 }
 
                 if (progressTimerRef.current) clearTimeout(progressTimerRef.current);
-                progressTimerRef.current = setTimeout(() => setCurrentProgress(null), 10000);
+                progressTimerRef.current = setTimeout(() => setCurrentProgress(null), 300000);
             }
         }
 
@@ -166,16 +196,15 @@ export default () => {
             terminal.write('\r\n' + TERMINAL_PRELUDE + line.replace(/(?:\r\n|\r|\n)$/im, '') + '\u001b[0m\r\n');
             lastStepRef.current = null;
         } else {
-            // --- 智能進度條聚合邏輯 (解決 Debug Log 中的重複輸出問題) ---
-            if (isProgressStep && !hasOriginalBar && !isCompletion) {
+            // --- 智能進度條聚合邏輯 ---
+            // 排除指令回顯與伺服器日誌，確保手動輸入不會被改寫為進度條
+            if (!isEcho && !isServerLog && isProgressStep && !hasOriginalBar && !isCompletion) {
                 const activeStep = progressKeywords.find(kw => cleanLine.startsWith(kw)) || cleanLine;
                 const translatedStep = t(`console.steps.${activeStep.toLowerCase().replace(' ', '_')}`, activeStep);
                 
                 if (lastStepRef.current === activeStep) {
-                    // 同步進度：增加進度條長度
                     stepProgressRef.current = Math.min(stepProgressRef.current + 1, 40);
                 } else {
-                    // 切換步驟：強制填滿上一個進度條並換行
                     if (lastStepRef.current !== null) {
                         const barSize = 20;
                         const bar = '\u2588'.repeat(barSize);
@@ -186,22 +215,18 @@ export default () => {
                     lastStepRef.current = activeStep;
                 }
 
-                // 產生美化的文字進度條 [###---]
                 const barSize = 20;
                 const filledSize = Math.floor((stepProgressRef.current / 40) * barSize);
                 const bar = '\u2588'.repeat(filledSize) + '\u2591'.repeat(barSize - filledSize);
-                
-                // 使用 ANSI \r 覆寫當前行，並加上顏色與動態圖標
                 const spinner = ['\u25d0', '\u25d3', '\u25d1', '\u25d2'][stepProgressRef.current % 4];
                 const processingText = t('console.processing', 'Processing');
                 terminal.write(`\r \u001b[38;5;39m${spinner} ${translatedStep}\u001b[0m [${bar}] \u001b[38;5;244m${processingText}...\u001b[0m \r`);
                 return;
             }
 
-            // 當收到完成訊息或普通訊息時，結束當前進度條追蹤
+            // 完成狀態清理
             if (isCompletion || (cleanLine.length > 0 && !isProgressStep && !line.includes('\r'))) {
                 if (lastStepRef.current) {
-                    // 如果是完成訊息，顯示滿格進度條
                     const barSize = 20;
                     const bar = '\u2588'.repeat(barSize);
                     const translatedStep = t(`console.steps.${lastStepRef.current.toLowerCase().replace(' ', '_')}`, lastStepRef.current);
@@ -210,7 +235,7 @@ export default () => {
                 }
             }
 
-            // 為 "Download complete" 等訊息添加綠色高亮與翻譯
+            // 處理特殊關鍵字高亮
             let output = line;
             if (cleanLine === 'Download complete') {
                 output = `\r\u001b[1;32m${t('console.status.download_complete', 'Download complete')}\u001b[0m\r\n`;
@@ -220,13 +245,15 @@ export default () => {
                 output = `\r\u001b[1;33m${t('console.steps.checksum', 'Verifying Checksum')}\u001b[0m\r\n`;
             }
 
-            // 優化輸出：保留原始的 \r 更新邏輯（如已有的進度條）
-            if (output.includes('\r') || hasOriginalBar) {
-                terminal.write(output);
-            } else {
-                const formatted = output.endsWith('\n') ? output.replace(/\n$/, '\r\n') : (output.endsWith('\r') ? output : output + '\r\n');
-                terminal.write(formatted);
+            // --- 換行處理邏輯 ---
+            let formatted = output.replace(/\r?\n/g, '\r\n');
+            
+            // 如果不是原地更新 (\r)，且行尾沒有換行，則強制補上
+            if (!output.endsWith('\r') && !output.endsWith('\n') && !hasOriginalBar) {
+                formatted += '\r\n';
             }
+
+            terminal.write(formatted);
         }
     };
 
@@ -279,15 +306,19 @@ export default () => {
     useEffect(() => {
         if (serverUuid) {
             http.get(`/api/client/servers/${serverUuid}/shortcuts`)
-                .then(({ data }) => setShortcuts(data))
-                .catch(error => console.error('Failed to fetch shortcuts:', error));
+                .then(({ data }) => setShortcuts(Array.isArray(data) ? data : []))
+                .catch(error => {
+                    console.error('Failed to fetch shortcuts:', error);
+                    setShortcuts([]);
+                });
         }
     }, [serverUuid]);
 
     const saveShortcuts = (newShortcuts: any[]) => {
         if (!serverUuid) return;
-        setShortcuts(newShortcuts);
-        http.post(`/api/client/servers/${serverUuid}/shortcuts`, { shortcuts: newShortcuts })
+        const safeShortcuts = Array.isArray(newShortcuts) ? newShortcuts : [];
+        setShortcuts(safeShortcuts);
+        http.post(`/api/client/servers/${serverUuid}/shortcuts`, { shortcuts: safeShortcuts })
             .catch(error => console.error('Failed to save shortcuts:', error));
     };
 
@@ -412,20 +443,28 @@ export default () => {
                         >
                             {isMinimized ? (
                                 /* Minimized Bubble Mode */
-                                <div 
-                                    onClick={() => setIsMinimized(false)}
-                                    onMouseDown={handleMouseDown}
-                                    className={'group flex items-center gap-3 bg-black/80 backdrop-blur-xl border border-white/20 p-2 rounded-full shadow-2xl cursor-grab hover:scale-110 active:scale-95 transition-all'}
-                                >
-                                    <div className={classNames('w-3 h-3 rounded-full animate-pulse', {
-                                        'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]': status === 'running',
-                                        'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)]': status === 'starting' || status === 'installing',
-                                        'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]': status === 'stopping' || status === 'offline',
-                                        'bg-gray-500': !status,
-                                    })}></div>
-                                    <span className={'text-[10px] font-mono text-white/70 group-hover:text-white transition-colors pr-2'}>
-                                        {status ? t(`dashboard.server_row.${status}`, t(`console.${status}`, status.toUpperCase())) : t('console.active')}
-                                    </span>
+                                <div className={'flex items-center gap-1'}>
+                                    <div 
+                                        onClick={() => setIsMinimized(false)}
+                                        onMouseDown={handleMouseDown}
+                                        className={'group flex items-center gap-3 bg-black/80 backdrop-blur-xl border border-white/20 p-2 rounded-full shadow-2xl cursor-grab hover:scale-110 active:scale-95 transition-all'}
+                                    >
+                                        <div className={classNames('w-3 h-3 rounded-full animate-pulse', {
+                                            'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]': status === 'running',
+                                            'bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.6)]': status === 'starting' || status === 'installing',
+                                            'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]': status === 'stopping' || status === 'offline' || status === 'suspended',
+                                            'bg-gray-500': !status,
+                                        })}></div>
+                                        <span className={'text-[10px] font-mono text-white/70 group-hover:text-white transition-colors pr-2'}>
+                                            {status ? t(`dashboard.server_row.${status}`, t(`console.${status}`, status.toUpperCase())) : t('console.active')}
+                                        </span>
+                                    </div>
+                                    <button 
+                                        onClick={() => setIsHiddenByUser(true)}
+                                        className={'p-2 bg-black/60 backdrop-blur-xl border border-white/10 rounded-full text-white/30 hover:text-red-400 hover:bg-red-500/20 transition-all shadow-xl'}
+                                    >
+                                        <svg className={'w-3 h-3'} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
                                 </div>
                             ) : (
                                 /* Full Window Mode */
@@ -475,25 +514,27 @@ export default () => {
                                             })}>
                                                 {status ? t(`dashboard.server_row.${status}`, t(`console.${status}`, status.toUpperCase())) : t('console.active')}
                                             </span>
-                                            <span className={'text-[8px] text-white/30 uppercase tracking-tighter'}>Better Pterodactyl Kernel</span>
+                                            <span className={'text-[8px] text-white/30 tracking-tighter'}>Better Pterodactyl</span>
                                         </div>
                                         <div className={'text-xs font-mono text-white/90 truncate mb-4 font-semibold'}>
                                             {currentProgress}
                                         </div>
-                                        <div className={'h-1.5 w-full bg-white/5 rounded-full overflow-hidden'}>
-                                            <div 
-                                                className={'h-full bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-400 rounded-full transition-all duration-500 relative'}
-                                                style={{ 
-                                                    width: currentProgress.includes('100%') || currentProgress.includes('complete')
-                                                        ? '100%'
-                                                        : (currentProgress.includes('%') 
-                                                            ? `${currentProgress.match(/(\d+)%/)?.[1] || 100}%` 
-                                                            : (currentProgress.includes('[') ? `${Math.min((currentProgress.match(/[=#\u2588]/g)?.length || 0) * 2.5, 100)}%` : '100%'))
-                                                }}
-                                            >
-                                                <div className={'absolute top-0 left-0 w-full h-full bg-white/20 animate-shimmer'} style={{ backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)' }}></div>
+                                        {status !== 'running' && status !== 'offline' && status !== 'suspended' && (
+                                            <div className={'h-1.5 w-full bg-white/5 rounded-full overflow-hidden'}>
+                                                <div 
+                                                    className={'h-full bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-400 rounded-full transition-all duration-500 relative'}
+                                                    style={{ 
+                                                        width: currentProgress.includes('100%') || currentProgress.includes('complete')
+                                                            ? '100%'
+                                                            : (currentProgress.includes('%') 
+                                                                ? `${currentProgress.match(/(\d+)%/)?.[1] || 100}%` 
+                                                                : (currentProgress.includes('[') ? `${Math.min((currentProgress.match(/[=#\u2588]/g)?.length || 0) * 2.5, 100)}%` : '100%'))
+                                                    }}
+                                                >
+                                                    <div className={'absolute top-0 left-0 w-full h-full bg-white/20 animate-shimmer'} style={{ backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)' }}></div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             )}
