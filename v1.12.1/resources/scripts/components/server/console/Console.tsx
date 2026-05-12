@@ -429,8 +429,8 @@ export default () => {
                 <div className={'h-full relative'}>
                     <div id={'terminal-container'} ref={ref} />
                     
-                    {/* Floating Task Window - Draggable, Minimizable, Closable */}
-                    {currentProgress && !isHiddenByUser && (
+                    {/* Floating Task Window - Always visible monitor until manually hidden */}
+                    {!isHiddenByUser && (
                         <div 
                             className={classNames('absolute z-50 animate-in fade-in zoom-in-95 duration-500 select-none', {
                                 'cursor-grabbing': isDragging,
@@ -517,9 +517,9 @@ export default () => {
                                             <span className={'text-[8px] text-white/30 tracking-tighter'}>Better Pterodactyl</span>
                                         </div>
                                         <div className={'text-xs font-mono text-white/90 truncate mb-4 font-semibold'}>
-                                            {currentProgress}
+                                            {currentProgress || (status ? t(`dashboard.server_row.${status}`, t(`console.${status}`, status.toUpperCase())) : t('console.active'))}
                                         </div>
-                                        {status !== 'running' && status !== 'offline' && status !== 'suspended' && (
+                                        {status !== 'running' && status !== 'offline' && status !== 'suspended' && currentProgress && (
                                             <div className={'h-1.5 w-full bg-white/5 rounded-full overflow-hidden'}>
                                                 <div 
                                                     className={'h-full bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-400 rounded-full transition-all duration-500 relative'}
